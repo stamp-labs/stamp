@@ -75,17 +75,26 @@ router.get('/avatar/:id', async (req, res) => {
   if (!stream) stream = await getBlockie(address);
 
   // Resize image
-  const src = stream.pipe(
-    sharp()
-      .resize(w, h)
-      .webp({ lossless: true })
-  );
-  src.pipe(res);
+  let src;
+  try {
+    src = stream.pipe(
+      sharp()
+        .resize(w, h)
+        .webp({ lossless: true })
+    );
+    src.pipe(res);
+  } catch (e) {
+    console.log('Resize failed', e);
+  }
 
   // Store cache
-  const buff = await src.toBuffer();
-  await set(key, buff);
-  console.log('Stored cache');
+  try {
+    const buff = await src.toBuffer();
+    await set(key, buff);
+    console.log('Stored cache');
+  } catch (e) {
+    console.log('Store cache failed', e);
+  }
 });
 
 export default router;
