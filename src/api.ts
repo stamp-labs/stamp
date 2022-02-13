@@ -55,8 +55,11 @@ router.get('/avatar/:id', async (req, res) => {
   const data: any = await get(key);
   if (data) {
     console.log('Got cache');
-    const contentType = 'image/webp';
-    res.set({ 'Content-Type': contentType });
+    res.set({
+      'Content-Type': 'image/webp',
+      'Cache-Control': 'public, max-age=86400',
+      Expires: new Date(Date.now() + 86400000).toUTCString()
+    });
     return data.pipe(res);
   }
 
