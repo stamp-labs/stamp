@@ -21,7 +21,7 @@ async function getEnsName(network, address) {
 async function getBlockie(address) {
   const canvas = createCanvas(64, 64);
   renderIcon({ seed: address, scale: 64 }, canvas);
-  return canvas.createPNGStream({ compressionLevel: 0, resolution: 100 });
+  return canvas.toBuffer();
 }
 
 router.get('/avatar/:id', async (req, res) => {
@@ -54,7 +54,7 @@ router.get('/avatar/:id', async (req, res) => {
   // Check cache
   const data: any = await get(key);
   if (data) {
-    console.log('Got cache');
+    console.log('Got cache', address);
     res.set({
       'Content-Type': 'image/webp',
       'Cache-Control': 'public, max-age=86400',
@@ -63,31 +63,39 @@ router.get('/avatar/:id', async (req, res) => {
     return data.pipe(res);
   }
 
-  let stream;
+  let input;
 
   // ENS avatar lookup
   try {
     const ensName = await getEnsName(network, address);
     const url = `https://metadata.ens.domains/mainnet/avatar/${ensName}`;
-    stream = (await axios({ url, responseType: 'stream' })).data;
+    input = (await axios({ url, responseType: 'arraybuffer' })).data as Buffer;
   } catch (e) {
     // console.log(e);
   }
 
   // Fallback to Blockie
-  if (!stream) stream = await getBlockie(address);
+  if (!input) {
+    console.log('Fallback', address);
+    input = await getBlockie(address);
+  }
 
   // Resize image
   let src;
   try {
-    src = stream.pipe(
-      sharp()
-        .resize(w, h)
-        .webp({ lossless: true })
-    );
-    src.pipe(res);
+    src = await sharp(input)
+      .resize(w, h)
+      .webp({ lossless: true })
+      .toBuffer();
+    res.set({
+      'Content-Type': 'image/webp',
+      'Cache-Control': 'public, max-age=86400',
+      Expires: new Date(Date.now() + 86400000).toUTCString()
+    });
+    res.send(src);
   } catch (e) {
-    console.log('Resize failed', e);
+    console.log('Resize failed', address, e);
+    return res.send();
   }
 
   // Store cache
@@ -95,9 +103,9 @@ router.get('/avatar/:id', async (req, res) => {
     try {
       const buff = await src.toBuffer();
       await set(key, buff);
-      console.log('Stored cache');
+      console.log('Stored cache', address);
     } catch (e) {
-      console.log('Store cache failed', e);
+      console.log('Store cache failed', address, e);
     }
   }
 });
