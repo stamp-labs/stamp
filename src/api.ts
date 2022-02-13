@@ -88,12 +88,14 @@ router.get('/avatar/:id', async (req, res) => {
   }
 
   // Store cache
-  try {
-    const buff = await src.toBuffer();
-    await set(key, buff);
-    console.log('Stored cache');
-  } catch (e) {
-    console.log('Store cache failed', e);
+  if (src) {
+    try {
+      const buff = await src.toBuffer();
+      await set(key, buff);
+      console.log('Stored cache');
+    } catch (e) {
+      console.log('Store cache failed', e);
+    }
   }
 });
 
