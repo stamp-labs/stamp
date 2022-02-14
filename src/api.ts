@@ -90,13 +90,24 @@ router.get('/avatar/:id', async (req, res) => {
     file = await resize(input, w, h);
   }
 
-  // Store cache
-  res.set({
-    'Content-Type': 'image/webp',
-    'Cache-Control': 'public, max-age=86400',
-    Expires: new Date(Date.now() + 86400000).toUTCString()
-  });
-  res.send(file);
+  // Render image
+  try {
+    res.set({
+      'Content-Type': 'image/webp',
+      'Cache-Control': 'public, max-age=86400',
+      Expires: new Date(Date.now() + 86400000).toUTCString()
+    });
+    res.send(file);
+  } catch (e) {
+    console.log('Render image failed', address, e);
+    res.json();
+    res.status(500).json({
+      error: {
+        message: 'server error',
+        data: e
+      }
+    });
+  }
 
   try {
     await set(key, file);
