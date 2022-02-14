@@ -44,9 +44,14 @@ router.get('/avatar/:id', async (req, res) => {
   }
   address = address.toLowerCase();
   const query: any = req.query;
-  const s = query.s ? parseInt(query.s) : 256;
-  const w = query.w ? parseInt(query.w) : s;
-  const h = query.h ? parseInt(query.h) : s;
+  const size = 64;
+  const maxSize = 500;
+  let s = query.s ? parseInt(query.s) : size;
+  if (s < 1 || s > maxSize || isNaN(s)) s = size;
+  let w = query.w ? parseInt(query.w) : s;
+  if (w < 1 || w > maxSize || isNaN(w)) w = size;
+  let h = query.h ? parseInt(query.h) : s;
+  if (h < 1 || h > maxSize || isNaN(h)) h = size;
 
   // Generate key
   const key = sha256(
