@@ -100,8 +100,7 @@ router.get('/avatar/:id', async (req, res) => {
     res.send(file);
   } catch (e) {
     console.log('Render image failed', address, e);
-    res.json();
-    res.status(500).json({
+    return res.status(500).json({
       error: {
         message: 'server error',
         data: e
