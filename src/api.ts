@@ -24,6 +24,13 @@ async function getBlockie(address) {
   return canvas.toBuffer();
 }
 
+async function resize(input, w, h) {
+  return sharp(input)
+    .resize(w, h)
+    .webp({ lossless: true })
+    .toBuffer();
+}
+
 router.get('/avatar/:id', async (req, res) => {
   // Parse query
   const { id } = req.params;
@@ -64,49 +71,38 @@ router.get('/avatar/:id', async (req, res) => {
   }
 
   let input;
+  let file;
 
   // ENS avatar lookup
   try {
     const ensName = await getEnsName(network, address);
     const url = `https://metadata.ens.domains/mainnet/avatar/${ensName}`;
     input = (await axios({ url, responseType: 'arraybuffer' })).data as Buffer;
+    file = await resize(input, w, h);
   } catch (e) {
     // console.log(e);
   }
 
   // Fallback to Blockie
-  if (!input) {
-    console.log('Fallback', address);
+  if (!file) {
+    // console.log('Fallback', address);
     input = await getBlockie(address);
-  }
-
-  // Resize image
-  let src;
-  try {
-    src = await sharp(input)
-      .resize(w, h)
-      .webp({ lossless: true })
-      .toBuffer();
-    res.set({
-      'Content-Type': 'image/webp',
-      'Cache-Control': 'public, max-age=86400',
-      Expires: new Date(Date.now() + 86400000).toUTCString()
-    });
-    res.send(src);
-  } catch (e) {
-    console.log('Resize failed', address, e);
-    return res.send();
+    file = await resize(input, w, h);
   }
 
   // Store cache
-  if (src) {
-    try {
-      const buff = await src.toBuffer();
-      await set(key, buff);
-      console.log('Stored cache', address);
-    } catch (e) {
-      console.log('Store cache failed', address, e);
-    }
+  res.set({
+    'Content-Type': 'image/webp',
+    'Cache-Control': 'public, max-age=86400',
+    Expires: new Date(Date.now() + 86400000).toUTCString()
+  });
+  res.send(file);
+
+  try {
+    await set(key, file);
+    console.log('Stored cache', address);
+  } catch (e) {
+    console.log('Store cache failed', address, e);
   }
 });
 
