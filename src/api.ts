@@ -75,8 +75,14 @@ router.get('/avatar/:id', async (req, res) => {
     return data.pipe(res);
   }
 
-  let input;
-  let file;
+  let input = await getBlockie(address);
+  let file = await resize(input, w, h);
+  res.set({
+    'Content-Type': 'image/webp',
+    'Cache-Control': 'public, max-age=10',
+    Expires: new Date(Date.now() + 10000).toUTCString()
+  });
+  res.send(file);
 
   // ENS avatar lookup
   try {
@@ -88,31 +94,7 @@ router.get('/avatar/:id', async (req, res) => {
     // console.log(e);
   }
 
-  // Fallback to Blockie
-  if (!file) {
-    // console.log('Fallback', address);
-    input = await getBlockie(address);
-    file = await resize(input, w, h);
-  }
-
-  // Render image
-  try {
-    res.set({
-      'Content-Type': 'image/webp',
-      'Cache-Control': 'public, max-age=86400',
-      Expires: new Date(Date.now() + 86400000).toUTCString()
-    });
-    res.send(file);
-  } catch (e) {
-    console.log('Render image failed', address, e);
-    return res.status(500).json({
-      error: {
-        message: 'server error',
-        data: e
-      }
-    });
-  }
-
+  // Store cache
   try {
     await set(key, file);
     console.log('Stored cache', address);
