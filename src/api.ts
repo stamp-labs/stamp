@@ -79,8 +79,8 @@ router.get('/avatar/:id', async (req, res) => {
   let file = await resize(input, w, h);
   res.set({
     'Content-Type': 'image/webp',
-    'Cache-Control': 'public, max-age=10',
-    Expires: new Date(Date.now() + 10000).toUTCString()
+    'Cache-Control': 'public, max-age=3',
+    Expires: new Date(Date.now() + 3 * 1e3).toUTCString()
   });
   res.send(file);
 
