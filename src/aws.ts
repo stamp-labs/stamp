@@ -1,13 +1,13 @@
 import * as AWS from '@aws-sdk/client-s3';
 import { Readable } from 'stream';
 
-const cb = 'stamp/10';
+const cb = 'stamp/12';
 
 let client;
 const region = process.env.AWS_REGION;
 if (region) client = new AWS.S3({ region });
 
-export async function streamToString(stream: Readable) {
+export async function streamToBuffer(stream: Readable) {
   return await new Promise((resolve, reject) => {
     const chunks: Uint8Array[] = [];
     stream.on('data', chunk => chunks.push(Buffer.from(chunk)));
