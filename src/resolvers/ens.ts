@@ -5,7 +5,7 @@ import { resize } from '../utils';
 import { max } from '../constants.json';
 
 async function resolveName(network, address) {
-  const provider = new StaticJsonRpcProvider('https://cloudflare-eth.com');
+  const provider = new StaticJsonRpcProvider('https://rpc.ankr.com/eth');
   const abi = ['function getNames(address[]) view returns (string[])'];
   const contract = new Contract('0x3671aE578E63FdF66ad4F3E12CC0c0d71Ac7510C', abi, provider);
   const names = await contract.getNames([address]);
