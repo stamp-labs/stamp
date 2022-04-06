@@ -1,7 +1,7 @@
 import * as AWS from '@aws-sdk/client-s3';
 import { Readable } from 'stream';
 
-const cb = 'stamp/12';
+const cb = 'stamp/13';
 
 let client;
 const region = process.env.AWS_REGION;
