@@ -5,6 +5,7 @@ import { max } from '../constants.json';
 
 export default async function resolve(address) {
   try {
+    if (!process.env.HUB_HOST) throw new Error('HUB_HOST is not set');
     const url = `${process.env.HUB_HOST}/graphql`;
 
     const user = (
