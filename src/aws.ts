@@ -1,11 +1,10 @@
 import * as AWS from '@aws-sdk/client-s3';
 import { Readable } from 'stream';
 
-const cb = 'stamp/13';
-
 let client;
 const region = process.env.AWS_REGION;
-if (region) client = new AWS.S3({ region });
+const endpoint = process.env.AWS_ENDPOINT || undefined;
+if (region) client = new AWS.S3({ region, endpoint });
 
 export async function streamToBuffer(stream: Readable) {
   return await new Promise((resolve, reject) => {
@@ -20,7 +19,7 @@ export async function set(key, value) {
   try {
     return await client.putObject({
       Bucket: process.env.AWS_BUCKET_NAME,
-      Key: `public/${cb}/${key}`,
+      Key: `public/stamp/${key}`,
       Body: value,
       ContentType: 'image/webp'
     });
@@ -34,7 +33,7 @@ export async function get(key) {
   try {
     const { Body } = await client.getObject({
       Bucket: process.env.AWS_BUCKET_NAME,
-      Key: `public/${cb}/${key}`
+      Key: `public/stamp/${key}`
     });
     return Body;
   } catch (e) {
