@@ -53,11 +53,14 @@ export async function parseQuery(id, query) {
   let h = query.h ? parseInt(query.h) : s;
   if (h < 1 || h > maxSize || isNaN(h)) h = size;
 
+  const cb = query.cb ? query.cb : '0';
+
   return {
     address,
     network,
     w,
-    h
+    h,
+    cb
   };
 }
 
