@@ -2,13 +2,7 @@
   "max": 500,
   "ttl": 86400,
   "resolvers": {
-    "avatar": [
-      "blockie",
-      "ens"
-    ],
-    "token": [
-      "blockie",
-      "trustwallet"
-    ]
+    "avatar": ["blockie", "ens", "snapshot"],
+    "token": ["blockie", "trustwallet"]
   }
 }
