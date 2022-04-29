@@ -9,11 +9,7 @@ const router = express.Router();
 router.get('/:type/:id', async (req, res) => {
   // Generate keys
   const { type, id } = req.params;
-
   const { address, network, w, h, cb } = await parseQuery(id, req.query);
-
-  let bypassCache = false;
-  if (cb === '1') bypassCache = true;
 
   const key1 = sha256(
     JSON.stringify({ type, network, address, w: constants.max, h: constants.max })
@@ -22,9 +18,12 @@ router.get('/:type/:id', async (req, res) => {
   let currentResolvers = constants.resolvers.avatar;
   if (type === 'token') currentResolvers = constants.resolvers.token;
 
+  let cache1;
+  let cache2;
+
   // Check cache
-  const cache2: any = await get(key2);
-  if (cache2 && !bypassCache) {
+  if (!cb) cache2 = await get(key2);
+  if (cache2 && !cb) {
     console.log('Got cache', address);
     res.set({
       'Content-Type': 'image/webp',
@@ -34,9 +33,9 @@ router.get('/:type/:id', async (req, res) => {
     return cache2.pipe(res);
   }
 
-  const cache1: any = await get(key1);
+  if (!cb) cache1 = await get(key1);
   let file1;
-  if (cache1 && !bypassCache) {
+  if (cache1 && !cb) {
     file1 = await streamToBuffer(cache1);
     console.log('Got base cache');
   } else {
