@@ -29,6 +29,18 @@ export async function set(key, value) {
   }
 }
 
+export async function remove(key) {
+  try {
+    return await client.deleteObject({
+      Bucket: process.env.AWS_BUCKET_NAME,
+      Key: `public/stamp/${key}`
+    });
+  } catch (e) {
+    console.log('Remove cache failed', e);
+    throw e;
+  }
+}
+
 export async function get(key) {
   try {
     const { Body } = await client.getObject({

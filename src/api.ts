@@ -1,10 +1,36 @@
 import express from 'express';
 import { parseQuery, resize, sha256 } from './utils';
-import { set, get, streamToBuffer } from './aws';
+import { set, get, streamToBuffer, remove } from './aws';
 import resolvers from './resolvers';
 import constants from './constants.json';
 
 const router = express.Router();
+
+router.post('/:type/:id/delete', async (req, res) => {
+  const { type, id } = req.params;
+  const { sizes } = req.body;
+  // also add the original image
+  sizes.push({ w: constants.max, h: constants.max });
+
+  try {
+    if (sizes.length > 0) {
+      await Promise.all(
+        sizes.map(async size => {
+          console.log(size);
+          const { address, network, w, h } = await parseQuery(id, size);
+          const key = sha256(JSON.stringify({ type, network, address, w, h }));
+          remove(key);
+          return;
+        })
+      );
+    }
+
+    res.status(200).end();
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: (error as Error).message });
+  }
+});
 
 router.get('/:type/:id', async (req, res) => {
   // Generate keys
