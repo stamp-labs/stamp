@@ -57,8 +57,7 @@ export async function parseQuery(id, query) {
     address,
     network,
     w,
-    h,
-    cb: query.cb || false
+    h
   };
 }
 

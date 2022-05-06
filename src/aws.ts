@@ -15,11 +15,11 @@ export async function streamToBuffer(stream: Readable) {
   });
 }
 
-export async function set(key, value) {
+export async function set(key, value, folder) {
   try {
     return await client.putObject({
       Bucket: process.env.AWS_BUCKET_NAME,
-      Key: `public/stamp/${key}`,
+      Key: `public/stamp/${folder}/${key}`,
       Body: value,
       ContentType: 'image/webp'
     });
@@ -29,23 +29,40 @@ export async function set(key, value) {
   }
 }
 
-export async function remove(key) {
+export async function remove(folder) {
   try {
-    return await client.deleteObject({
-      Bucket: process.env.AWS_BUCKET_NAME,
-      Key: `public/stamp/${key}`
+    const Bucket = process.env.AWS_BUCKET_NAME;
+    const listedObjects = await client.listObjectsV2({
+      Bucket,
+      Prefix: `public/stamp/${folder}`
     });
+
+    if (listedObjects.Contents.length === 0) return;
+
+    const Objects = [] as { Key: string }[];
+
+    listedObjects.Contents.forEach(({ Key }) => {
+      Objects.push({ Key });
+    });
+
+    await client.deleteObjects({
+      Bucket,
+      Delete: { Objects }
+    });
+    // If there are more files, it will delete them too
+    if (listedObjects.IsTruncated) await remove(folder);
+    return;
   } catch (e) {
     console.log('Remove cache failed', e);
     throw e;
   }
 }
 
-export async function get(key) {
+export async function get(key, folder) {
   try {
     const { Body } = await client.getObject({
       Bucket: process.env.AWS_BUCKET_NAME,
-      Key: `public/stamp/${key}`
+      Key: `public/stamp/${folder}/${key}`
     });
     return Body;
   } catch (e) {
