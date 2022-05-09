@@ -1,57 +1,53 @@
 import express from 'express';
 import { parseQuery, resize, sha256 } from './utils';
-import { set, get, streamToBuffer, remove } from './aws';
+import { set, get, streamToBuffer, clear } from './aws';
 import resolvers from './resolvers';
 import constants from './constants.json';
 
 const router = express.Router();
 
-router.delete('/:type/:id', async (req, res) => {
+router.get('/clear/:type/:id', async (req, res) => {
   const { type, id } = req.params;
-
   try {
     const { address, network, w, h } = await parseQuery(id, { s: constants.max });
-    const baseImageFolder = sha256(JSON.stringify({ type, network, address, w, h }));
-    remove(baseImageFolder);
-
-    res.status(200).end();
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: (error as Error).message });
+    const key = sha256(JSON.stringify({ type, network, address, w, h }));
+    await clear(key);
+    res.status(200).json({ status: 'ok' });
+  } catch (e) {
+    res.status(500).json({ status: 'error', error: e });
   }
 });
 
 router.get('/:type/:id', async (req, res) => {
-  // Generate keys
   const { type, id } = req.params;
   const { address, network, w, h } = await parseQuery(id, req.query);
-
-  const baseImageKey = sha256(
+  const key1 = sha256(
     JSON.stringify({ type, network, address, w: constants.max, h: constants.max })
   );
-  const resizedImageKey = sha256(JSON.stringify({ type, network, address, w, h }));
+  const key2 = sha256(JSON.stringify({ type, network, address, w, h }));
   let currentResolvers = constants.resolvers.avatar;
   if (type === 'token') currentResolvers = constants.resolvers.token;
 
-  // Check cache
-  const resizedImageCache = await get(resizedImageKey, baseImageKey);
-  if (resizedImageCache) {
+  // Check resized cache
+  const cache = await get(`${key1}/${key2}`);
+  if (cache) {
     console.log('Got cache', address);
     res.set({
       'Content-Type': 'image/webp',
       'Cache-Control': `public, max-age=${constants.ttl}`,
       Expires: new Date(Date.now() + constants.ttl * 1e3).toUTCString()
     });
-    return resizedImageCache.pipe(res);
+    return cache.pipe(res);
   }
 
-  const baseImageCache = await get(baseImageKey, baseImageKey);
+  // Check base cache
+  const base = await get(`${key1}/${key1}`);
   let baseImage;
-  if (baseImageCache) {
-    baseImage = await streamToBuffer(baseImageCache);
+  if (base) {
+    baseImage = await streamToBuffer(base);
     console.log('Got base cache');
   } else {
-    console.log('No cache for', baseImageKey, baseImageCache);
+    console.log('No cache for', key1, base);
     const p = currentResolvers.map(r => resolvers[r](address, network));
     const resolvedImages = await Promise.all(p);
     resolvedImages.forEach(file => {
@@ -70,11 +66,11 @@ router.get('/:type/:id', async (req, res) => {
 
   // Store cache
   try {
-    if (!baseImageCache) {
-      await set(baseImageKey, baseImage, baseImageKey);
-      console.log('Stored base cache', baseImageKey);
+    if (!base) {
+      await set(`${key1}/${key1}`, baseImage);
+      console.log('Stored base cache', key1);
     }
-    await set(resizedImageKey, resizedImage, baseImageKey);
+    await set(`${key2}/${key1}`, resizedImage);
     console.log('Stored cache', address);
   } catch (e) {
     console.log('Store cache failed', address, e);
