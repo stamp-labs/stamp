@@ -14,8 +14,11 @@ async function resolveName(network, address) {
 
 export default async function resolve(address, network) {
   try {
-    const name = await resolveName(network, address);
-    const url = `https://metadata.ens.domains/mainnet/avatar/${name}`;
+    const provider = new StaticJsonRpcProvider('https://rpc.ankr.com/eth');
+    const name = await provider.lookupAddress(address);
+    const resolver = await provider.getResolver(name);
+    const avatar = await resolver.getAvatar();
+    const url = avatar.url;
     const input = (await axios({ url, responseType: 'arraybuffer' })).data as Buffer;
     return await resize(input, max, max);
   } catch (e) {
