@@ -37,13 +37,14 @@ export async function clear(path) {
       Bucket: bucket,
       Prefix: `public/${dir}/${path}`
     });
-    if (listedObjects.Contents.length === 0) return;
-    const objs = listedObjects.Contents.map(obj => ({ Key: obj.key }));
+    if (!listedObjects.Contents || listedObjects.Contents.length === 0) return;
+    const objs = listedObjects.Contents.map(obj => ({ Key: obj.Key }));
     await client.deleteObjects({
       Bucket: bucket,
       Delete: { Objects: objs }
     });
     if (listedObjects.IsTruncated) await clear(path);
+    console.log('Cleared cache', path);
     return;
   } catch (e) {
     console.log('Clear cache failed', e);
