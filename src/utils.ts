@@ -2,6 +2,7 @@ import { createHash } from 'crypto';
 import sharp from 'sharp';
 import { StaticJsonRpcProvider } from '@ethersproject/providers';
 import snapshot from '@snapshot-labs/snapshot.js';
+import constants from './constants.json';
 
 export function sha256(str) {
   return createHash('sha256')
@@ -57,12 +58,19 @@ export async function parseQuery(id, query) {
     address,
     network,
     w,
-    h,
-    cb: query.cb || false
+    h
   };
 }
 
 export function getUrl(url) {
   const gateway: string = process.env.IPFS_GATEWAY || 'cloudflare-ipfs.com';
   return snapshot.utils.getUrl(url, gateway);
+}
+
+export function setHeader(res) {
+  res.set({
+    'Content-Type': 'image/webp',
+    'Cache-Control': `public, max-age=${constants.ttl}`,
+    Expires: new Date(Date.now() + constants.ttl * 1e3).toUTCString()
+  });
 }

@@ -2,9 +2,11 @@ import * as AWS from '@aws-sdk/client-s3';
 import { Readable } from 'stream';
 
 let client;
+const bucket = process.env.AWS_BUCKET_NAME;
 const region = process.env.AWS_REGION;
 const endpoint = process.env.AWS_ENDPOINT || undefined;
 if (region) client = new AWS.S3({ region, endpoint });
+const dir = 'stamp';
 
 export async function streamToBuffer(stream: Readable) {
   return await new Promise((resolve, reject) => {
@@ -18,8 +20,8 @@ export async function streamToBuffer(stream: Readable) {
 export async function set(key, value) {
   try {
     return await client.putObject({
-      Bucket: process.env.AWS_BUCKET_NAME,
-      Key: `public/stamp/${key}`,
+      Bucket: bucket,
+      Key: `public/${dir}/${key}`,
       Body: value,
       ContentType: 'image/webp'
     });
@@ -29,11 +31,32 @@ export async function set(key, value) {
   }
 }
 
+export async function clear(path) {
+  try {
+    const listedObjects = await client.listObjectsV2({
+      Bucket: bucket,
+      Prefix: `public/${dir}/${path}`
+    });
+    if (!listedObjects.Contents || listedObjects.Contents.length === 0) return;
+    const objs = listedObjects.Contents.map(obj => ({ Key: obj.Key }));
+    await client.deleteObjects({
+      Bucket: bucket,
+      Delete: { Objects: objs }
+    });
+    if (listedObjects.IsTruncated) await clear(path);
+    console.log('Cleared cache', path);
+    return;
+  } catch (e) {
+    console.log('Clear cache failed', e);
+    throw e;
+  }
+}
+
 export async function get(key) {
   try {
     const { Body } = await client.getObject({
-      Bucket: process.env.AWS_BUCKET_NAME,
-      Key: `public/stamp/${key}`
+      Bucket: bucket,
+      Key: `public/${dir}/${key}`
     });
     return Body;
   } catch (e) {
