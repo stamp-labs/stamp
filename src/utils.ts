@@ -2,6 +2,7 @@ import { createHash } from 'crypto';
 import sharp from 'sharp';
 import { StaticJsonRpcProvider } from '@ethersproject/providers';
 import snapshot from '@snapshot-labs/snapshot.js';
+import constants from './constants.json';
 
 export function sha256(str) {
   return createHash('sha256')
@@ -57,8 +58,7 @@ export async function parseQuery(id, query) {
     address,
     network,
     w,
-    h,
-    cb: query.cb || false
+    h
   };
 }
 
@@ -67,37 +67,10 @@ export function getUrl(url) {
   return snapshot.utils.getUrl(url, gateway);
 }
 
-/**
- * @param methods An array of methods for benchmarking
- * @param inputs An array of inputs. These will be zippered to the methods
- * @param iterations The number of iterations to run to find the average
- * @param message An array of identifier message for similar functions. Useful when methods share names
- * Example:
- * import { resolveName, resolveName_ethers } from './ens';
- * import { benchmark } from './utils'
- * 
- * const methods = [resolveName, resolveName_ethers];
- * const inputs = [['0x809fa673fe2ab515faa168259cb14e2bedebf68e'], ['0x809fa673fe2ab515faa168259cb14e2bedebf68e']];
- * benchmark(methods, inputs, 3);
- * 
- * Then run:
- * 
- * yarn benchmark
- */
-export async function benchmark(methods, inputs, iterations, identifiers) {
-  for (let i = 0; i < methods.length; i++) {
-    let sum = 0;
-    for (let j = 0; j < iterations; j++) {
-      const t0 = performance.now();
-      await methods[i](...inputs[i]);
-      const t1 = performance.now();
-      console.log(`Call to ${methods[i].name} (${identifiers[i]}) took ${t1 - t0} milliseconds.`);
-      const duration = t1 - t0;
-      sum += duration;
-    }
-    const average = sum / iterations;
-    console.log(
-      `Average response time for ${methods[i].name} (${identifiers[i]}) after ${iterations} calls is ${average} milliseconds.\n`
-    );
-  }
+export function setHeader(res) {
+  res.set({
+    'Content-Type': 'image/webp',
+    'Cache-Control': `public, max-age=${constants.ttl}`,
+    Expires: new Date(Date.now() + constants.ttl * 1e3).toUTCString()
+  });
 }

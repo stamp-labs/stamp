@@ -2,9 +2,9 @@ import axios from 'axios';
 import { StaticJsonRpcProvider } from '@ethersproject/providers';
 import { resize } from '../utils';
 import { max } from '../constants.json';
-import { Contract } from 'ethers';
+import { Contract } from '@ethersproject/contracts';
 
-export async function resolveName(address) {
+async function resolveName(address) {
   const provider = new StaticJsonRpcProvider('https://rpc.ankr.com/eth');
   const abi = ['function getNames(address[]) view returns (string[])'];
   const contract = new Contract('0x3671aE578E63FdF66ad4F3E12CC0c0d71Ac7510C', abi, provider);
