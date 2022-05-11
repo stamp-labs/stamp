@@ -2,15 +2,7 @@ import axios from 'axios';
 import { StaticJsonRpcProvider } from '@ethersproject/providers';
 import { resize } from '../utils';
 import { max } from '../constants.json';
-import { AvatarResolver } from '@ensdomains/ens-avatar';
-import jsdom from 'jsdom';
 import { Contract } from 'ethers';
-
-export async function getAvatar(provider, name) {
-  const avt = new AvatarResolver(provider);
-  const avatarURI = await avt.getAvatar(name, { jsdomWindow: jsdom });
-  return avatarURI;
-}
 
 export async function resolveName(address) {
   const provider = new StaticJsonRpcProvider('https://rpc.ankr.com/eth');
@@ -20,18 +12,12 @@ export async function resolveName(address) {
   return names[0];
 }
 
-export async function resolveName_ethers(address) {
-  const provider = new StaticJsonRpcProvider('https://rpc.ankr.com/eth');
-  const name = await provider.lookupAddress(address);
-  return name;
-}
-
 export default async function resolve(address) {
   try {
     const provider = new StaticJsonRpcProvider('https://rpc.ankr.com/eth');
-    const name = await provider.lookupAddress(address);
+    const name = await resolveName(address);
     if (!name) return false;
-    const url = await getAvatar(provider, name);
+    const url = await provider.getAvatar(name);
     if (!url) return false;
     const input = (await axios({ url, responseType: 'arraybuffer' })).data as Buffer;
     return await resize(input, max, max);
