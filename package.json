@@ -6,8 +6,7 @@
     "lint": "eslint . --ext .ts --fix",
     "build": "tsc",
     "dev": "nodemon src/index.ts",
-    "start": "node build/src/index.js",
-    "benchmark": "ts-node __tests__/benchmarking.ts"
+    "start": "node build/src/index.js"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.51.0",
