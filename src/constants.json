@@ -3,6 +3,7 @@
   "ttl": 86400,
   "resolvers": {
     "avatar": ["blockie", "ens", "snapshot"],
-    "token": ["blockie", "trustwallet"]
+    "token": ["blockie", "trustwallet"],
+    "space": ["blockie", "space"]
   }
 }

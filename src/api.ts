@@ -9,7 +9,7 @@ const router = express.Router();
 router.get('/clear/:type/:id', async (req, res) => {
   const { type, id } = req.params;
   try {
-    const { address, network, w, h } = await parseQuery(id, { s: constants.max });
+    const { address, network, w, h } = await parseQuery(id, type, { s: constants.max });
     const key = sha256(JSON.stringify({ type, network, address, w, h }));
     await clear(key);
     res.status(200).json({ status: 'ok' });
@@ -20,13 +20,14 @@ router.get('/clear/:type/:id', async (req, res) => {
 
 router.get('/:type/:id', async (req, res) => {
   const { type, id } = req.params;
-  const { address, network, w, h } = await parseQuery(id, req.query);
+  const { address, network, w, h } = await parseQuery(id, type, req.query);
   const key1 = sha256(
     JSON.stringify({ type, network, address, w: constants.max, h: constants.max })
   );
   const key2 = sha256(JSON.stringify({ type, network, address, w, h }));
   let currentResolvers = constants.resolvers.avatar;
   if (type === 'token') currentResolvers = constants.resolvers.token;
+  if (type === 'space') currentResolvers = constants.resolvers.space;
 
   // Check resized cache
   const cache = await get(`${key1}/${key2}`);

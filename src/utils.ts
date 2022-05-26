@@ -17,7 +17,7 @@ export async function resize(input, w, h) {
     .toBuffer();
 }
 
-export async function parseQuery(id, query) {
+export async function parseQuery(id, type, query) {
   let address = id;
   let network = '1';
 
@@ -38,7 +38,7 @@ export async function parseQuery(id, query) {
   console.log('Format', format);
 
   // Resolve ENS name
-  if (address.includes('.')) {
+  if (address.includes('.') && type !== 'space') {
     const provider = new StaticJsonRpcProvider('https://cloudflare-eth.com');
     const addressFromEns = await provider.resolveName(address);
     if (addressFromEns) address = addressFromEns;
