@@ -32,7 +32,7 @@ router.get('/:type/:id', async (req, res) => {
   // Check resized cache
   const cache = await get(`${key1}/${key2}`);
   if (cache) {
-    console.log('Got cache', address);
+    // console.log('Got cache', address);
     setHeader(res);
     return cache.pipe(res);
   }
@@ -42,7 +42,7 @@ router.get('/:type/:id', async (req, res) => {
   let file1;
   if (base) {
     file1 = await streamToBuffer(base);
-    console.log('Got base cache');
+    // console.log('Got base cache');
   } else {
     console.log('No cache for', key1, base);
     const p = currentResolvers.map(r => resolvers[r](address, network));

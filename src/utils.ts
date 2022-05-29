@@ -35,7 +35,7 @@ export async function parseQuery(id, type, query) {
     format = 'did';
     address = id.slice(4);
   }
-  console.log('Format', format);
+  // console.log('Format', format);
 
   // Resolve ENS name
   if (address.includes('.') && type !== 'space') {
