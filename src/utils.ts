@@ -39,7 +39,7 @@ export async function parseQuery(id, type, query) {
 
   // Resolve ENS name
   if (address.includes('.') && type !== 'space') {
-    const provider = new StaticJsonRpcProvider('https://cloudflare-eth.com');
+    const provider = new StaticJsonRpcProvider('https://brovider.xyz/1');
     const addressFromEns = await provider.resolveName(address);
     if (addressFromEns) address = addressFromEns;
   }
