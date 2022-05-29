@@ -63,7 +63,7 @@ export async function parseQuery(id, type, query) {
 }
 
 export function getUrl(url) {
-  const gateway: string = process.env.IPFS_GATEWAY || 'cloudflare-ipfs.com';
+  const gateway: string = process.env.IPFS_GATEWAY || 'ipfs.fleek.co';
   return snapshot.utils.getUrl(url, gateway);
 }
 
