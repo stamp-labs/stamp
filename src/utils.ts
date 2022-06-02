@@ -63,7 +63,7 @@ export async function parseQuery(id, type, query) {
 }
 
 export function getUrl(url) {
-  const gateway: string = process.env.IPFS_GATEWAY || 'ipfs.fleek.co';
+  const gateway: string = process.env.IPFS_GATEWAY || 'snapshot.mypinata.cloud';
   return snapshot.utils.getUrl(url, gateway);
 }
 
