@@ -1,4 +1,4 @@
-import resolvers from '../../src/resolvers';
+import resolvers from '../../../src/resolvers';
 
 describe('resolvers', () => {
   describe('blockie', () => {
