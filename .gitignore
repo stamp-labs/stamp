@@ -3,6 +3,7 @@ node_modules
 dist
 build
 .env
+coverage
 
 # Remove some common IDE working directories
 .idea
