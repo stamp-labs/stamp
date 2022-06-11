@@ -1,7 +1,7 @@
 import resolvers from '../../../src/resolvers';
 
 describe('resolvers', () => {
-  describe('ens', () => {
+  describe('selfid', () => {
     it('should return false if missing DID', async () => {
       const result = await resolvers.selfid('0x290ADCcA6253aCe88b10A6bb34C07a5Ad10fC6B0');
 
