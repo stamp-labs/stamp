@@ -8,7 +8,14 @@ describe('resolvers', () => {
       expect(result).toBe(false);
     });
 
-    it('should resolve', async () => {
+    it('should resolve with handle', async () => {
+      const result = await resolvers.lens('fabien.lens');
+
+      expect(result).toBeInstanceOf(Buffer);
+      expect(result.length).toBeGreaterThan(1000);
+    });
+
+    it('should resolve with address (default profile)', async () => {
       const result = await resolvers.lens('0x3A5bd1E37b099aE3386D13947b6a90d97675e5e3');
 
       expect(result).toBeInstanceOf(Buffer);
