@@ -4,6 +4,7 @@ import trustwallet from './trustwallet';
 import snapshot from './snapshot';
 import space from './space';
 import selfid from './selfid';
+import lens from './lens';
 
 export default {
   blockie,
@@ -11,5 +12,6 @@ export default {
   trustwallet,
   snapshot,
   space,
-  selfid
+  selfid,
+  lens
 };
