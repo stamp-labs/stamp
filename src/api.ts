@@ -20,6 +20,8 @@ router.get('/clear/:type/:id', async (req, res) => {
 
 router.get('/:type/:id', async (req, res) => {
   const { type, id } = req.params;
+  const { fb } = req.query;
+
   const { address, network, w, h } = await parseQuery(id, type, req.query);
   const key1 = sha256(
     JSON.stringify({ type, network, address, w: constants.max, h: constants.max })
@@ -28,6 +30,7 @@ router.get('/:type/:id', async (req, res) => {
   let currentResolvers = constants.resolvers.avatar;
   if (type === 'token') currentResolvers = constants.resolvers.token;
   if (type === 'space') currentResolvers = constants.resolvers.space;
+  currentResolvers = [fb === 'jazzicon' ? 'jazzicon' : 'blockie', ...currentResolvers];
 
   // Check resized cache
   const cache = await get(`${key1}/${key2}`);
