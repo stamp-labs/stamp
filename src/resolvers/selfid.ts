@@ -11,7 +11,7 @@ export default async function resolve(address: string) {
     const did = await core.getAccountDID(`${getAddress(address)}@eip155:1`);
     const result = await core.get('basicProfile', did);
 
-    const src = result?.image?.original.src;
+    const { src } = result?.image?.original || {};
     if (!src) return false;
 
     const url = getUrl(src);
