@@ -12,6 +12,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.51.0",
     "@download/blockies": "^1.0.3",
+    "@self.id/core": "^0.3.0",
     "@snapshot-labs/snapshot.js": "^0.3.75",
     "axios": "^0.25.0",
     "canvas": "^2.9.0",
