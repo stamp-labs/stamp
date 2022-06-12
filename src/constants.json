@@ -2,7 +2,7 @@
   "max": 500,
   "ttl": 86400,
   "resolvers": {
-    "avatar": ["ens", "snapshot", "selfid"],
+    "avatar": ["selfid", "ens", "snapshot"],
     "token": ["trustwallet"],
     "space": ["space"]
   }

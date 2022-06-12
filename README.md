@@ -41,9 +41,10 @@ stamp.fyi/avatar/0xeF8305E140ac520225DAf050e2f71d5fBcC543e7?**cb=1**
 ### Resolvers
 
 #### [ENS avatar](/src/resolvers/ens.ts)
+#### [Self.ID](/src/resolvers/selfid.ts)
+#### [Snapshot](/src/resolvers/snapshot.ts)
 #### [TrustWallet Assets Info](/src/resolvers/trustwallet.ts)
 #### [Blockie](/src/resolvers/blockie.ts)
-#### [Snapshot](/src/resolvers/snapshot.ts)
 
 ### License
 
