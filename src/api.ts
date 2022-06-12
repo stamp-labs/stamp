@@ -1,5 +1,5 @@
 import express from 'express';
-import { parseQuery, resize, setHeader, sha256 } from './utils';
+import { parseQuery, resize, setHeader, sha256, getCacheKey } from './utils';
 import { set, get, streamToBuffer, clear } from './aws';
 import resolvers from './resolvers';
 import constants from './constants.json';
@@ -9,8 +9,11 @@ const router = express.Router();
 router.get('/clear/:type/:id', async (req, res) => {
   const { type, id } = req.params;
   try {
-    const { address, network, w, h } = await parseQuery(id, type, { s: constants.max });
-    const key = sha256(JSON.stringify({ type, network, address, w, h }));
+    const { address, network, w, h, fallback } = await parseQuery(id, type, {
+      s: constants.max,
+      fb: req.query.fb
+    });
+    const key = getCacheKey({ type, network, address, w, h, fallback });
     await clear(key);
     res.status(200).json({ status: 'ok' });
   } catch (e) {
@@ -20,17 +23,21 @@ router.get('/clear/:type/:id', async (req, res) => {
 
 router.get('/:type/:id', async (req, res) => {
   const { type, id } = req.params;
-  const { fb } = req.query;
 
-  const { address, network, w, h } = await parseQuery(id, type, req.query);
-  const key1 = sha256(
-    JSON.stringify({ type, network, address, w: constants.max, h: constants.max })
-  );
-  const key2 = sha256(JSON.stringify({ type, network, address, w, h }));
+  const { address, network, w, h, fallback } = await parseQuery(id, type, req.query);
+  const key1 = getCacheKey({
+    type,
+    network,
+    address,
+    w: constants.max,
+    h: constants.max,
+    fallback
+  });
+  const key2 = getCacheKey({ type, network, address, w, h, fallback });
   let currentResolvers = constants.resolvers.avatar;
   if (type === 'token') currentResolvers = constants.resolvers.token;
   if (type === 'space') currentResolvers = constants.resolvers.space;
-  currentResolvers = [fb === 'jazzicon' ? 'jazzicon' : 'blockie', ...currentResolvers];
+  currentResolvers = [fallback, ...currentResolvers];
 
   // Check resized cache
   const cache = await get(`${key1}/${key2}`);
