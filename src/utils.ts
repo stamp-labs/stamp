@@ -83,10 +83,7 @@ export function getCacheKey({
   h: number;
   fallback: string;
 }) {
-  if (fallback === 'blockie') {
-    return sha256(JSON.stringify({ type, network, address, w, h }));
-  }
-
+  if (fallback === 'blockie') return sha256(JSON.stringify({ type, network, address, w, h }));
   return sha256(JSON.stringify({ type, network, address, w, h, fallback }));
 }
 

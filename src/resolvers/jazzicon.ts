@@ -5,7 +5,7 @@ import { resize } from '../utils';
 import { max } from '../constants.json';
 
 const dom = new JSDOM('');
-global.document = dom.window.document;
+global['document'] = dom.window.document;
 
 export default async function resolve(address) {
   const { innerHTML, style } = jazzicon(500, parseInt(address.slice(2, 10), 16));

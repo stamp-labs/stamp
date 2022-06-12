@@ -1,5 +1,5 @@
 import express from 'express';
-import { parseQuery, resize, setHeader, sha256, getCacheKey } from './utils';
+import { parseQuery, resize, setHeader, getCacheKey } from './utils';
 import { set, get, streamToBuffer, clear } from './aws';
 import resolvers from './resolvers';
 import constants from './constants.json';
