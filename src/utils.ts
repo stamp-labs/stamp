@@ -58,13 +58,36 @@ export async function parseQuery(id, type, query) {
     address,
     network,
     w,
-    h
+    h,
+    fallback: query.fb === 'jazzicon' ? 'jazzicon' : 'blockie'
   };
 }
 
 export function getUrl(url) {
   const gateway: string = process.env.IPFS_GATEWAY || 'snapshot.mypinata.cloud';
   return snapshot.utils.getUrl(url, gateway);
+}
+
+export function getCacheKey({
+  type,
+  network,
+  address,
+  w,
+  h,
+  fallback
+}: {
+  type: string;
+  network: string;
+  address: string;
+  w: number;
+  h: number;
+  fallback: string;
+}) {
+  if (fallback === 'blockie') {
+    return sha256(JSON.stringify({ type, network, address, w, h }));
+  }
+
+  return sha256(JSON.stringify({ type, network, address, w, h, fallback }));
 }
 
 export function setHeader(res) {
