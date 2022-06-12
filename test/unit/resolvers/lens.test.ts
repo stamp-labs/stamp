@@ -15,8 +15,8 @@ describe('resolvers', () => {
       expect(result.length).toBeGreaterThan(1000);
     });
 
-    it('should resolve with address (default profile)', async () => {
-      const result = await resolvers.lens('0x3A5bd1E37b099aE3386D13947b6a90d97675e5e3');
+    it('should resolve with address', async () => {
+      const result = await resolvers.lens('0xeF8305E140ac520225DAf050e2f71d5fBcC543e7');
 
       expect(result).toBeInstanceOf(Buffer);
       expect(result.length).toBeGreaterThan(1000);

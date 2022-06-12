@@ -13,12 +13,9 @@ function getDefaultImage(picture) {
 }
 
 export default async function resolve(address) {
-  const path = isAddress(address) ? 'defaultProfile' : 'profile';
-
-  const request =
-    path === 'defaultProfile'
-      ? `${path}(request: { ethereumAddress: "${getAddress(address)}"})`
-      : `${path}(request: { handle: "${address}"})`;
+  const request = isAddress(address)
+    ? `{ ownedBy: "${getAddress(address)}", limit: 1 }`
+    : `{ handles: ["${address}"], limit: 1 }`;
 
   try {
     const { data } = await axios({
@@ -27,19 +24,21 @@ export default async function resolve(address) {
       data: {
         query: `
             query Profile {
-              ${request} {
-                picture {
-                  ... on NftImage {
-                    contractAddress
-                    tokenId
-                    uri
-                    chainId
-                    verified
-                  }
-                  ... on MediaSet {
-                    original {
-                      url
-                      mimeType
+              profiles(request: ${request}) {
+                items {
+                  picture {
+                    ... on NftImage {
+                      contractAddress
+                      tokenId
+                      uri
+                      chainId
+                      verified
+                    }
+                    ... on MediaSet {
+                      original {
+                        url
+                        mimeType
+                      }
                     }
                   }
                 }
@@ -49,7 +48,7 @@ export default async function resolve(address) {
       }
     });
 
-    const sourceUrl = getDefaultImage(data.data[path]?.picture);
+    const sourceUrl = getDefaultImage(data.data.profiles.items[0]?.picture);
     if (!sourceUrl) return false;
 
     const url = getUrl(sourceUrl);
