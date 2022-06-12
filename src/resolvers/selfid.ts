@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { getAddress } from '@ethersproject/address';
+import { Core } from '@self.id/core';
 import { getUrl, resize } from '../utils';
 import { max } from '../constants.json';
-import { Core } from '@self.id/core';
 
 const core = new Core({ ceramic: 'https://ceramic-private.3boxlabs.com' });
 

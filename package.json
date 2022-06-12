@@ -6,7 +6,7 @@
     "lint": "eslint . --ext .ts --fix",
     "build": "tsc",
     "dev": "nodemon src/index.ts",
-    "start": "node build/src/index.js",
+    "start": "node dist/src/index.js",
     "test": "yarn jest"
   },
   "dependencies": {
