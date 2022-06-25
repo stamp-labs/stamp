@@ -63,6 +63,16 @@ export async function parseQuery(id, type, query) {
   };
 }
 
+export function chainIdToName(chainId: string) {
+  if (chainId === '1') return 'ethereum';
+  if (chainId === '56') return 'binance';
+  if (chainId === '250') return 'fantom';
+  if (chainId === '137') return 'polygon';
+  if (chainId === '42161') return 'arbitrum';
+
+  return null;
+}
+
 export function getUrl(url) {
   const gateway: string = process.env.IPFS_GATEWAY || 'snapshot.mypinata.cloud';
   return snapshot.utils.getUrl(url, gateway);

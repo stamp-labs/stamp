@@ -13,7 +13,7 @@ export default async function resolve(address, chainId) {
     const networkName = chainIdToName(chainId) || 'ethereum';
     const checksum = getAddress(address);
 
-    let url = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/${networkName}/assets/${checksum}/logo.png`;
+    let url = `https://storage.googleapis.com/zapper-fi-assets/tokens/${networkName}/${checksum.toLocaleLowerCase()}.png`;
     if (ETH.includes(checksum)) url = 'https://static.cdnlogo.com/logos/e/81/ethereum-eth.svg';
 
     const input = (await axios({ url, responseType: 'arraybuffer' })).data as Buffer;
