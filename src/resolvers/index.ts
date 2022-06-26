@@ -6,6 +6,7 @@ import snapshot from './snapshot';
 import space from './space';
 import selfid from './selfid';
 import lens from './lens';
+import zapper from './zapper';
 
 export default {
   blockie,
@@ -15,5 +16,6 @@ export default {
   snapshot,
   space,
   selfid,
-  lens
+  lens,
+  zapper
 };
