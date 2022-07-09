@@ -8,14 +8,14 @@ describe('resolvers', () => {
 
         expect(result).toBeInstanceOf(Buffer);
         expect(result.length).toBeGreaterThan(500);
-      });
+      }, 15000);
 
       it('should resolve IPFS metadata', async () => {
         const result = await resolvers.nft('0x7f8162f4ffe3db46cd3b0626dab699506c0ff63a', '6386');
 
         expect(result).toBeInstanceOf(Buffer);
         expect(result.length).toBeGreaterThan(500);
-      });
+      }, 15000);
     });
 
     describe('erc1155', () => {
@@ -24,7 +24,7 @@ describe('resolvers', () => {
 
         expect(result).toBeInstanceOf(Buffer);
         expect(result.length).toBeGreaterThan(500);
-      });
+      }, 15000);
 
       it.skip('should resolve OpeanSea metadata', async () => {
         // TODO: for some reason URL for metadata returns 404 every time
@@ -40,7 +40,7 @@ describe('resolvers', () => {
 
         expect(result).toBeInstanceOf(Buffer);
         expect(result.length).toBeGreaterThan(500);
-      });
+      }, 15000);
     });
   });
 });

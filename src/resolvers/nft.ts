@@ -2,9 +2,11 @@ import axios from 'axios';
 import parseDataURL from 'data-urls';
 import { getAddress } from '@ethersproject/address';
 import { Contract } from '@ethersproject/contracts';
-import { getDefaultProvider } from '@ethersproject/providers';
+import { StaticJsonRpcProvider } from '@ethersproject/providers';
 import { getUrl, resize } from '../utils';
 import { max } from '../constants.json';
+
+const provider = new StaticJsonRpcProvider('https://brovider.xyz/1');
 
 const abis = {
   erc721: ['function tokenURI(uint256 tokenId) view returns (string)'],
@@ -12,7 +14,7 @@ const abis = {
 };
 
 async function resolveErc721(address: string, tokenId: string) {
-  const contract = new Contract(getAddress(address), abis.erc721, getDefaultProvider());
+  const contract = new Contract(getAddress(address), abis.erc721, provider);
   const data = await contract.tokenURI(tokenId);
 
   const parsedMetadata = parseDataURL(data);
@@ -39,7 +41,7 @@ async function resolveErc721(address: string, tokenId: string) {
 }
 
 async function resolveErc1155(address: string, tokenId: string) {
-  const contract = new Contract(getAddress(address), abis.erc1155, getDefaultProvider());
+  const contract = new Contract(getAddress(address), abis.erc1155, provider);
   const data = await contract.uri(tokenId);
 
   const replacementId =
