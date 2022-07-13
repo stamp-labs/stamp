@@ -3,8 +3,7 @@ import parseDataURL from 'data-urls';
 import { getAddress } from '@ethersproject/address';
 import { Contract } from '@ethersproject/contracts';
 import { StaticJsonRpcProvider } from '@ethersproject/providers';
-import { getUrl, resize } from '../utils';
-import { max } from '../constants.json';
+import { getUrl } from '../utils';
 
 const provider = new StaticJsonRpcProvider('https://brovider.xyz/1');
 
@@ -79,12 +78,7 @@ async function resolveErc1155(address: string, tokenId: string) {
 
 export default async function resolve(address: string, tokenId: string) {
   try {
-    const input = await Promise.any([
-      resolveErc721(address, tokenId),
-      resolveErc1155(address, tokenId)
-    ]);
-
-    return await resize(input, max, max);
+    return await Promise.any([resolveErc721(address, tokenId), resolveErc1155(address, tokenId)]);
   } catch (e) {
     return false;
   }

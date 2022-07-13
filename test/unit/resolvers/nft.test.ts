@@ -7,14 +7,14 @@ describe('resolvers', () => {
         const result = await resolvers.nft('0x29b4ea6b1164c7cd8a3a0a1dc4ad88d1e0589124', '6364');
 
         expect(result).toBeInstanceOf(Buffer);
-        expect(result.length).toBeGreaterThan(500);
+        expect((result as Buffer).length).toBeGreaterThan(500);
       }, 15000);
 
       it('should resolve IPFS metadata', async () => {
         const result = await resolvers.nft('0x7f8162f4ffe3db46cd3b0626dab699506c0ff63a', '6386');
 
         expect(result).toBeInstanceOf(Buffer);
-        expect(result.length).toBeGreaterThan(500);
+        expect((result as Buffer).length).toBeGreaterThan(500);
       }, 15000);
     });
 
@@ -23,7 +23,7 @@ describe('resolvers', () => {
         const result = await resolvers.nft('0x3b1417c1f204607deda4767929497256e4ff540c', '1');
 
         expect(result).toBeInstanceOf(Buffer);
-        expect(result.length).toBeGreaterThan(500);
+        expect((result as Buffer).length).toBeGreaterThan(500);
       }, 15000);
 
       it.skip('should resolve OpeanSea metadata', async () => {
@@ -39,7 +39,7 @@ describe('resolvers', () => {
         );
 
         expect(result).toBeInstanceOf(Buffer);
-        expect(result.length).toBeGreaterThan(500);
+        expect((result as Buffer).length).toBeGreaterThan(500);
       }, 15000);
     });
   });
