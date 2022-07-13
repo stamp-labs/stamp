@@ -46,7 +46,7 @@ async function resolveErc1155(address: string, tokenId: string) {
   const replacementId =
     tokenId.length === 64
       ? tokenId
-      : parseInt(tokenId, 10)
+      : BigInt(tokenId)
           .toString(16)
           .padStart(64, '0');
 
