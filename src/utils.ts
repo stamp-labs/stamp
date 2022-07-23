@@ -10,9 +10,11 @@ export function sha256(str) {
     .digest('hex');
 }
 
-export async function resize(input, w, h) {
+export async function resize(input, w, h, fit = 'cover') {
   return sharp(input)
-    .resize(w, h)
+    .resize(w, h, {
+      fit
+    })
     .webp({ lossless: true })
     .toBuffer();
 }
