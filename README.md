@@ -50,9 +50,9 @@ cdn.stamp.fyi/avatar/0xeF8305E140ac520225DAf050e2f71d5fBcC543e7?**cb=1**
 
 ### Integrations
 
-- Snapshot http://snapshot.org
-- Parcel https://parcel.money
-- You? [Make a PR](https://github.com/snapshot-labs/stamp/edit/master/README.md)!
+#### [Snapshot](http://snapshot.org)
+#### [Parcel](https://parcel.money)
+#### [You?](https://github.com/snapshot-labs/stamp/edit/master/README.md)
 
 ### License
 
