@@ -52,6 +52,7 @@ cdn.stamp.fyi/avatar/0xeF8305E140ac520225DAf050e2f71d5fBcC543e7?**cb=1**
 
 #### [Snapshot](http://snapshot.org)
 #### [Parcel](https://parcel.money)
+#### [Lenster](https://lenster.xyz)
 #### [You?](https://github.com/snapshot-labs/stamp/edit/master/README.md)
 
 ### License
