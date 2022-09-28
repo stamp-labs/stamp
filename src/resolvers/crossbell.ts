@@ -15,7 +15,7 @@ function getDefaultImage(data) {
 
 export default async function resolve(address: string) {
   const endpoint = isAddress(address)
-    ? `${API_URL}/addresses/${getAddress(address)}/characters`
+    ? `${API_URL}/addresses/${getAddress(address)}/characters?primary=true`
     : `${API_URL}/handles/${address}/character`;
 
   try {
