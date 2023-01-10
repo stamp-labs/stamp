@@ -73,7 +73,7 @@ router.get('/:type/:id', async (req, res) => {
       await set(`${key1}/${key1}`, file1);
       console.log('Stored base cache', key1);
     }
-    await set(`${key2}/${key1}`, file2);
+    await set(`${key1}/${key2}`, file2);
     console.log('Stored cache', address);
   } catch (e) {
     console.log('Store cache failed', address, e);
