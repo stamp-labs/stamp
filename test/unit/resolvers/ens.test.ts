@@ -13,6 +13,6 @@ describe('resolvers', () => {
 
       expect(result).toBeInstanceOf(Buffer);
       expect(result.length).toBeGreaterThan(1000);
-    });
+    }, 30000);
   });
 });
