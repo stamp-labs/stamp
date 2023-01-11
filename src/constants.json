@@ -1,6 +1,7 @@
 {
   "max": 500,
   "ttl": 86400,
+  "shortTtl": 3600,
   "resolvers": {
     "avatar": ["selfid", "lens", "ens", "snapshot"],
     "token": ["trustwallet", "zapper"],

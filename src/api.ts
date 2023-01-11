@@ -34,10 +34,6 @@ router.get('/:type/:id', async (req, res) => {
     fallback
   });
   const key2 = getCacheKey({ type, network, address, w, h, fallback });
-  let currentResolvers = constants.resolvers.avatar;
-  if (type === 'token') currentResolvers = constants.resolvers.token;
-  if (type === 'space') currentResolvers = constants.resolvers.space;
-  currentResolvers = [fallback, ...currentResolvers];
 
   // Check resized cache
   const cache = await get(`${key1}/${key2}`);
@@ -49,31 +45,41 @@ router.get('/:type/:id', async (req, res) => {
 
   // Check base cache
   const base = await get(`${key1}/${key1}`);
-  let file1;
+  let baseImage;
   if (base) {
-    file1 = await streamToBuffer(base);
+    baseImage = await streamToBuffer(base);
     // console.log('Got base cache');
   } else {
     console.log('No cache for', key1, base);
-    const p = currentResolvers.map(r => resolvers[r](address, network));
-    const files = await Promise.all(p);
-    files.forEach(file => {
-      if (file) file1 = file;
-    });
+
+    let currentResolvers: string[] = constants.resolvers.avatar;
+    if (type === 'token') currentResolvers = constants.resolvers.token;
+    if (type === 'space') currentResolvers = constants.resolvers.space;
+
+    const files = await Promise.all(currentResolvers.map(r => resolvers[r](address, network)));
+    baseImage = [...files].reverse().find(file => !!file);
+
+    if (!baseImage) {
+      const fallbackImage = await resolvers[fallback](address, network);
+      const resizedImage = await resize(fallbackImage, w, h);
+
+      setHeader(res, 'SHORT');
+      return res.send(resizedImage);
+    }
   }
 
   // Resize and return image
-  const file2 = await resize(file1, w, h);
+  const resizedImage = await resize(baseImage, w, h);
   setHeader(res);
-  res.send(file2);
+  res.send(resizedImage);
 
   // Store cache
   try {
     if (!base) {
-      await set(`${key1}/${key1}`, file1);
+      await set(`${key1}/${key1}`, baseImage);
       console.log('Stored base cache', key1);
     }
-    await set(`${key1}/${key2}`, file2);
+    await set(`${key1}/${key2}`, resizedImage);
     console.log('Stored cache', address);
   } catch (e) {
     console.log('Store cache failed', address, e);
