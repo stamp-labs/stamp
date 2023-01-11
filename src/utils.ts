@@ -98,8 +98,8 @@ export function getCacheKey({
   return sha256(JSON.stringify({ type, network, address, w, h, fallback }));
 }
 
-export function setHeader(res: Response, cacheType: 'SHORT' | 'LONG' = 'LONG') {
-  const ttl = cacheType === 'SHORT' ? constants.shortTtl : constants.ttl;
+export function setHeader(res: Response, cacheType: 'SHORT_CACHE' | 'LONG_CACHE' = 'LONG_CACHE') {
+  const ttl = cacheType === 'SHORT_CACHE' ? constants.shortTtl : constants.ttl;
 
   res.set({
     'Content-Type': 'image/webp',

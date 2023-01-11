@@ -63,7 +63,7 @@ router.get('/:type/:id', async (req, res) => {
       const fallbackImage = await resolvers[fallback](address, network);
       const resizedImage = await resize(fallbackImage, w, h);
 
-      setHeader(res, 'SHORT');
+      setHeader(res, 'SHORT_CACHE');
       return res.send(resizedImage);
     }
   }
