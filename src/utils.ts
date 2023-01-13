@@ -1,5 +1,6 @@
 import { createHash } from 'crypto';
 import sharp from 'sharp';
+import { Response } from 'express';
 import { StaticJsonRpcProvider } from '@ethersproject/providers';
 import snapshot from '@snapshot-labs/snapshot.js';
 import constants from './constants.json';
@@ -97,10 +98,12 @@ export function getCacheKey({
   return sha256(JSON.stringify({ type, network, address, w, h, fallback }));
 }
 
-export function setHeader(res) {
+export function setHeader(res: Response, cacheType: 'SHORT_CACHE' | 'LONG_CACHE' = 'LONG_CACHE') {
+  const ttl = cacheType === 'SHORT_CACHE' ? constants.shortTtl : constants.ttl;
+
   res.set({
     'Content-Type': 'image/webp',
-    'Cache-Control': `public, max-age=${constants.ttl}`,
-    Expires: new Date(Date.now() + constants.ttl * 1e3).toUTCString()
+    'Cache-Control': `public, max-age=${ttl}`,
+    Expires: new Date(Date.now() + ttl * 1e3).toUTCString()
   });
 }
