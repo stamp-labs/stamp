@@ -3,7 +3,7 @@
   "ttl": 86400,
   "shortTtl": 3600,
   "resolvers": {
-    "avatar": ["selfid", "lens", "ens", "snapshot"],
+    "avatar": ["lens", "ens", "snapshot"],
     "token": ["trustwallet", "zapper"],
     "space": ["space"]
   }
