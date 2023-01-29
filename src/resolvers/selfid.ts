@@ -4,7 +4,7 @@ import { Core } from '@self.id/core';
 import { getUrl, resize } from '../utils';
 import { max } from '../constants.json';
 
-const core = new Core({ ceramic: 'https://ceramic-private.3boxlabs.com' });
+const core = new Core({ ceramic: 'https://gateway.ceramic.network' });
 
 export default async function resolve(address: string) {
   try {
