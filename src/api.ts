@@ -50,7 +50,7 @@ router.get('/:type/:id', async (req, res) => {
     baseImage = await streamToBuffer(base);
     // console.log('Got base cache');
   } else {
-    console.log('No cache for', key1, base);
+    // console.log('No cache for', key1, base);
 
     let currentResolvers: string[] = constants.resolvers.avatar;
     if (type === 'token') currentResolvers = constants.resolvers.token;
