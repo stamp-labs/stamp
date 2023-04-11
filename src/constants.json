@@ -5,6 +5,6 @@
   "resolvers": {
     "avatar": ["lens", "ens", "snapshot"],
     "token": ["trustwallet", "zapper"],
-    "space": ["space"]
+    "space": ["space", "space-sx"]
   }
 }
