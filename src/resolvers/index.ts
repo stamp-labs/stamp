@@ -4,6 +4,7 @@ import ens from './ens';
 import trustwallet from './trustwallet';
 import snapshot from './snapshot';
 import space from './space';
+import spacesx from './space-sx'
 import selfid from './selfid';
 import lens from './lens';
 import zapper from './zapper';
@@ -15,6 +16,7 @@ export default {
   trustwallet,
   snapshot,
   space,
+  spacesx,
   selfid,
   lens,
   zapper
