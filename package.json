@@ -4,6 +4,7 @@
   "license": "MIT",
   "scripts": {
     "lint": "eslint . --ext .ts --fix",
+    "lint:nofix": "eslint . --ext .ts",
     "build": "tsc",
     "dev": "nodemon src/index.ts",
     "start": "node dist/src/index.js",
