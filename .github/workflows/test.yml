@@ -12,4 +12,5 @@ jobs:
           cache: 'yarn'
       - run: yarn
       - run: yarn lint:nofix
+      - run: yarn typecheck
       - run: yarn test
