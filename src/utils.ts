@@ -23,17 +23,17 @@ export async function parseQuery(id, type, query) {
   let network = '1';
 
   // Resolve format
-  let format;
+  // let format;
   const chunks = id.split(':');
   if (chunks.length === 2) {
-    format = 'eip3770';
+    // format = 'eip3770';
     address = chunks[1];
   } else if (chunks.length === 3) {
-    format = 'caip10';
+    // format = 'caip10';
     address = chunks[2];
     network = chunks[1];
   } else if (id.startsWith('did:')) {
-    format = 'did';
+    // format = 'did';
     address = id.slice(4);
   }
   // console.log('Format', format);
