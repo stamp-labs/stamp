@@ -60,7 +60,8 @@ export async function parseQuery(id, type, query) {
     network,
     w,
     h,
-    fallback: query.fb === 'jazzicon' ? 'jazzicon' : 'blockie'
+    fallback: query.fb === 'jazzicon' ? 'jazzicon' : 'blockie',
+    cb: query.cb
   };
 }
 
@@ -85,7 +86,8 @@ export function getCacheKey({
   address,
   w,
   h,
-  fallback
+  fallback,
+  cb
 }: {
   type: string;
   network: string;
@@ -93,9 +95,13 @@ export function getCacheKey({
   w: number;
   h: number;
   fallback: string;
+  cb?: string;
 }) {
-  if (fallback === 'blockie') return sha256(JSON.stringify({ type, network, address, w, h }));
-  return sha256(JSON.stringify({ type, network, address, w, h, fallback }));
+  const data = { type, network, address, w, h };
+  if (fallback !== 'blockie') data['fallback'] = fallback;
+  if (cb) data['cb'] = cb;
+
+  return sha256(JSON.stringify(data));
 }
 
 export function setHeader(res: Response, cacheType: 'SHORT_CACHE' | 'LONG_CACHE' = 'LONG_CACHE') {
