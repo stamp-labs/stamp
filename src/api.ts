@@ -36,8 +36,6 @@ router.get('/:type/:id', async (req, res) => {
   });
   const key2 = getCacheKey({ type, network, address, w, h, fallback, cb });
 
-  console.log('cached', key1, key2);
-
   // Check resized cache
   const cache = await get(`${key1}/${key2}`);
   if (cache) {
