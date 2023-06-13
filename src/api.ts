@@ -24,16 +24,17 @@ router.get('/clear/:type/:id', async (req, res) => {
 router.get('/:type/:id', async (req, res) => {
   const { type, id } = req.params;
 
-  const { address, network, w, h, fallback } = await parseQuery(id, type, req.query);
+  const { address, network, w, h, fallback, cb } = await parseQuery(id, type, req.query);
   const key1 = getCacheKey({
     type,
     network,
     address,
     w: constants.max,
     h: constants.max,
-    fallback
+    fallback,
+    cb
   });
-  const key2 = getCacheKey({ type, network, address, w, h, fallback });
+  const key2 = getCacheKey({ type, network, address, w, h, fallback, cb });
 
   // Check resized cache
   const cache = await get(`${key1}/${key2}`);
