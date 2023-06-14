@@ -19,12 +19,14 @@ export async function streamToBuffer(stream: Readable) {
 
 export async function set(key, value) {
   try {
-    return await client.putObject({
+    const command = new AWS.PutObjectCommand({
       Bucket: bucket,
       Key: `public/${dir}/${key}`,
       Body: value,
       ContentType: 'image/webp'
     });
+
+    await client.send(command);
   } catch (e) {
     console.log('Store cache failed', e);
     throw e;
@@ -54,10 +56,13 @@ export async function clear(path) {
 
 export async function get(key) {
   try {
-    const { Body } = await client.getObject({
+    const command = new AWS.GetObjectCommand({
       Bucket: bucket,
       Key: `public/${dir}/${key}`
     });
+
+    const { Body } = await client.send(command);
+
     return Body;
   } catch (e) {
     return false;
