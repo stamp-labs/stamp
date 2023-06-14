@@ -22,10 +22,9 @@ router.get('/clear/:type/:id', async (req, res) => {
     const key = getCacheKey({ type, network, address, w, h, fallback });
     await clear(key);
     res.status(200).json({ status: 'ok' });
-  } catch (e: any = {}) {
+  } catch (e) {
     console.log(e);
-    const errorMessage = e?.message || 'Error while clearing cache'
-    res.status(500).json({ status: 'error', error: errorMessage});
+    res.status(500).json({ status: 'error', error: 'failed to clear cache' });
   }
 });
 
@@ -36,7 +35,7 @@ router.get('/:type/:id', async (req, res) => {
   try {
     ({ address, network, w, h, fallback, cb } = await parseQuery(id, type, req.query));
   } catch (e) {
-    return res.status(500).json({ status: 'error', error: e });
+    return res.status(500).json({ status: 'error', error: 'failed to load content' });
   }
 
   const key1 = getCacheKey({
@@ -52,7 +51,7 @@ router.get('/:type/:id', async (req, res) => {
 
   // Check resized cache
   const cache = await get(`${key1}/${key2}`);
-  if (cache) {
+  if (cache && network === '1234') {
     // console.log('Got cache', address);
     setHeader(res);
     return cache.pipe(res);
