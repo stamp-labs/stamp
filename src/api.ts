@@ -29,8 +29,14 @@ router.get('/clear/:type/:id', async (req, res) => {
 
 router.get('/:type/:id', async (req, res) => {
   const { type, id } = req.params;
+  let address, network, w, h, fallback, cb;
 
-  const { address, network, w, h, fallback, cb } = await parseQuery(id, type, req.query);
+  try {
+    ({ address, network, w, h, fallback, cb } = await parseQuery(id, type, req.query));
+  } catch (e) {
+    return res.status(500).json({ status: 'error', error: e });
+  }
+
   const key1 = getCacheKey({
     type,
     network,
