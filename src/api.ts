@@ -51,7 +51,7 @@ router.get('/:type/:id', async (req, res) => {
 
   // Check resized cache
   const cache = await get(`${key1}/${key2}`);
-  if (cache && network === '1234') {
+  if (cache) {
     // console.log('Got cache', address);
     setHeader(res);
     return cache.pipe(res);
