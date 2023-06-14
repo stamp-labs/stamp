@@ -3,8 +3,14 @@ import { parseQuery, resize, setHeader, getCacheKey } from './utils';
 import { set, get, streamToBuffer, clear } from './aws';
 import resolvers from './resolvers';
 import constants from './constants.json';
+import { name, version } from '../package.json';
 
 const router = express.Router();
+
+router.get('/', (req, res) => {
+  const commit = process.env.COMMIT_HASH ?? undefined;
+  res.json({ name, version, commit });
+});
 
 router.get('/clear/:type/:id', async (req, res) => {
   const { type, id } = req.params;
@@ -86,10 +92,6 @@ router.get('/:type/:id', async (req, res) => {
   } catch (e) {
     console.log('Store cache failed', address, e);
   }
-});
-
-router.get('/*', async (req, res) => {
-  res.redirect('https://github.com/snapshot-labs/stamp');
 });
 
 export default router;

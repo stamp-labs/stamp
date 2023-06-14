@@ -5,6 +5,22 @@ import { StaticJsonRpcProvider } from '@ethersproject/providers';
 import snapshot from '@snapshot-labs/snapshot.js';
 import constants from './constants.json';
 
+const providers: Record<string, StaticJsonRpcProvider> = {};
+
+export function getProvider(network: number): StaticJsonRpcProvider {
+  if (!providers[`_${network}`])
+    providers[`_${network}`] = new StaticJsonRpcProvider(
+      {
+        url: `https://rpc.brovider.xyz/${network}`,
+        timeout: 20e3,
+        allowGzip: true
+      },
+      network
+    );
+
+  return providers[`_${network}`];
+}
+
 export function sha256(str) {
   return createHash('sha256')
     .update(str)
@@ -40,7 +56,7 @@ export async function parseQuery(id, type, query) {
 
   // Resolve ENS name
   if (address.includes('.') && type !== 'space') {
-    const provider = new StaticJsonRpcProvider('https://brovider.xyz/1');
+    const provider = getProvider(1);
     const addressFromEns = await provider.resolveName(address);
     if (addressFromEns) address = addressFromEns;
   }
