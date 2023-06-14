@@ -22,7 +22,7 @@ router.get('/clear/:type/:id', async (req, res) => {
     const key = getCacheKey({ type, network, address, w, h, fallback });
     await clear(key);
     res.status(200).json({ status: 'ok' });
-  } catch (e: any = {}) {
+  } catch (e: any) {
     console.log(e);
     const errorMessage = e?.message || 'Error while clearing cache'
     res.status(500).json({ status: 'error', error: errorMessage});
