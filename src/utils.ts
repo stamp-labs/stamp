@@ -63,7 +63,7 @@ export async function parseQuery(id, type, query) {
 
   address = address.toLowerCase();
   const size = 64;
-  const maxSize = 500;
+  const maxSize = type === 'space-cover-sx' ? 1500 : 500;
   let s = query.s ? parseInt(query.s) : size;
   if (s < 1 || s > maxSize || isNaN(s)) s = size;
   let w = query.w ? parseInt(query.w) : s;

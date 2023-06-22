@@ -70,6 +70,7 @@ router.get('/:type/:id', async (req, res) => {
     if (type === 'token') currentResolvers = constants.resolvers.token;
     if (type === 'space') currentResolvers = constants.resolvers.space;
     if (type === 'space-sx') currentResolvers = constants.resolvers['space-sx'];
+    if (type === 'space-cover-sx') currentResolvers = constants.resolvers['space-cover-sx'];
 
     const files = await Promise.all(currentResolvers.map(r => resolvers[r](address, network)));
     baseImage = [...files].reverse().find(file => !!file);

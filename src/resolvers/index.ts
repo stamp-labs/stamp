@@ -4,7 +4,7 @@ import ens from './ens';
 import trustwallet from './trustwallet';
 import snapshot from './snapshot';
 import space from './space';
-import spaceSx from './space-sx';
+import { resolveAvatar as sxResolveAvatar, resolveCover as sxResolveCover } from './space-sx';
 import selfid from './selfid';
 import lens from './lens';
 import zapper from './zapper';
@@ -16,7 +16,8 @@ export default {
   trustwallet,
   snapshot,
   space,
-  'space-sx': spaceSx,
+  'space-sx': sxResolveAvatar,
+  'space-cover-sx': sxResolveCover,
   selfid,
   lens,
   zapper
