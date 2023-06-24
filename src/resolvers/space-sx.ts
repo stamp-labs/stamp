@@ -2,16 +2,11 @@ import axios from 'axios';
 import { getUrl, resize } from '../utils';
 import { max } from '../constants.json';
 
-// TODO: deploy new cover indexing to all networks
 const SUBGRAPH_URLS = [
-  'https://api.studio.thegraph.com/query/41343/sekhmet-sx-goerli/version/latest'
+  'https://api.studio.thegraph.com/query/23545/sx-goerli/version/latest',
+  'https://api.studio.thegraph.com/query/23545/sx-sepolia/version/latest',
+  'https://thegraph.goerli.zkevm.consensys.net/subgraphs/name/snapshot-labs/sx-subgraph'
 ];
-
-// const SUBGRAPH_URLS = [
-//   'https://api.studio.thegraph.com/query/23545/sx-goerli/version/latest',
-//   'https://api.studio.thegraph.com/query/23545/sx-sepolia/version/latest',
-//   'https://thegraph.goerli.zkevm.consensys.net/subgraphs/name/snapshot-labs/sx-subgraph'
-// ];
 
 async function getSpaceProperty(key: string, url: string, property: 'avatar' | 'cover') {
   const data = await axios({
