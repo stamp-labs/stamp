@@ -3,11 +3,13 @@
   "version": "0.1.0",
   "license": "MIT",
   "scripts": {
-    "lint": "eslint . --ext .ts --fix",
+    "lint": "yarn lint:nofix --fix",
+    "lint:nofix": "eslint . --ext .ts",
     "build": "tsc",
     "dev": "nodemon src/index.ts",
     "start": "node dist/src/index.js",
-    "test": "yarn jest"
+    "test": "yarn jest",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.352.0",
