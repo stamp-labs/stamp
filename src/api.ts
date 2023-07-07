@@ -3,8 +3,14 @@ import { parseQuery, resize, setHeader, getCacheKey } from './utils';
 import { set, get, streamToBuffer, clear } from './aws';
 import resolvers from './resolvers';
 import constants from './constants.json';
+import { name, version } from '../package.json';
 
 const router = express.Router();
+
+router.get('/', (req, res) => {
+  const commit = process.env.COMMIT_HASH ?? undefined;
+  res.json({ name, version, commit });
+});
 
 router.get('/clear/:type/:id', async (req, res) => {
   const { type, id } = req.params;
@@ -17,23 +23,31 @@ router.get('/clear/:type/:id', async (req, res) => {
     await clear(key);
     res.status(200).json({ status: 'ok' });
   } catch (e) {
-    res.status(500).json({ status: 'error', error: e });
+    console.log(e);
+    res.status(500).json({ status: 'error', error: 'failed to clear cache' });
   }
 });
 
 router.get('/:type/:id', async (req, res) => {
   const { type, id } = req.params;
+  let address, network, w, h, fallback, cb;
 
-  const { address, network, w, h, fallback } = await parseQuery(id, type, req.query);
+  try {
+    ({ address, network, w, h, fallback, cb } = await parseQuery(id, type, req.query));
+  } catch (e) {
+    return res.status(500).json({ status: 'error', error: 'failed to load content' });
+  }
+
   const key1 = getCacheKey({
     type,
     network,
     address,
     w: constants.max,
     h: constants.max,
-    fallback
+    fallback,
+    cb
   });
-  const key2 = getCacheKey({ type, network, address, w, h, fallback });
+  const key2 = getCacheKey({ type, network, address, w, h, fallback, cb });
 
   // Check resized cache
   const cache = await get(`${key1}/${key2}`);
@@ -56,6 +70,7 @@ router.get('/:type/:id', async (req, res) => {
     if (type === 'token') currentResolvers = constants.resolvers.token;
     if (type === 'space') currentResolvers = constants.resolvers.space;
     if (type === 'space-sx') currentResolvers = constants.resolvers['space-sx'];
+    if (type === 'space-cover-sx') currentResolvers = constants.resolvers['space-cover-sx'];
 
     const files = await Promise.all(currentResolvers.map(r => resolvers[r](address, network)));
     baseImage = [...files].reverse().find(file => !!file);
@@ -85,10 +100,6 @@ router.get('/:type/:id', async (req, res) => {
   } catch (e) {
     console.log('Store cache failed', address, e);
   }
-});
-
-router.get('/*', async (req, res) => {
-  res.redirect('https://github.com/snapshot-labs/stamp');
 });
 
 export default router;

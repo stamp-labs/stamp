@@ -6,6 +6,7 @@
     "avatar": ["lens", "ens", "snapshot"],
     "token": ["trustwallet", "zapper"],
     "space": ["space"],
-    "space-sx": ["space-sx"]
+    "space-sx": ["space-sx"],
+    "space-cover-sx": ["space-cover-sx"]
   }
 }

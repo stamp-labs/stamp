@@ -5,6 +5,22 @@ import { StaticJsonRpcProvider } from '@ethersproject/providers';
 import snapshot from '@snapshot-labs/snapshot.js';
 import constants from './constants.json';
 
+const providers: Record<string, StaticJsonRpcProvider> = {};
+
+export function getProvider(network: number): StaticJsonRpcProvider {
+  if (!providers[`_${network}`])
+    providers[`_${network}`] = new StaticJsonRpcProvider(
+      {
+        url: `https://rpc.brovider.xyz/${network}`,
+        timeout: 20e3,
+        allowGzip: true
+      },
+      network
+    );
+
+  return providers[`_${network}`];
+}
+
 export function sha256(str) {
   return createHash('sha256')
     .update(str)
@@ -40,14 +56,14 @@ export async function parseQuery(id, type, query) {
 
   // Resolve ENS name
   if (address.includes('.') && type !== 'space') {
-    const provider = new StaticJsonRpcProvider('https://brovider.xyz/1');
+    const provider = getProvider(1);
     const addressFromEns = await provider.resolveName(address);
     if (addressFromEns) address = addressFromEns;
   }
 
   address = address.toLowerCase();
   const size = 64;
-  const maxSize = 500;
+  const maxSize = type === 'space-cover-sx' ? 1500 : 500;
   let s = query.s ? parseInt(query.s) : size;
   if (s < 1 || s > maxSize || isNaN(s)) s = size;
   let w = query.w ? parseInt(query.w) : s;
@@ -60,7 +76,8 @@ export async function parseQuery(id, type, query) {
     network,
     w,
     h,
-    fallback: query.fb === 'jazzicon' ? 'jazzicon' : 'blockie'
+    fallback: query.fb === 'jazzicon' ? 'jazzicon' : 'blockie',
+    cb: query.cb
   };
 }
 
@@ -85,7 +102,8 @@ export function getCacheKey({
   address,
   w,
   h,
-  fallback
+  fallback,
+  cb
 }: {
   type: string;
   network: string;
@@ -93,9 +111,13 @@ export function getCacheKey({
   w: number;
   h: number;
   fallback: string;
+  cb?: string;
 }) {
-  if (fallback === 'blockie') return sha256(JSON.stringify({ type, network, address, w, h }));
-  return sha256(JSON.stringify({ type, network, address, w, h, fallback }));
+  const data = { type, network, address, w, h };
+  if (fallback !== 'blockie') data['fallback'] = fallback;
+  if (cb) data['cb'] = cb;
+
+  return sha256(JSON.stringify(data));
 }
 
 export function setHeader(res: Response, cacheType: 'SHORT_CACHE' | 'LONG_CACHE' = 'LONG_CACHE') {
