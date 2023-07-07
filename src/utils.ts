@@ -22,16 +22,11 @@ export function getProvider(network: number): StaticJsonRpcProvider {
 }
 
 export function sha256(str) {
-  return createHash('sha256')
-    .update(str)
-    .digest('hex');
+  return createHash('sha256').update(str).digest('hex');
 }
 
 export async function resize(input, w, h) {
-  return sharp(input)
-    .resize(w, h)
-    .webp({ lossless: true })
-    .toBuffer();
+  return sharp(input).resize(w, h).webp({ lossless: true }).toBuffer();
 }
 
 export async function parseQuery(id, type, query) {
