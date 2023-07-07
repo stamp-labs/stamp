@@ -17,6 +17,7 @@
     "@ethersproject/providers": "^5.7.2",
     "@metamask/jazzicon": "^2.0.0",
     "@self.id/core": "^0.3.0",
+    "@sentry/node": "^7.57.0",
     "@snapshot-labs/snapshot.js": "^0.3.75",
     "axios": "^0.25.0",
     "canvas": "^2.9.0",
