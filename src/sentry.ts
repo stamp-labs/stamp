@@ -22,6 +22,8 @@ export function initLogger(app: Express) {
 }
 
 export function fallbackLogger(app: Express) {
+  if (process.env.NODE_ENV !== 'production') return;
+  
   app.use(Sentry.Handlers.errorHandler());
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   app.use(function onError(err: any, req: any, res: any, _: any) {
