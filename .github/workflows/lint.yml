@@ -1,4 +1,4 @@
-name: Test
+name: Build and run lint
 on: [push]
 jobs:
   build-test:
@@ -10,8 +10,6 @@ jobs:
           node-version: '16'
           cache: 'yarn'
       - run: yarn
-      - run: yarn test
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+      - run: yarn build
+      - run: yarn lint:nofix
+      - run: yarn typecheck

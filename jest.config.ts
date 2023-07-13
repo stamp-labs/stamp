@@ -8,6 +8,7 @@ export default {
   collectCoverage: true,
   coverageDirectory: 'coverage',
   coverageProvider: 'v8',
+  collectCoverageFrom: ['./src/**'],
   coveragePathIgnorePatterns: ['/node_modules/', '<rootDir>/dist/', '<rootDir>/test/fixtures/'],
 
   preset: 'ts-jest',
