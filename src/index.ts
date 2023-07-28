@@ -4,7 +4,7 @@ import express from 'express';
 import compression from 'compression';
 import cors from 'cors';
 import api from './api';
-import { initLogger, fallbackLogger } from './sentry';
+import { initLogger, fallbackLogger } from '@snapshot-labs/snapshot-sentry';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
