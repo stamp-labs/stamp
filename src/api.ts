@@ -3,7 +3,7 @@ import { parseQuery, resize, setHeader, getCacheKey } from './utils';
 import { set, get, streamToBuffer, clear } from './aws';
 import resolvers from './resolvers';
 import constants from './constants.json';
-import { capture } from './sentry';
+import { capture } from '@snapshot-labs/snapshot-sentry';
 import { name, version } from '../package.json';
 
 const router = express.Router();
