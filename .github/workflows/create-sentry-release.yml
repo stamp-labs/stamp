@@ -8,3 +8,4 @@ jobs:
     uses: snapshot-labs/actions/.github/workflows/create-sentry-release.yml@main
     with:
       project: stamp
+    secrets: inherit
