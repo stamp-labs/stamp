@@ -9,6 +9,9 @@
     "noImplicitAny": false,
     "resolveJsonModule": true,
     "moduleResolution": "Node",
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "inlineSources": true,
+    "sourceRoot": "/"
   }
 }

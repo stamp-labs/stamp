@@ -3,6 +3,7 @@ import { parseQuery, resize, setHeader, getCacheKey } from './utils';
 import { set, get, streamToBuffer, clear } from './aws';
 import resolvers from './resolvers';
 import constants from './constants.json';
+import { capture } from '@snapshot-labs/snapshot-sentry';
 import { name, version } from '../package.json';
 
 const router = express.Router();
@@ -23,7 +24,7 @@ router.get('/clear/:type/:id', async (req, res) => {
     await clear(key);
     res.status(200).json({ status: 'ok' });
   } catch (e) {
-    console.log(e);
+    capture(e);
     res.status(500).json({ status: 'error', error: 'failed to clear cache' });
   }
 });
@@ -98,6 +99,7 @@ router.get('/:type/:id', async (req, res) => {
     await set(`${key1}/${key2}`, resizedImage);
     console.log('Stored cache', address);
   } catch (e) {
+    capture(e);
     console.log('Store cache failed', address, e);
   }
 });
