@@ -54,13 +54,6 @@ export async function parseQuery(id, type, query) {
   }
   // console.log('Format', format);
 
-  // Resolve ENS name
-  if (address.includes('.') && type !== 'space') {
-    const provider = getProvider(1);
-    const addressFromEns = await provider.resolveName(address);
-    if (addressFromEns) address = addressFromEns;
-  }
-
   address = address.toLowerCase();
   const size = 64;
   const maxSize = type === 'space-cover-sx' ? 1500 : 500;
