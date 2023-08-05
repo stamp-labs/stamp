@@ -5,6 +5,8 @@ import { max } from '../constants.json';
 const SUBGRAPH_URLS = [
   'https://api.studio.thegraph.com/query/23545/sx-goerli/version/latest',
   'https://api.studio.thegraph.com/query/23545/sx-sepolia/version/latest',
+  'https://api.studio.thegraph.com/query/23545/sx-polygon/version/latest',
+  'https://api.studio.thegraph.com/query/23545/sx-arbitrum/version/latest',
   'https://thegraph.goerli.zkevm.consensys.net/subgraphs/name/snapshot-labs/sx-subgraph'
 ];
 
