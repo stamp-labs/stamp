@@ -11,7 +11,7 @@ export default async function resolve(name: string) {
     }
 
     const url = await ensResolver.getText('avatar');
-    if (!url) {
+    if (!url || !url.startsWith('http')) {
       return false;
     }
 
