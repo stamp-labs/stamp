@@ -3,13 +3,15 @@ dotenv.config();
 import express from 'express';
 import compression from 'compression';
 import cors from 'cors';
-import api from './api';
 import { initLogger, fallbackLogger } from '@snapshot-labs/snapshot-sentry';
+import initMetrics from './metrics';
+import api from './api';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 initLogger(app);
+initMetrics(app);
 
 app.use(express.json({ limit: '4mb' }));
 app.use(express.urlencoded({ limit: '4mb', extended: false }));
