@@ -13,6 +13,7 @@ const PORT = process.env.PORT || 3000;
 initLogger(app);
 initMetrics(app);
 
+app.disable('x-powered-by');
 app.use(express.json({ limit: '4mb' }));
 app.use(express.urlencoded({ limit: '4mb', extended: false }));
 
