@@ -7,13 +7,14 @@ import { capture } from '@snapshot-labs/snapshot-sentry';
 import { name, version } from '../package.json';
 
 const router = express.Router();
+const TYPE_CONSTRAINTS = Object.keys(constants.resolvers).join('|');
 
 router.get('/', (req, res) => {
   const commit = process.env.COMMIT_HASH ?? undefined;
   res.json({ name, version, commit });
 });
 
-router.get('/clear/:type/:id', async (req, res) => {
+router.get(`/clear/:type(${TYPE_CONSTRAINTS})/:id`, async (req, res) => {
   const { type, id } = req.params;
   try {
     const { address, network, w, h, fallback } = await parseQuery(id, type, {
@@ -29,7 +30,7 @@ router.get('/clear/:type/:id', async (req, res) => {
   }
 });
 
-router.get('/:type/:id', async (req, res) => {
+router.get(`/:type(${TYPE_CONSTRAINTS})/:id`, async (req, res) => {
   const { type, id } = req.params;
   let address, network, w, h, fallback, cb;
 
