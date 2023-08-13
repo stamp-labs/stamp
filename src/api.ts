@@ -1,18 +1,12 @@
 import express from 'express';
+import { capture } from '@snapshot-labs/snapshot-sentry';
 import { parseQuery, resize, setHeader, getCacheKey } from './utils';
 import { set, get, streamToBuffer, clear } from './aws';
 import resolvers from './resolvers';
 import constants from './constants.json';
-import { capture } from '@snapshot-labs/snapshot-sentry';
-import { name, version } from '../package.json';
 
 const router = express.Router();
 const TYPE_CONSTRAINTS = Object.keys(constants.resolvers).join('|');
-
-router.get('/', (req, res) => {
-  const commit = process.env.COMMIT_HASH ?? undefined;
-  res.json({ name, version, commit });
-});
 
 router.get(`/clear/:type(${TYPE_CONSTRAINTS})/:id`, async (req, res) => {
   const { type, id } = req.params;
