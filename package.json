@@ -22,7 +22,7 @@
     "@snapshot-labs/snapshot-sentry": "^1.0.0",
     "@snapshot-labs/snapshot.js": "^0.3.75",
     "axios": "^0.25.0",
-    "canvas": "^2.9.0",
+    "canvas": "^2.11.2",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
     "dotenv": "^16.0.0",
