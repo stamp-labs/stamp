@@ -1,4 +1,5 @@
 import init from '@snapshot-labs/snapshot-metrics';
+import { capture } from '@snapshot-labs/snapshot-sentry';
 import { Express } from 'express';
 import constants from './constants.json';
 
@@ -14,6 +15,7 @@ export default function initMetrics(app: Express) {
       /^\/$/,
       new RegExp(`^/clear/(${TYPE_CONSTRAINTS})/.+$`),
       new RegExp(`^/(${TYPE_CONSTRAINTS})/.+$`)
-    ]
+    ],
+    errorHandler: (e: any) => capture(e)
   });
 }
