@@ -7,7 +7,8 @@ const SUBGRAPH_URLS = [
   'https://api.studio.thegraph.com/query/23545/sx-sepolia/version/latest',
   'https://api.studio.thegraph.com/query/23545/sx-polygon/version/latest',
   'https://api.studio.thegraph.com/query/23545/sx-arbitrum/version/latest',
-  'https://thegraph.goerli.zkevm.consensys.net/subgraphs/name/snapshot-labs/sx-subgraph'
+  'https://thegraph.goerli.zkevm.consensys.net/subgraphs/name/snapshot-labs/sx-subgraph',
+  'https://api-1.snapshotx.xyz'
 ];
 
 async function getSpaceProperty(key: string, url: string, property: 'avatar' | 'cover') {
