@@ -34,6 +34,16 @@ export async function resize(input, w, h) {
     .toBuffer();
 }
 
+export function shortNameToChainId(shortName: string) {
+  if (shortName === 'eth') return '1';
+  if (shortName === 'bsc') return '56';
+  if (shortName === 'ftm') return '250';
+  if (shortName === 'matic') return '137';
+  if (shortName === 'arb1') return '42161';
+
+  return null;
+}
+
 export async function parseQuery(id, type, query) {
   let address = id;
   let network = '1';
@@ -44,6 +54,7 @@ export async function parseQuery(id, type, query) {
   if (chunks.length === 2) {
     // format = 'eip3770';
     address = chunks[1];
+    network = shortNameToChainId(chunks[0]) || '1';
   } else if (chunks.length === 3) {
     // format = 'caip10';
     address = chunks[2];
