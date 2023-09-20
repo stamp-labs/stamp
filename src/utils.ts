@@ -34,6 +34,16 @@ export async function resize(input, w, h) {
     .toBuffer();
 }
 
+export function shortNameToChainId(shortName: string) {
+  if (shortName === 'eth') return '1';
+  if (shortName === 'bsc') return '56';
+  if (shortName === 'ftm') return '250';
+  if (shortName === 'matic') return '137';
+  if (shortName === 'arb1') return '42161';
+
+  return null;
+}
+
 export async function parseQuery(id, type, query) {
   let address = id;
   let network = '1';
@@ -44,6 +54,7 @@ export async function parseQuery(id, type, query) {
   if (chunks.length === 2) {
     // format = 'eip3770';
     address = chunks[1];
+    network = shortNameToChainId(chunks[0]) || '1';
   } else if (chunks.length === 3) {
     // format = 'caip10';
     address = chunks[2];
@@ -122,3 +133,10 @@ export function setHeader(res: Response, cacheType: 'SHORT_CACHE' | 'LONG_CACHE'
     Expires: new Date(Date.now() + ttl * 1e3).toUTCString()
   });
 }
+
+export const getBaseAssetIconUrl = (chainId: string) => {
+  if (chainId === '137') {
+    return 'https://github-production-user-asset-6210df.s3.amazonaws.com/1968722/269347324-fc34c3a3-01e8-424a-80f6-0910374ea6de.svg';
+  }
+  return 'https://static.cdnlogo.com/logos/e/81/ethereum-eth.svg';
+};

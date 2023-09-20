@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { getAddress } from '@ethersproject/address';
-import { resize, chainIdToName } from '../utils';
+import { resize, chainIdToName, getBaseAssetIconUrl } from '../utils';
 import { max } from '../constants.json';
 
 const ETH = [
@@ -14,7 +14,7 @@ export default async function resolve(address, chainId) {
     const checksum = getAddress(address);
 
     let url = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/${networkName}/assets/${checksum}/logo.png`;
-    if (ETH.includes(checksum)) url = 'https://static.cdnlogo.com/logos/e/81/ethereum-eth.svg';
+    if (ETH.includes(checksum)) url = getBaseAssetIconUrl(chainId);
 
     const input = (await axios({ url, responseType: 'arraybuffer' })).data as Buffer;
     return await resize(input, max, max);
