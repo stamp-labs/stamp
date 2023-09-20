@@ -122,3 +122,10 @@ export function setHeader(res: Response, cacheType: 'SHORT_CACHE' | 'LONG_CACHE'
     Expires: new Date(Date.now() + ttl * 1e3).toUTCString()
   });
 }
+
+export const getBaseAssetIconUrl = (chainId: string) => {
+  if (chainId === '137') {
+    return 'https://github-production-user-asset-6210df.s3.amazonaws.com/1968722/269347324-fc34c3a3-01e8-424a-80f6-0910374ea6de.svg';
+  }
+  return 'https://static.cdnlogo.com/logos/e/81/ethereum-eth.svg';
+};
