@@ -19,7 +19,7 @@
     "@ethersproject/providers": "^5.7.2",
     "@metamask/jazzicon": "^2.0.0",
     "@self.id/core": "^0.3.0",
-    "@snapshot-labs/snapshot-metrics": "^1.1.0",
+    "@snapshot-labs/snapshot-metrics": "^1.3.0",
     "@snapshot-labs/snapshot-sentry": "^1.5.0",
     "@snapshot-labs/snapshot.js": "^0.3.75",
     "axios": "^0.25.0",
