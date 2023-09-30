@@ -69,7 +69,7 @@ cdn.stamp.fyi/avatar/0xeF8305E140ac520225DAf050e2f71d5fBcC543e7?**cb=1**
 
 #### [Parcel](https://parcel.money)
 
-#### [Lenster](https://lenster.xyz)
+#### [Hey](https://hey.xyz)
 
 #### [RSS3](https://rss3.io)
 
