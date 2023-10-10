@@ -13,7 +13,8 @@ router.get(`/clear/:type(${TYPE_CONSTRAINTS})/:id`, async (req, res) => {
   try {
     const { address, network, w, h, fallback } = await parseQuery(id, type, {
       s: constants.max,
-      fb: req.query.fb
+      fb: req.query.fb,
+      cb: req.query.cb
     });
     const key = getCacheKey({ type, network, address, w, h, fallback });
     await clear(key);
