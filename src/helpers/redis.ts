@@ -11,7 +11,7 @@ let client;
   client.on('ready', () => console.log('[redis] Redis ready'));
   client.on('reconnecting', err => console.log('[redis] Redis reconnecting', err));
   client.on('error', err => console.log('[redis] Redis error', err));
-  client.on('end', err => console.log('[redis] Redis end', err));
+  client.on('end', () => console.log('[redis] Redis end'));
   await client.connect();
 })();
 

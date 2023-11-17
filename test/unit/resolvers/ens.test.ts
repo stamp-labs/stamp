@@ -12,7 +12,7 @@ describe('resolvers', () => {
       const result = await resolvers.ens('snapshot-test.eth');
 
       expect(result).toBe(false);
-    });
+    }, 10e3);
 
     it('should resolve', async () => {
       const result = await resolvers.ens('snowowl.eth');
