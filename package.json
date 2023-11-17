@@ -9,7 +9,7 @@
     "build": "tsc",
     "dev": "nodemon src/index.ts",
     "start": "node dist/src/index.js",
-    "test": "yarn jest"
+    "test": "REDIS_URL=redis://localhost:6379 yarn jest"
   },
   "dependencies": {
     "@adraffy/ens-normalize": "^1.10.0",
