@@ -4,9 +4,27 @@ import { parseQuery, resize, setHeader, getCacheKey } from './utils';
 import { set, get, streamToBuffer, clear } from './aws';
 import resolvers from './resolvers';
 import constants from './constants.json';
+import { rpcError, rpcSuccess } from './helpers/utils';
+import { lookupAddresses } from './addressResolvers';
 
 const router = express.Router();
 const TYPE_CONSTRAINTS = Object.keys(constants.resolvers).join('|');
+
+router.post('/', async (req, res) => {
+  const { id = null, method, params } = req.body;
+  if (!method) return rpcError(res, 400, 'missing method', id);
+  try {
+    let result: any = {};
+    if (method === 'lookup_addresses') result = await lookupAddresses(params);
+    else return rpcError(res, 400, 'invalid method', id);
+
+    if (result.error) return rpcError(res, result.code || 500, result.error, id);
+    return rpcSuccess(res, result, id);
+  } catch (e) {
+    capture(e);
+    return rpcError(res, 500, e, id);
+  }
+});
 
 router.get(`/clear/:type(${TYPE_CONSTRAINTS})/:id`, async (req, res) => {
   const { type, id } = req.params;
