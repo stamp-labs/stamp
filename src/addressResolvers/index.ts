@@ -11,11 +11,11 @@ export async function lookupAddresses(addresses: Address[]) {
   const normalizedAddresses = addresses.slice(0, 250).map(a => getAddress(a));
 
   return cache(normalizedAddresses, async (addresses: Address[]) => {
-    const [ens, ud, lens] = await Promise.all(RESOLVERS.map(r => r.lookupAddresses(addresses)));
+    const results = await Promise.all(RESOLVERS.map(r => r.lookupAddresses(addresses)));
 
     return Object.fromEntries(
       addresses.map(address => {
-        return [address, ens[address] || lens[address] || ud[address] || ''];
+        return [address, results.map(r => r[address]).filter(handle => !!handle)[0] || ''];
       })
     );
   });
