@@ -13,18 +13,16 @@ export async function getCache(addresses: Address[]): Promise<Record<Address, Ha
 
   return Object.fromEntries(
     addresses
-      .map((address, index) => {
-        return [address, results[index]];
-      })
+      .map((address, index) => [address, results[index]])
       .filter(([, handle]) => handle !== null)
   );
 }
 
 export function setCache(payload: Record<Address, Handle>) {
   const transaction = redis.multi();
-  Object.entries(payload).map(([address, handle]) => {
-    transaction.set(`${KEY}:${address}`, handle, { EX: TTL });
-  });
+  Object.entries(payload).map(([address, handle]) =>
+    transaction.set(`${KEY}:${address}`, handle, { EX: TTL })
+  );
 
   return transaction.exec();
 }

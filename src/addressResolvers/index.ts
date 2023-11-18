@@ -23,9 +23,10 @@ export async function lookupAddresses(addresses: Address[]) {
     const results = await Promise.all(RESOLVERS.map(r => r.lookupAddresses(addresses)));
 
     return Object.fromEntries(
-      addresses.map(address => {
-        return [address, results.map(r => r[address]).filter(handle => !!handle)[0] || ''];
-      })
+      addresses.map(address => [
+        address,
+        results.map(r => r[address]).filter(handle => !!handle)[0] || ''
+      ])
     );
   });
 }
