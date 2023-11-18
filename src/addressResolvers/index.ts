@@ -8,7 +8,16 @@ import cache from './cache';
 const RESOLVERS = [ensResolver, unstoppableDomainsesolver, lensResolver];
 
 export async function lookupAddresses(addresses: Address[]) {
-  const normalizedAddresses = addresses.slice(0, 250).map(a => getAddress(a));
+  if (addresses.length > 250) {
+    return Promise.reject({ error: 'params must contains less than 250 addresses', code: 400 });
+  }
+
+  let normalizedAddresses: Address[];
+  try {
+    normalizedAddresses = addresses.map(a => getAddress(a));
+  } catch (e) {
+    return Promise.reject({ error: 'params contains invalid address', code: 400 });
+  }
 
   return cache(normalizedAddresses, async (addresses: Address[]) => {
     const results = await Promise.all(RESOLVERS.map(r => r.lookupAddresses(addresses)));
