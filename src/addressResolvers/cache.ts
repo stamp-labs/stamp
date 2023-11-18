@@ -34,7 +34,7 @@ export default async function cache(addresses: Address[], callback) {
   const cachedAddresses = Object.keys(cache);
 
   const results = await callback(addresses.filter(a => !cachedAddresses.includes(a)));
-  await setCache(results);
+  setCache(results);
 
   return { ...cache, ...results };
 }
