@@ -6,10 +6,14 @@ import { Address } from './utils';
 import cache from './cache';
 
 const RESOLVERS = [ensResolver, unstoppableDomainsesolver, lensResolver];
+const MAX_LOOKUP_ADDRESSES = 250;
 
 export async function lookupAddresses(addresses: Address[]) {
-  if (addresses.length > 250) {
-    return Promise.reject({ error: 'params must contains less than 250 addresses', code: 400 });
+  if (addresses.length > MAX_LOOKUP_ADDRESSES) {
+    return Promise.reject({
+      error: `params must contains less than ${MAX_LOOKUP_ADDRESSES} addresses`,
+      code: 400
+    });
   }
 
   let normalizedAddresses: Address[];
