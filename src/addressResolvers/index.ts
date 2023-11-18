@@ -8,7 +8,7 @@ import cache from './cache';
 const RESOLVERS = [ensResolver, unstoppableDomainsesolver, lensResolver];
 
 export async function lookupAddresses(addresses: Address[]) {
-  const normalizedAddresses = addresses.slice(0, 250).map(a => getAddress(a));
+  const normalizedAddresses = addresses.slice(0, 250).map(getAddress);
 
   return cache(normalizedAddresses, async (addresses: Address[]) => {
     const results = await Promise.all(RESOLVERS.map(r => r.lookupAddresses(addresses)));
