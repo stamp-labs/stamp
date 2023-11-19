@@ -23,14 +23,18 @@ export async function lookupAddresses(addresses: Address[]) {
     return Promise.reject({ error: 'params contains invalid address', code: 400 });
   }
 
-  return cache(normalizedAddresses, async (addresses: Address[]) => {
-    const results = await Promise.all(RESOLVERS.map(r => r.lookupAddresses(addresses)));
+  return Object.fromEntries(
+    Object.entries(
+      await cache(normalizedAddresses, async (addresses: Address[]) => {
+        const results = await Promise.all(RESOLVERS.map(r => r.lookupAddresses(addresses)));
 
-    return Object.fromEntries(
-      addresses.map(address => [
-        address,
-        results.map(r => r[address]).filter(handle => !!handle)[0] || ''
-      ])
-    );
-  });
+        return Object.fromEntries(
+          addresses.map(address => [
+            address,
+            results.map(r => r[address]).filter(handle => !!handle)[0] || ''
+          ])
+        );
+      })
+    ).filter(([, handle]) => handle)
+  );
 }
