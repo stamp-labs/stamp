@@ -18,7 +18,7 @@ export async function lookupAddresses(addresses: Address[]) {
 
   let normalizedAddresses: Address[];
   try {
-    normalizedAddresses = addresses.map(a => getAddress(a));
+    normalizedAddresses = addresses.map(getAddress);
   } catch (e) {
     return Promise.reject({ error: 'params contains invalid address', code: 400 });
   }
