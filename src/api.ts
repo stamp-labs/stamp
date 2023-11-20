@@ -5,7 +5,7 @@ import { set, get, streamToBuffer, clear } from './aws';
 import resolvers from './resolvers';
 import constants from './constants.json';
 import { rpcError, rpcSuccess } from './helpers/utils';
-import { lookupAddresses } from './addressResolvers';
+import { lookupAddresses, resolveName } from './addressResolvers';
 
 const router = express.Router();
 const TYPE_CONSTRAINTS = Object.keys(constants.resolvers).join('|');
@@ -16,6 +16,7 @@ router.post('/', async (req, res) => {
   try {
     let result: any = {};
     if (method === 'lookup_addresses') result = await lookupAddresses(params);
+    else if (method === 'resolve_name') result = await resolveName(params);
     else return rpcError(res, 400, 'invalid method', id);
 
     if (result.error) return rpcError(res, result.code || 500, result.error, id);

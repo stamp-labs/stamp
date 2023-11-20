@@ -36,7 +36,7 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
   }
 }
 
-export async function resolveName(handle: string): Promise<string | void> {
+export async function resolveName(handle: string): Promise<string | null> {
   try {
     const response = await axios({
       url: API_URL,
@@ -62,4 +62,6 @@ export async function resolveName(handle: string): Promise<string | void> {
   } catch (e) {
     capture(e);
   }
+
+  return null;
 }

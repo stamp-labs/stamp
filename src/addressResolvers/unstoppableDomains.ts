@@ -21,3 +21,7 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
     return {};
   }
 }
+
+export async function resolveName(handle: string): Promise<Address | null> {
+  return null;
+}

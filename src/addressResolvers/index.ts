@@ -2,20 +2,22 @@ import { getAddress } from '@ethersproject/address';
 import * as ensResolver from './ens';
 import * as lensResolver from './lens';
 import * as unstoppableDomainResolver from './unstoppableDomains';
-import { Address } from './utils';
 import cache from './cache';
+import { Address } from './utils';
 
 const RESOLVERS = [ensResolver, unstoppableDomainResolver, lensResolver];
 const MAX_LOOKUP_ADDRESSES = 250;
 
-export async function resolveName(handle: string) {
+export async function resolveName(handle: string): Promise<string | null> {
   if (handle.endsWith('.ens')) {
-    return ensResolver.resolveAddress(handle);
+    return ensResolver.resolveName(handle);
   } else if (handle.endsWith('.lens')) {
-    return lensResolver.resolveAddress(handle);
+    return lensResolver.resolveName(handle);
   } else {
-    return unstoppableDomainsesolver.resolveAddress(handle);
+    return unstoppableDomainResolver.resolveName(handle);
   }
+
+  return null;
 }
 
 export async function lookupAddresses(addresses: Address[]) {
