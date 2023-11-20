@@ -8,16 +8,6 @@ import { Address } from './utils';
 const RESOLVERS = [ensResolver, unstoppableDomainResolver, lensResolver];
 const MAX_LOOKUP_ADDRESSES = 250;
 
-export async function resolveName(handle: string): Promise<string | null> {
-  if (handle.endsWith('.ens')) {
-    return ensResolver.resolveName(handle);
-  } else if (handle.endsWith('.lens')) {
-    return lensResolver.resolveName(handle);
-  } else {
-    return unstoppableDomainResolver.resolveName(handle);
-  }
-}
-
 export async function lookupAddresses(addresses: Address[]) {
   if (addresses.length > MAX_LOOKUP_ADDRESSES) {
     return Promise.reject({
@@ -47,4 +37,14 @@ export async function lookupAddresses(addresses: Address[]) {
       })
     ).filter(([, handle]) => handle)
   );
+}
+
+export async function resolveName(handle: string): Promise<string | null> {
+  if (handle.endsWith('.ens')) {
+    return ensResolver.resolveName(handle);
+  } else if (handle.endsWith('.lens')) {
+    return lensResolver.resolveName(handle);
+  } else {
+    return unstoppableDomainResolver.resolveName(handle);
+  }
 }

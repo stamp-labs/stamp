@@ -1,6 +1,6 @@
 import redis from '../helpers/redis';
-import { Address, Handle } from './utils';
 import constants from '../constants.json';
+import { Address, Handle } from './utils';
 
 const KEY = 'address-resolvers';
 
