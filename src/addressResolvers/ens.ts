@@ -38,3 +38,12 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
     return {};
   }
 }
+
+export async function resolveAddress(handle: string): Promise<string | void> {
+  try {
+    const addressResolved = await provider(NETWORK).resolveName(handle);
+    if (addressResolved) return addressResolved;
+  } catch (e) {
+    capture(e);
+  }
+}

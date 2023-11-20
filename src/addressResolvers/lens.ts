@@ -35,3 +35,31 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
     return {};
   }
 }
+
+export async function resolveName(handle: string): Promise<string | void> {
+  try {
+    const response = await axios({
+      url: API_URL,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      data: {
+        query: `
+          query Profiles {
+            profiles(request: { handles: ["${handle}"], limit: 1 }) {
+              items {
+                ownedBy
+              }
+            }
+          }
+        `
+      }
+    });
+
+    const result = await response.json();
+    return result.data?.profiles?.items?.[0]?.ownedBy;
+  } catch (e) {
+    capture(e);
+  }
+}

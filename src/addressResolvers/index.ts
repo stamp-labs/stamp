@@ -8,6 +8,16 @@ import cache from './cache';
 const RESOLVERS = [ensResolver, unstoppableDomainsesolver, lensResolver];
 const MAX_LOOKUP_ADDRESSES = 250;
 
+export async function resolveName(handle: string) {
+  if (handle.endsWith('.ens')) {
+    return ensResolver.resolveAddress(handle);
+  } else if (handle.endsWith('.lens')) {
+    return lensResolver.resolveAddress(handle);
+  } else {
+    return unstoppableDomainsesolver.resolveAddress(handle);
+  }
+}
+
 export async function lookupAddresses(addresses: Address[]) {
   if (addresses.length > MAX_LOOKUP_ADDRESSES) {
     return Promise.reject({
