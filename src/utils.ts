@@ -96,7 +96,7 @@ export function chainIdToName(chainId: string) {
 }
 
 export function getUrl(url) {
-  const gateway: string = process.env.IPFS_GATEWAY || 'snapshot.mypinata.cloud';
+  const gateway: string = process.env.IPFS_GATEWAY || 'cloudflare-ipfs.com';
   return snapshot.utils.getUrl(url, gateway);
 }
 
