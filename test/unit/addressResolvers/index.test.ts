@@ -108,5 +108,27 @@ describe('addressResolvers', () => {
         return expect(resolveName('test-snapshot.eth')).resolves.toBeUndefined();
       }, 10e3);
     });
+
+    describe('when cached', () => {
+      beforeEach(async () => {
+        await redis.flushDb();
+      });
+
+      it('should cache the results', async () => {
+        await expect(resolveName('snapshot.crypto')).resolves.toEqual(
+          '0xeF8305E140ac520225DAf050e2f71d5fBcC543e7'
+        );
+
+        return expect(getCache(['snapshot.crypto'])).resolves.toEqual({
+          'snapshot.crypto': '0xeF8305E140ac520225DAf050e2f71d5fBcC543e7'
+        });
+      });
+
+      it('should return the cached results', async () => {
+        await setCache({ 'snapshot.crypto': '0x0' });
+
+        return expect(resolveName('snapshot.crypto')).resolves.toEqual('0x0');
+      });
+    });
   });
 });
