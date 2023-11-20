@@ -1,10 +1,12 @@
 import { Address, Handle } from './utils';
 import redis from '../helpers/redis';
+import constants from '../constants.json';
 
 const KEY = 'address-resolvers';
-const TTL = 24 * 60 * 60 * 1e3;
 
 export async function getCache(addresses: Address[]): Promise<Record<Address, Handle>> {
+  if (!redis) return {};
+
   const transaction = redis.multi();
   addresses.map(address => {
     transaction.get(`${KEY}:${address}`);
@@ -19,9 +21,11 @@ export async function getCache(addresses: Address[]): Promise<Record<Address, Ha
 }
 
 export function setCache(payload: Record<Address, Handle>) {
+  if (!redis) return;
+
   const transaction = redis.multi();
   Object.entries(payload).map(([address, handle]) =>
-    transaction.set(`${KEY}:${address}`, handle, { EX: TTL })
+    transaction.set(`${KEY}:${address}`, handle, { EX: constants.ttl })
   );
 
   return transaction.exec();
