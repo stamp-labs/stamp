@@ -31,7 +31,7 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
     return Object.fromEntries(
       addresses
         .map((address, index) => [address, validNames[index]])
-        .filter((address, index) => !!validNames[index])
+        .filter((_, index) => !!validNames[index])
     );
   } catch (e) {
     capture(e);
