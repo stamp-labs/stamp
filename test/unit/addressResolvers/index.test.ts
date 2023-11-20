@@ -93,12 +93,12 @@ describe('addressResolvers', () => {
   });
 
   describe('resolveName()', () => {
-    describe('when cached', () => {
+    describe('when not cached', () => {
       beforeEach(async () => {
         await redis.flushDb();
       });
 
-      it.only('should return the address associated to the handle', () => {
+      it('should return the address associated to the handle', () => {
         return expect(resolveName('snapshot.crypto')).resolves.toEqual(
           '0xeF8305E140ac520225DAf050e2f71d5fBcC543e7'
         );

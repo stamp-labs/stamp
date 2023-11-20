@@ -12,7 +12,7 @@ async function apiCall(query: string) {
       }
     }
   } = await axios({
-    url: API_URL,
+    url: `${API_URL}/graphql`,
     method: 'post',
     headers: {
       'Content-Type': 'application/json'
