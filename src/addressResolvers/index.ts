@@ -1,11 +1,11 @@
 import { getAddress } from '@ethersproject/address';
 import * as ensResolver from './ens';
 import * as lensResolver from './lens';
-import * as unstoppableDomainsesolver from './unstoppableDomains';
+import * as unstoppableDomainResolver from './unstoppableDomains';
 import { Address } from './utils';
 import cache from './cache';
 
-const RESOLVERS = [ensResolver, unstoppableDomainsesolver, lensResolver];
+const RESOLVERS = [ensResolver, unstoppableDomainResolver, lensResolver];
 const MAX_LOOKUP_ADDRESSES = 250;
 
 export async function lookupAddresses(addresses: Address[]) {
