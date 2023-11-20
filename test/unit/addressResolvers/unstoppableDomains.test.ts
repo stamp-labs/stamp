@@ -1,4 +1,4 @@
-import { lookupAddresses } from '../../../src/addressResolvers/unstoppableDomains';
+import { lookupAddresses, resolveName } from '../../../src/addressResolvers/unstoppableDomains';
 
 describe('UnstoppableDomains address resolver', () => {
   const validAddress = '0xeF8305E140ac520225DAf050e2f71d5fBcC543e7';
@@ -31,6 +31,20 @@ describe('UnstoppableDomains address resolver', () => {
     describe('when passing invalid addresses', () => {
       it('returns an empty object', () => {
         return expect(lookupAddresses([validAddress, `${blankAddress}xxx`])).resolves.toEqual({});
+      }, 10e3);
+    });
+  });
+
+  describe('resolveName()', () => {
+    describe('when the domain is associated to an address', () => {
+      it('returns an address', () => {
+        return expect(resolveName(validDomain)).resolves.toEqual(validAddress);
+      }, 10e3);
+    });
+
+    describe('when the domain is not associated to an address', () => {
+      it('returns null', () => {
+        return expect(resolveName('test-snapshot.lens')).resolves.toBeNull();
       }, 10e3);
     });
   });
