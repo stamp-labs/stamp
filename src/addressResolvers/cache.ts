@@ -20,7 +20,7 @@ export function setCache(payload: Record<string, string>) {
 
   const transaction = redis.multi();
   Object.entries(payload).map(([key, value]) =>
-    transaction.set(`${KEY}:${key}`, value, { EX: constants.ttl })
+    transaction.set(`${KEY}:${key}`, value || '', { EX: constants.ttl })
   );
 
   return transaction.exec();
