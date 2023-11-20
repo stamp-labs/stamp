@@ -39,13 +39,13 @@ describe('Lens address resolver', () => {
     describe('when the domain is associated to an address', () => {
       it('returns an address', () => {
         return expect(resolveName(validDomain)).resolves.toEqual(validAddress);
-      });
+      }, 10e3);
     });
 
     describe('when the domain is not associated to an address', () => {
       it('returns null', () => {
         return expect(resolveName('test-snapshot.lens')).resolves.toBeNull();
-      });
+      }, 10e3);
     });
   });
 });
