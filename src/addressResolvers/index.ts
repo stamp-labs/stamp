@@ -3,7 +3,7 @@ import * as ensResolver from './ens';
 import * as lensResolver from './lens';
 import * as unstoppableDomainResolver from './unstoppableDomains';
 import cache from './cache';
-import { Address } from './utils';
+import { Address, Handle } from './utils';
 
 const RESOLVERS = [ensResolver, unstoppableDomainResolver, lensResolver];
 const MAX_LOOKUP_ADDRESSES = 250;
@@ -39,12 +39,21 @@ export async function lookupAddresses(addresses: Address[]) {
   );
 }
 
-export async function resolveName(handle: string): Promise<string | null> {
-  if (handle.endsWith('.ens')) {
-    return ensResolver.resolveName(handle);
-  } else if (handle.endsWith('.lens')) {
-    return lensResolver.resolveName(handle);
-  } else {
-    return unstoppableDomainResolver.resolveName(handle);
-  }
+export async function resolveName(handle: Handle): Promise<Address | undefined> {
+  const results = await cache([handle], async (h: Handle[]) => {
+    let address: Address | undefined;
+    const _handle = h[0];
+
+    if (_handle.endsWith('.ens')) {
+      address = await ensResolver.resolveName(_handle);
+    } else if (_handle.endsWith('.lens')) {
+      address = await lensResolver.resolveName(_handle);
+    } else {
+      address = await unstoppableDomainResolver.resolveName(_handle);
+    }
+
+    return { [handle]: address };
+  });
+
+  return results[handle];
 }

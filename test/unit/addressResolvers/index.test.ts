@@ -1,4 +1,4 @@
-import { lookupAddresses } from '../../../src/addressResolvers';
+import { lookupAddresses, resolveName } from '../../../src/addressResolvers';
 import { getCache, setCache } from '../../../src/addressResolvers/cache';
 import redis from '../../../src/helpers/redis';
 
@@ -89,6 +89,24 @@ describe('addressResolvers', () => {
           '0xeF8305E140ac520225DAf050e2f71d5fBcC543e7': 'test.eth'
         });
       });
+    });
+  });
+
+  describe('resolveName()', () => {
+    describe('when cached', () => {
+      beforeEach(async () => {
+        await redis.flushDb();
+      });
+
+      it.only('should return the address associated to the handle', () => {
+        return expect(resolveName('snapshot.crypto')).resolves.toEqual(
+          '0xeF8305E140ac520225DAf050e2f71d5fBcC543e7'
+        );
+      }, 10e3);
+
+      it('return null when the handle does not exist', () => {
+        return expect(resolveName('test-snapshot.eth')).resolves.toBeUndefined();
+      }, 10e3);
     });
   });
 });

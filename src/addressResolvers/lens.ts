@@ -36,7 +36,7 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
   }
 }
 
-export async function resolveName(handle: string): Promise<string | null> {
+export async function resolveName(handle: string): Promise<string | undefined> {
   try {
     const {
       data: {
@@ -63,10 +63,8 @@ export async function resolveName(handle: string): Promise<string | null> {
       }
     });
 
-    return items?.[0]?.ownedBy || null;
+    return items?.[0]?.ownedBy;
   } catch (e) {
     capture(e);
   }
-
-  return null;
 }

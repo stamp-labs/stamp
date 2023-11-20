@@ -23,7 +23,7 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
   }
 }
 
-export async function resolveName(handle: string): Promise<Address | null> {
+export async function resolveName(handle: string): Promise<Address | undefined> {
   const abi = ['function ownerOf(uint256 tokenId) external view returns (address address)'];
 
   try {
@@ -38,6 +38,5 @@ export async function resolveName(handle: string): Promise<Address | null> {
     if (!(e as Error).message.includes('invalid token ID')) {
       capture(e);
     }
-    return null;
   }
 }

@@ -43,8 +43,8 @@ describe('Lens address resolver', () => {
     });
 
     describe('when the domain is not associated to an address', () => {
-      it('returns null', () => {
-        return expect(resolveName('test-snapshot.lens')).resolves.toBeNull();
+      it('returns undefined', () => {
+        return expect(resolveName('test-snapshot.lens')).resolves.toBeUndefined();
       }, 10e3);
     });
   });
