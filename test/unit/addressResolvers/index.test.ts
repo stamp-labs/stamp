@@ -4,6 +4,7 @@ import redis from '../../../src/helpers/redis';
 
 describe('addressResolvers', () => {
   afterAll(async () => {
+    await redis.flushDb();
     await redis.quit();
   });
 
