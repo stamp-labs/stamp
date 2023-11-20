@@ -16,10 +16,8 @@ export default async function resolve(address) {
         }
       })
     ).data.data.user;
-    console.log(user);
     if (!user || !user.avatar) return false;
     const url = getUrl(user.avatar);
-    console.log(url);
     const input = (await axios({ url, responseType: 'arraybuffer' })).data as Buffer;
     return await resize(input, max, max);
   } catch (e) {
