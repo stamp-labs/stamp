@@ -1,4 +1,4 @@
-import { lookupAddresses } from '../../../src/addressResolvers/lens';
+import { lookupAddresses, resolveName } from '../../../src/addressResolvers/lens';
 
 describe('Lens address resolver', () => {
   const validAddress = '0xeF8305E140ac520225DAf050e2f71d5fBcC543e7';
@@ -32,6 +32,20 @@ describe('Lens address resolver', () => {
       it('returns an empty object', () => {
         return expect(lookupAddresses([validAddress, `${blankAddress}xxx`])).resolves.toEqual({});
       }, 10e3);
+    });
+  });
+
+  describe('resolveName()', () => {
+    describe('when the domain is associated to an address', () => {
+      it('returns an address', () => {
+        return expect(resolveName(validDomain)).resolves.toEqual(validAddress);
+      });
+    });
+
+    describe('when the domain is not associated to an address', () => {
+      it('returns null', () => {
+        return expect(resolveName('test-snapshot.lens')).resolves.toBeNull();
+      });
     });
   });
 });

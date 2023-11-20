@@ -42,10 +42,9 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
 export async function resolveName(handle: string): Promise<string | null> {
   try {
     const addressResolved = await provider(NETWORK).resolveName(handle);
-    if (addressResolved) return addressResolved;
+    return addressResolved;
   } catch (e) {
     capture(e);
   }
-
   return null;
 }

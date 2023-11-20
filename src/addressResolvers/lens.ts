@@ -38,7 +38,13 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
 
 export async function resolveName(handle: string): Promise<string | null> {
   try {
-    const response = await axios({
+    const {
+      data: {
+        data: {
+          profiles: { items }
+        }
+      }
+    } = await axios({
       url: API_URL,
       method: 'POST',
       headers: {
@@ -57,8 +63,7 @@ export async function resolveName(handle: string): Promise<string | null> {
       }
     });
 
-    const result = await response.json();
-    return result.data?.profiles?.items?.[0]?.ownedBy;
+    return items?.[0]?.ownedBy || null;
   } catch (e) {
     capture(e);
   }

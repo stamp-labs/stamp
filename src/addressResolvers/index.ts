@@ -16,8 +16,6 @@ export async function resolveName(handle: string): Promise<string | null> {
   } else {
     return unstoppableDomainResolver.resolveName(handle);
   }
-
-  return null;
 }
 
 export async function lookupAddresses(addresses: Address[]) {
