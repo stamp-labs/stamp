@@ -30,8 +30,8 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
 
     return Object.fromEntries(
       addresses
-        .filter((address, index) => validNames[index])
         .map((address, index) => [address, validNames[index]])
+        .filter((address, index) => !!validNames[index])
     );
   } catch (e) {
     capture(e);
