@@ -44,7 +44,7 @@ export async function resolveName(handle: Handle): Promise<Address | undefined> 
     let address: Address | undefined;
     const _handle = h[0];
 
-    if (_handle.endsWith('.ens')) {
+    if (_handle.endsWith('.eth')) {
       address = await ensResolver.resolveName(_handle);
     } else if (_handle.endsWith('.lens')) {
       address = await lensResolver.resolveName(_handle);
