@@ -8,7 +8,7 @@ import api from './api';
 import { name, version } from '../package.json';
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3008;
 
 initLogger(app);
 initMetrics(app);
