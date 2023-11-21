@@ -36,7 +36,10 @@ export async function resolveName(handle: string): Promise<Address | undefined> 
       { blockTag: 'latest' }
     );
   } catch (e) {
-    if (!(e as Error).message.includes('invalid token ID')) {
+    if (
+      !(e as Error).message.includes('invalid token ID') &&
+      !(e as Error).message.includes('is not supported')
+    ) {
       capture(e);
     }
   }
