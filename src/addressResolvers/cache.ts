@@ -30,9 +30,9 @@ export default async function cache(input: string[], callback) {
   const cache = await getCache(input);
   const cachedKeys = Object.keys(cache);
 
-  const callbackArgs = input.filter(a => !cachedKeys.includes(a));
-  if (callbackArgs.length > 0) {
-    const results = await callback(callbackArgs);
+  const uncachedInputs = input.filter(a => !cachedKeys.includes(a));
+  if (uncachedInputs.length > 0) {
+    const results = await callback(uncachedInputs);
     setCache(results);
 
     return { ...cache, ...results };
