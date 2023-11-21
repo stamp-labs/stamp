@@ -19,8 +19,8 @@ router.post('/', async (req, res) => {
     else if (method === 'resolve_name') result = await resolveName(params);
     else return rpcError(res, 400, 'invalid method', id);
 
-    if (result.error) return rpcError(res, result.code || 500, result.error, id);
-    return rpcSuccess(res, result, id);
+    if (result?.error) return rpcError(res, result.code || 500, result.error, id);
+    return rpcSuccess(res, { address: result[params] }, id);
   } catch (e) {
     capture(e);
     return rpcError(res, 500, e, id);

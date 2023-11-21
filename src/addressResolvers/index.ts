@@ -3,7 +3,8 @@ import * as ensResolver from './ens';
 import * as lensResolver from './lens';
 import * as unstoppableDomainResolver from './unstoppableDomains';
 import cache from './cache';
-import { Address, Handle } from './utils';
+import { Address, Handle, withoutEmptyValues } from './utils';
+import { version } from 'os';
 
 const RESOLVERS = [ensResolver, unstoppableDomainResolver, lensResolver];
 const MAX_LOOKUP_ADDRESSES = 250;
@@ -23,23 +24,21 @@ export async function lookupAddresses(addresses: Address[]) {
     return Promise.reject({ error: 'params contains invalid address', code: 400 });
   }
 
-  return Object.fromEntries(
-    Object.entries(
-      await cache(normalizedAddresses, async (addresses: Address[]) => {
-        const results = await Promise.all(RESOLVERS.map(r => r.lookupAddresses(addresses)));
+  const results = await cache(normalizedAddresses, async (addresses: Address[]) => {
+    const results = await Promise.all(RESOLVERS.map(r => r.lookupAddresses(addresses)));
 
-        return Object.fromEntries(
-          addresses.map(address => [
-            address,
-            results.map(r => r[address]).filter(handle => !!handle)[0] || ''
-          ])
-        );
-      })
-    ).filter(([, handle]) => handle)
-  );
+    return Object.fromEntries(
+      addresses.map(address => [
+        address,
+        results.map(r => r[address]).filter(handle => !!handle)[0] || ''
+      ])
+    );
+  });
+
+  return withoutEmptyValues(results);
 }
 
-export async function resolveName(handle: Handle): Promise<Address | undefined> {
+export async function resolveName(handle: Handle): Promise<Record<Handle, Address>> {
   const results = await cache([handle], async (h: Handle[]) => {
     let address: Address | undefined;
     const _handle = h[0];
@@ -52,8 +51,8 @@ export async function resolveName(handle: Handle): Promise<Address | undefined> 
       address = await unstoppableDomainResolver.resolveName(_handle);
     }
 
-    return { [handle]: address };
+    return { [handle]: address || '' };
   });
 
-  return results[handle];
+  return withoutEmptyValues(results);
 }

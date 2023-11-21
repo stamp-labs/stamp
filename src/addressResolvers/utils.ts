@@ -8,3 +8,7 @@ const broviderUrl = process.env.BROVIDER_URL || 'https://rpc.brovider.xyz';
 export function provider(network: string) {
   return snapshot.utils.getProvider(network, { broviderUrl });
 }
+
+export function withoutEmptyValues(obj: Record<string, any>) {
+  return Object.fromEntries(Object.entries(obj).filter(([, value]) => value));
+}
