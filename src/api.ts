@@ -15,8 +15,10 @@ router.post('/', async (req, res) => {
   if (!method) return rpcError(res, 400, 'missing method', id);
   try {
     let result: any = {};
+    if (!Array.isArray(params)) return rpcError(400, 'params must be an array of string', id);
+
     if (method === 'lookup_addresses') result = await lookupAddresses(params);
-    else if (method === 'resolve_name') result = await resolveName(params);
+    else if (method === 'resolve_name') result = await resolveName(params[0]);
     else return rpcError(res, 400, 'invalid method', id);
 
     if (result?.error) return rpcError(res, result.code || 500, result.error, id);
