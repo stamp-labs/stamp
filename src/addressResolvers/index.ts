@@ -4,7 +4,6 @@ import * as lensResolver from './lens';
 import * as unstoppableDomainResolver from './unstoppableDomains';
 import cache from './cache';
 import { Address, Handle, withoutEmptyValues } from './utils';
-import { version } from 'os';
 
 const RESOLVERS = [ensResolver, unstoppableDomainResolver, lensResolver];
 const MAX_LOOKUP_ADDRESSES = 250;
