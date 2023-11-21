@@ -1,9 +1,10 @@
 import snapshot from '@snapshot-labs/snapshot.js';
 import { capture } from '@snapshot-labs/snapshot-sentry';
 import { ens_normalize } from '@adraffy/ens-normalize';
-import { provider, Address, Handle } from './utils';
+import { provider as getProvider, Address, Handle } from './utils';
 
 const NETWORK = '1';
+const provider = getProvider(NETWORK);
 
 function normalizeNames(names: string[]) {
   return names.map(name => {
@@ -21,7 +22,7 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
 
   try {
     const reverseRecords = await snapshot.utils.call(
-      provider(NETWORK),
+      provider,
       abi,
       ['0x3671aE578E63FdF66ad4F3E12CC0c0d71Ac7510C', 'getNames', [addresses]],
       { blockTag: 'latest' }
@@ -41,7 +42,7 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
 
 export async function resolveName(handle: string): Promise<string | undefined> {
   try {
-    const addressResolved = await provider(NETWORK).resolveName(handle);
+    const addressResolved = await provider.resolveName(handle);
     return addressResolved || undefined;
   } catch (e) {
     capture(e);
