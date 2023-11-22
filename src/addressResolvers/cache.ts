@@ -34,9 +34,14 @@ export function setCache(payload: Record<Address, Handle>) {
 export default async function cache(addresses: Address[], callback) {
   const cache = await getCache(addresses);
   const cachedAddresses = Object.keys(cache);
+  const uncachedAddresses = addresses.filter(a => !cachedAddresses.includes(a));
 
-  const results = await callback(addresses.filter(a => !cachedAddresses.includes(a)));
-  setCache(results);
+  if (uncachedAddresses.length > 0) {
+    const results = await callback(uncachedAddresses);
+    setCache(results);
 
-  return { ...cache, ...results };
+    return { ...cache, ...results };
+  }
+
+  return cache;
 }
