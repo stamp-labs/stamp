@@ -52,7 +52,6 @@ export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Ad
       Object.fromEntries(handles.map((handle, index) => [handle, results[index]]))
     );
   } catch (e) {
-    console.log(e);
     capture(e);
     return {};
   }
