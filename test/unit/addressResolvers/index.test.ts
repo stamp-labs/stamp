@@ -10,10 +10,10 @@ describe('addressResolvers', () => {
 
   describe('lookupAddresses()', () => {
     describe('when passing more than 250 addresses', () => {
-      it('rejects with an error', () => {
+      it('rejects with an error', async () => {
         const params = Array(251);
 
-        expect(lookupAddresses(params)).rejects.toEqual({
+        return expect(lookupAddresses(params)).rejects.toEqual({
           error: 'params must contains less than 250 addresses',
           code: 400
         });
@@ -21,8 +21,8 @@ describe('addressResolvers', () => {
     });
 
     describe('when the params contains invalid address', () => {
-      it('rejects with an error', () => {
-        expect(lookupAddresses(['test'])).rejects.toEqual({
+      it('rejects with an error', async () => {
+        return expect(lookupAddresses(['test'])).rejects.toEqual({
           error: 'params contains invalid address',
           code: 400
         });
@@ -94,10 +94,10 @@ describe('addressResolvers', () => {
 
   describe('resolveNames()', () => {
     describe('when passing more than 5 addresses', () => {
-      it('rejects with an error', () => {
+      it('rejects with an error', async () => {
         const params = Array(6);
 
-        expect(resolveNames(params)).rejects.toEqual({
+        return expect(resolveNames(params)).rejects.toEqual({
           error: 'params must contains less than 5 handles',
           code: 400
         });
