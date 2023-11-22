@@ -1,4 +1,4 @@
-import { lookupAddresses, resolveName } from '../../../src/addressResolvers';
+import { lookupAddresses, resolveNames } from '../../../src/addressResolvers';
 import { getCache, setCache } from '../../../src/addressResolvers/cache';
 import redis from '../../../src/helpers/redis';
 
@@ -92,20 +92,31 @@ describe('addressResolvers', () => {
     });
   });
 
-  describe('resolveName()', () => {
+  describe('resolveNames()', () => {
+    describe('when passing more than 5 addresses', () => {
+      it('rejects with an error', () => {
+        const params = Array(6);
+
+        expect(resolveNames(params)).rejects.toEqual({
+          error: 'params must contains less than 5 handles',
+          code: 400
+        });
+      });
+    });
+
     describe('when not cached', () => {
       beforeEach(async () => {
         await redis.flushDb();
       });
 
       it('should return the address associated to the handle', () => {
-        return expect(resolveName('snapshot.crypto')).resolves.toEqual({
+        return expect(resolveNames(['snapshot.crypto'])).resolves.toEqual({
           'snapshot.crypto': '0xeF8305E140ac520225DAf050e2f71d5fBcC543e7'
         });
       }, 10e3);
 
       it('return null when the handle does not exist', () => {
-        return expect(resolveName('test-snapshot.eth')).resolves.toEqual({
+        return expect(resolveNames(['test-snapshot.eth'])).resolves.toEqual({
           'test-snapshot.eth': undefined
         });
       }, 10e3);
@@ -117,7 +128,7 @@ describe('addressResolvers', () => {
       });
 
       it('should cache the results', async () => {
-        await expect(resolveName('snapshot.crypto')).resolves.toEqual({
+        await expect(resolveNames(['snapshot.crypto'])).resolves.toEqual({
           'snapshot.crypto': '0xeF8305E140ac520225DAf050e2f71d5fBcC543e7'
         });
 
@@ -129,7 +140,7 @@ describe('addressResolvers', () => {
       it('should return the cached results', async () => {
         await setCache({ 'snapshot.crypto': '0x0' });
 
-        return expect(resolveName('snapshot.crypto')).resolves.toEqual({
+        return expect(resolveNames(['snapshot.crypto'])).resolves.toEqual({
           'snapshot.crypto': '0x0'
         });
       });

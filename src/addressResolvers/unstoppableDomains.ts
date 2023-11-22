@@ -1,7 +1,7 @@
 import snapshot from '@snapshot-labs/snapshot.js';
 import Resolution, { NamingServiceName } from '@unstoppabledomains/resolution';
 import { capture } from '@snapshot-labs/snapshot-sentry';
-import { provider as getProvider, Address, Handle } from './utils';
+import { provider as getProvider, Address, Handle, withoutEmptyValues } from './utils';
 
 const NETWORK = '137';
 const provider = getProvider(NETWORK);
@@ -17,28 +17,43 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
 
     const names = (await multi.execute()) as Record<Address, Handle>;
 
-    return Object.fromEntries(Object.entries(names).filter(([, name]) => !!name));
+    return withoutEmptyValues(names);
   } catch (e) {
     capture(e);
     return {};
   }
 }
 
-export async function resolveName(handle: string): Promise<Address | undefined> {
+export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Address>> {
   const abi = ['function ownerOf(uint256 tokenId) external view returns (address address)'];
 
   try {
-    const tokenId = new Resolution().namehash(handle, NamingServiceName.UNS);
-    return await snapshot.utils.call(
-      provider,
-      abi,
-      ['0xa9a6a3626993d487d2dbda3173cf58ca1a9d9e9f', 'ownerOf', [tokenId]],
-      { blockTag: 'latest' }
+    const results = await Promise.all(
+      handles.map(async handle => {
+        try {
+          const tokenId = new Resolution().namehash(handle, NamingServiceName.UNS);
+          return await snapshot.utils.call(
+            provider,
+            abi,
+            ['0xa9a6a3626993d487d2dbda3173cf58ca1a9d9e9f', 'ownerOf', [tokenId]],
+            { blockTag: 'latest' }
+          );
+        } catch (e) {
+          const message = (e as Error).message;
+          if (!['invalid token ID', 'is not supported'].some(m => message.includes(m))) {
+            capture(e);
+          }
+          return;
+        }
+      })
+    );
+
+    return withoutEmptyValues(
+      Object.fromEntries(handles.map((handle, index) => [handle, results[index]]))
     );
   } catch (e) {
-    const message = (e as Error).message;
-    if (!['invalid token ID', 'is not supported'].some(m => message.includes(m))) {
-      capture(e);
-    }
+    console.log(e);
+    capture(e);
+    return {};
   }
 }

@@ -1,42 +1,33 @@
-import axios from 'axios';
 import { capture } from '@snapshot-labs/snapshot-sentry';
-import { Address, Handle } from './utils';
+import { graphQlCall, Address, Handle } from './utils';
 
-const API_URL = 'https://api.lens.dev';
+const API_URL = 'https://api.lens.dev/graphql';
 
-async function apiCall(query: string) {
+async function apiCall(filterName: string, filters: string[]) {
   const {
     data: {
       data: {
         profiles: { items }
       }
     }
-  } = await axios({
-    url: `${API_URL}/graphql`,
-    method: 'post',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    data: {
-      query
-    }
-  });
+  } = await graphQlCall(
+    API_URL,
+    `query Profile {
+      profiles(request: { ${filterName}: ["${filters.join('","')}"] }) {
+        items {
+          handle
+          ownedBy
+        }
+      }
+    }`
+  );
 
   return items;
 }
 
 export async function lookupAddresses(addresses: Address[]): Promise<Record<Address, Handle>> {
   try {
-    const items = await apiCall(`
-          query Profile {
-            profiles(request: { ownedBy: ["${addresses.join('","')}"] }) {
-              items {
-                handle
-                ownedBy
-              }
-            }
-          }
-        `);
+    const items = await apiCall('ownedBy', addresses);
 
     return Object.fromEntries(items.map(i => [i.ownedBy, i.handle])) || {};
   } catch (e) {
@@ -45,20 +36,16 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
   }
 }
 
-export async function resolveName(handle: string): Promise<string | undefined> {
+export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Address>> {
   try {
-    const items = await apiCall(`
-          query Profiles {
-            profiles(request: { handles: ["${handle}"], limit: 1 }) {
-              items {
-                ownedBy
-              }
-            }
-          }
-        `);
+    const items = await apiCall(
+      'handles',
+      handles.filter(handle => handle.endsWith('.lens'))
+    );
 
-    return items?.[0]?.ownedBy;
+    return Object.fromEntries(items.map(i => [i.handle, i.ownedBy])) || {};
   } catch (e) {
     capture(e);
+    return {};
   }
 }

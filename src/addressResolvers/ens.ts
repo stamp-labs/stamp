@@ -1,7 +1,8 @@
+import { getAddress } from '@ethersproject/address';
 import snapshot from '@snapshot-labs/snapshot.js';
 import { capture } from '@snapshot-labs/snapshot-sentry';
 import { ens_normalize } from '@adraffy/ens-normalize';
-import { provider as getProvider, Address, Handle } from './utils';
+import { provider as getProvider, graphQlCall, Address, Handle } from './utils';
 
 const NETWORK = '1';
 const provider = getProvider(NETWORK);
@@ -40,11 +41,31 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
   }
 }
 
-export async function resolveName(handle: string): Promise<string | undefined> {
+export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Address>> {
+  const normalizedHandles = handles.filter(handle => handle.endsWith('.eth'));
+
+  if (normalizedHandles.length === 0) return {};
+
   try {
-    const addressResolved = await provider.resolveName(handle);
-    return addressResolved || undefined;
+    const {
+      data: {
+        data: { domains: items }
+      }
+    } = await graphQlCall(
+      'https://api.thegraph.com/subgraphs/name/ensdomains/ens',
+      `query Domains {
+        domains(where: {name_in: ["${normalizedHandles.join('","')}"]}) {
+          name
+          resolvedAddress {
+            id
+          }
+        }
+      }`
+    );
+
+    return Object.fromEntries(items.map(item => [item.name, getAddress(item.resolvedAddress.id)]));
   } catch (e) {
     capture(e);
+    return {};
   }
 }

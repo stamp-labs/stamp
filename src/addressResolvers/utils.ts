@@ -1,3 +1,4 @@
+import axios from 'axios';
 import snapshot from '@snapshot-labs/snapshot.js';
 
 export type Address = string;
@@ -11,4 +12,17 @@ export function provider(network: string) {
 
 export function withoutEmptyValues(obj: Record<string, any>) {
   return Object.fromEntries(Object.entries(obj).filter(([, value]) => value));
+}
+
+export function graphQlCall(url, query: string) {
+  return axios({
+    url: url,
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    data: {
+      query
+    }
+  });
 }

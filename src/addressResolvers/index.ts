@@ -7,6 +7,7 @@ import { Address, Handle, withoutEmptyValues } from './utils';
 
 const RESOLVERS = [ensResolver, unstoppableDomainResolver, lensResolver];
 const MAX_LOOKUP_ADDRESSES = 250;
+const MAX_RESOLVE_NAMES = 5;
 
 export async function lookupAddresses(addresses: Address[]) {
   if (addresses.length > MAX_LOOKUP_ADDRESSES) {
@@ -37,20 +38,22 @@ export async function lookupAddresses(addresses: Address[]) {
   return withoutEmptyValues(results);
 }
 
-export async function resolveName(handle: Handle): Promise<Record<Handle, Address>> {
-  const results = await cache([handle], async (h: Handle[]) => {
-    let address: Address | undefined;
-    const _handle = h[0];
+export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Address>> {
+  if (handles.length > MAX_RESOLVE_NAMES) {
+    return Promise.reject({
+      error: `params must contains less than ${MAX_RESOLVE_NAMES} handles`,
+      code: 400
+    });
+  }
 
-    if (_handle.endsWith('.eth')) {
-      address = await ensResolver.resolveName(_handle);
-    } else if (_handle.endsWith('.lens')) {
-      address = await lensResolver.resolveName(_handle);
-    } else {
-      address = await unstoppableDomainResolver.resolveName(_handle);
-    }
-
-    return { [handle]: address || '' };
+  const results = await cache(handles, async (handles: Handle[]) => {
+    const results = await Promise.all(RESOLVERS.map(r => r.resolveNames(handles)));
+    return Object.fromEntries(
+      handles.map(handle => [
+        handle,
+        results.map(r => r[handle]).filter(address => !!address)[0] || ''
+      ])
+    );
   });
 
   return withoutEmptyValues(results);
