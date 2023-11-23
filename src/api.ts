@@ -5,7 +5,7 @@ import { set, get, streamToBuffer, clear } from './aws';
 import resolvers from './resolvers';
 import constants from './constants.json';
 import { rpcError, rpcSuccess } from './helpers/utils';
-import { lookupAddresses } from './addressResolvers';
+import { lookupAddresses, resolveNames } from './addressResolvers';
 
 const router = express.Router();
 const TYPE_CONSTRAINTS = Object.keys(constants.resolvers).join('|');
@@ -15,10 +15,13 @@ router.post('/', async (req, res) => {
   if (!method) return rpcError(res, 400, 'missing method', id);
   try {
     let result: any = {};
+    if (!Array.isArray(params)) return rpcError(res, 400, 'params must be an array of string', id);
+
     if (method === 'lookup_addresses') result = await lookupAddresses(params);
+    else if (method === 'resolve_names') result = await resolveNames(params);
     else return rpcError(res, 400, 'invalid method', id);
 
-    if (result.error) return rpcError(res, result.code || 500, result.error, id);
+    if (result?.error) return rpcError(res, result.code || 500, result.error, id);
     return rpcSuccess(res, result, id);
   } catch (e) {
     const err = e as any;
@@ -30,14 +33,14 @@ router.post('/', async (req, res) => {
 router.get(`/clear/:type(${TYPE_CONSTRAINTS})/:id`, async (req, res) => {
   const { type, id } = req.params;
   try {
-    const { address, network, w, h, fallback } = await parseQuery(id, type, {
+    const { address, network, w, h, fallback, cb } = await parseQuery(id, type, {
       s: constants.max,
       fb: req.query.fb,
       cb: req.query.cb
     });
-    const key = getCacheKey({ type, network, address, w, h, fallback });
-    await clear(key);
-    res.status(200).json({ status: 'ok' });
+    const key = getCacheKey({ type, network, address, w, h, fallback, cb });
+    const result = await clear(key);
+    res.status(result ? 200 : 404).json({ status: result ? 'ok' : 'not found' });
   } catch (e) {
     capture(e);
     res.status(500).json({ status: 'error', error: 'failed to clear cache' });

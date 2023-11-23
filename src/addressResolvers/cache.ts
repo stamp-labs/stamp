@@ -1,43 +1,38 @@
-import { Address, Handle } from './utils';
 import redis from '../helpers/redis';
 import constants from '../constants.json';
 
 const KEY = 'address-resolvers';
 
-export async function getCache(addresses: Address[]): Promise<Record<Address, Handle>> {
+export async function getCache(keys: string[]): Promise<Record<string, string>> {
   if (!redis) return {};
 
   const transaction = redis.multi();
-  addresses.map(address => {
-    transaction.get(`${KEY}:${address}`);
-  });
+  keys.map(key => transaction.get(`${KEY}:${key}`));
   const results = await transaction.exec();
 
   return Object.fromEntries(
-    addresses
-      .map((address, index) => [address, results[index]])
-      .filter(([, handle]) => handle !== null)
+    keys.map((key, index) => [key, results[index]]).filter(([, value]) => value !== null)
   );
 }
 
-export function setCache(payload: Record<Address, Handle>) {
+export function setCache(payload: Record<string, string>) {
   if (!redis) return;
 
   const transaction = redis.multi();
-  Object.entries(payload).map(([address, handle]) =>
-    transaction.set(`${KEY}:${address}`, handle, { EX: constants.ttl })
+  Object.entries(payload).map(([key, value]) =>
+    transaction.set(`${KEY}:${key}`, value || '', { EX: constants.ttl })
   );
 
   return transaction.exec();
 }
 
-export default async function cache(addresses: Address[], callback) {
-  const cache = await getCache(addresses);
-  const cachedAddresses = Object.keys(cache);
-  const uncachedAddresses = addresses.filter(a => !cachedAddresses.includes(a));
+export default async function cache(input: string[], callback) {
+  const cache = await getCache(input);
+  const cachedKeys = Object.keys(cache);
 
-  if (uncachedAddresses.length > 0) {
-    const results = await callback(uncachedAddresses);
+  const uncachedInputs = input.filter(a => !cachedKeys.includes(a));
+  if (uncachedInputs.length > 0) {
+    const results = await callback(uncachedInputs);
     setCache(results);
 
     return { ...cache, ...results };
