@@ -16,8 +16,12 @@ export async function lookupAddresses(addresses: Address[]) {
     });
   }
 
+  const normalizedAddresses = normalizeAddresses(addresses);
+
+  if (normalizedAddresses.length === 0) return 0;
+
   return withoutEmptyValues(
-    await cache(normalizeAddresses(addresses), async (addresses: Address[]) => {
+    await cache(normalizedAddresses, async (addresses: Address[]) => {
       const results = await Promise.all(RESOLVERS.map(r => r.lookupAddresses(addresses)));
 
       return Object.fromEntries(
