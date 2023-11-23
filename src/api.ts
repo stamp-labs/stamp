@@ -30,14 +30,14 @@ router.post('/', async (req, res) => {
 router.get(`/clear/:type(${TYPE_CONSTRAINTS})/:id`, async (req, res) => {
   const { type, id } = req.params;
   try {
-    const { address, network, w, h, fallback } = await parseQuery(id, type, {
+    const { address, network, w, h, fallback, cb } = await parseQuery(id, type, {
       s: constants.max,
       fb: req.query.fb,
       cb: req.query.cb
     });
-    const key = getCacheKey({ type, network, address, w, h, fallback });
-    await clear(key);
-    res.status(200).json({ status: 'ok' });
+    const key = getCacheKey({ type, network, address, w, h, fallback, cb });
+    const result = await clear(key);
+    res.status(result ? 200 : 404).json({ status: result ? 'ok' : 'not found' });
   } catch (e) {
     capture(e);
     res.status(500).json({ status: 'error', error: 'failed to clear cache' });
