@@ -4,7 +4,8 @@ export default function testAddressResolver(
   resolveNames,
   validAddress,
   validDomain,
-  blankAddress
+  blankAddress,
+  invalidDomains
 ) {
   describe(`${name} address resolver`, () => {
     describe('lookupAddresses()', () => {
@@ -54,7 +55,7 @@ export default function testAddressResolver(
 
       describe('when mix of domains with and without associated address', () => {
         it('returns an object with only handles associated to an address', () => {
-          return expect(resolveNames([validDomain, 'test.snapshotdomain'])).resolves.toEqual({
+          return expect(resolveNames([...invalidDomains, validDomain])).resolves.toEqual({
             [validDomain]: validAddress
           });
         }, 10e3);

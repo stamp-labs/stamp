@@ -7,7 +7,7 @@ import { provider as getProvider, graphQlCall, Address, Handle } from './utils';
 const NETWORK = '1';
 const provider = getProvider(NETWORK);
 
-function normalizeNames(names: string[]) {
+function normalizeHandles(names: string[]) {
   return names.map(name => {
     try {
       return ens_normalize(name) === name ? name : '';
@@ -27,7 +27,7 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
       ['0x3671aE578E63FdF66ad4F3E12CC0c0d71Ac7510C', 'getNames', [addresses]],
       { blockTag: 'latest' }
     );
-    const validNames = normalizeNames(reverseRecords);
+    const validNames = normalizeHandles(reverseRecords);
 
     return Object.fromEntries(
       addresses
@@ -41,7 +41,7 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
 }
 
 export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Address>> {
-  const normalizedHandles = handles.filter(handle => handle.endsWith('.eth'));
+  const normalizedHandles = normalizeHandles(handles).filter(h => h);
 
   if (normalizedHandles.length === 0) return {};
 
