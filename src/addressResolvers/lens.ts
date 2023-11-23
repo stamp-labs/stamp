@@ -31,7 +31,7 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
 
     return Object.fromEntries(items.map(i => [i.ownedBy, i.handle])) || {};
   } catch (e) {
-    capture(e);
+    capture(e, { addresses });
     return {};
   }
 }

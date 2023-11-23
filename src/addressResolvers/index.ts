@@ -1,8 +1,7 @@
-import { getAddress } from '@ethersproject/address';
 import * as ensResolver from './ens';
 import * as lensResolver from './lens';
 import * as unstoppableDomainResolver from './unstoppableDomains';
-import { Address } from './utils';
+import { Address, normalizeAddresses } from './utils';
 import cache from './cache';
 
 const RESOLVERS = [ensResolver, unstoppableDomainResolver, lensResolver];
@@ -16,16 +15,9 @@ export async function lookupAddresses(addresses: Address[]) {
     });
   }
 
-  let normalizedAddresses: Address[];
-  try {
-    normalizedAddresses = addresses.map(getAddress);
-  } catch (e) {
-    return Promise.reject({ error: 'params contains invalid address', code: 400 });
-  }
-
   return Object.fromEntries(
     Object.entries(
-      await cache(normalizedAddresses, async (addresses: Address[]) => {
+      await cache(normalizeAddresses(addresses), async (addresses: Address[]) => {
         const results = await Promise.all(RESOLVERS.map(r => r.lookupAddresses(addresses)));
 
         return Object.fromEntries(

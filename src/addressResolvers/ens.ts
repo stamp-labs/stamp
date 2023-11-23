@@ -34,7 +34,7 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
         .filter((_, index) => !!validNames[index])
     );
   } catch (e) {
-    capture(e);
+    capture(e, { addresses });
     return {};
   }
 }

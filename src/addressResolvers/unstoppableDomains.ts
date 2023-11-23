@@ -17,7 +17,7 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
 
     return Object.fromEntries(Object.entries(names).filter(([, name]) => !!name));
   } catch (e) {
-    capture(e);
+    capture(e, { addresses });
     return {};
   }
 }
