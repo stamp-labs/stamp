@@ -7,7 +7,7 @@ const NETWORK = '137';
 const provider = getProvider(NETWORK);
 
 function normalizeHandles(handles: Handle[]): Handle[] {
-  return handles;
+  return handles.map(h => (h.match(RegExp('^[.a-z0-9-]+$')) ? h : ''));
 }
 
 export async function lookupAddresses(addresses: Address[]): Promise<Record<Address, Handle>> {
@@ -31,7 +31,7 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
 export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Address>> {
   const abi = ['function ownerOf(uint256 tokenId) external view returns (address address)'];
 
-  const normalizedHandles = normalizeHandles(handles);
+  const normalizedHandles = normalizeHandles(handles).filter(h => h);
 
   if (normalizedHandles.length === 0) return {};
 
