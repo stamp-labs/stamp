@@ -62,7 +62,12 @@ export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Ad
       }`
     );
 
-    return Object.fromEntries(items.map(item => [item.name, getAddress(item.resolvedAddress.id)]));
+    return Object.fromEntries(
+      items.map(item => [
+        item.name,
+        item.resolvedAddress ? getAddress(item.resolvedAddress.id) : ''
+      ])
+    );
   } catch (e) {
     capture(e, { handles });
     return {};
