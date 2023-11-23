@@ -1,4 +1,4 @@
-import { lookupAddresses } from '../../../src/addressResolvers';
+import { lookupAddresses, resolveNames } from '../../../src/addressResolvers';
 import { getCache, setCache } from '../../../src/addressResolvers/cache';
 import redis from '../../../src/helpers/redis';
 
@@ -10,10 +10,10 @@ describe('addressResolvers', () => {
 
   describe('lookupAddresses()', () => {
     describe('when passing more than 250 addresses', () => {
-      it('rejects with an error', () => {
+      it('rejects with an error', async () => {
         const params = Array(251);
 
-        expect(lookupAddresses(params)).rejects.toEqual({
+        return expect(lookupAddresses(params)).rejects.toEqual({
           error: 'params must contains less than 250 addresses',
           code: 400
         });
@@ -86,6 +86,61 @@ describe('addressResolvers', () => {
           lookupAddresses(['0xeF8305E140ac520225DAf050e2f71d5fBcC543e7'])
         ).resolves.toEqual({
           '0xeF8305E140ac520225DAf050e2f71d5fBcC543e7': 'test.eth'
+        });
+      });
+    });
+  });
+
+  describe('resolveNames()', () => {
+    describe('when passing more than 5 addresses', () => {
+      it('rejects with an error', async () => {
+        const params = Array(6);
+
+        return expect(resolveNames(params)).rejects.toEqual({
+          error: 'params must contains less than 5 handles',
+          code: 400
+        });
+      });
+    });
+
+    describe('when not cached', () => {
+      beforeEach(async () => {
+        await redis.flushDb();
+      });
+
+      it('should return the address associated to the handle', () => {
+        return expect(resolveNames(['snapshot.crypto'])).resolves.toEqual({
+          'snapshot.crypto': '0xeF8305E140ac520225DAf050e2f71d5fBcC543e7'
+        });
+      }, 10e3);
+
+      it('return null when the handle does not exist', () => {
+        return expect(resolveNames(['test-snapshot.eth'])).resolves.toEqual({
+          'test-snapshot.eth': undefined
+        });
+      }, 10e3);
+    });
+
+    describe('when cached', () => {
+      beforeEach(async () => {
+        await redis.flushDb();
+      });
+
+      it('should cache the results', async () => {
+        await expect(resolveNames(['snapshot.crypto'])).resolves.toEqual({
+          'snapshot.crypto': '0xeF8305E140ac520225DAf050e2f71d5fBcC543e7'
+        });
+
+        return expect(getCache(['snapshot.crypto'])).resolves.toEqual({
+          'snapshot.crypto': '0xeF8305E140ac520225DAf050e2f71d5fBcC543e7'
+        });
+      });
+
+      it('should return the cached results', async () => {
+        await setCache({ 'snapshot.crypto': '0x0' });
+
+        return expect(resolveNames(['snapshot.crypto'])).resolves.toEqual({
+          'snapshot.crypto': '0x0'
         });
       });
     });
