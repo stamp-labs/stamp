@@ -10,7 +10,6 @@ function normalizeNames(names: string[]) {
     try {
       return ens_normalize(name) === name ? name : '';
     } catch (e) {
-      capture(e);
       return '';
     }
   });
