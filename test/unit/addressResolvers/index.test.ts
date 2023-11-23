@@ -21,11 +21,10 @@ describe('addressResolvers', () => {
     });
 
     describe('when the params contains invalid address', () => {
-      it('rejects with an error', async () => {
-        return expect(lookupAddresses(['test'])).rejects.toEqual({
-          error: 'params contains invalid address',
-          code: 400
-        });
+      it('should ignore the invalid address', () => {
+        expect(
+          lookupAddresses(['test', '0xeF8305E140ac520225DAf050e2f71d5fBcC543e7'])
+        ).resolves.toEqual({ '0xeF8305E140ac520225DAf050e2f71d5fBcC543e7': 'fabien.eth' });
       });
     });
 

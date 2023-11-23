@@ -1,5 +1,6 @@
 import axios from 'axios';
 import snapshot from '@snapshot-labs/snapshot.js';
+import { getAddress } from '@ethersproject/address';
 
 export type Address = string;
 export type Handle = string;
@@ -25,4 +26,14 @@ export function graphQlCall(url, query: string) {
       query
     }
   });
+}
+
+export function normalizeAddresses(addresses: Address[]): Address[] {
+  return addresses
+    .map(a => {
+      try {
+        return getAddress(a);
+      } catch (e) {}
+    })
+    .filter(a => a) as Address[];
 }
