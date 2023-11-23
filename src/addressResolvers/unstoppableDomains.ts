@@ -6,6 +6,10 @@ import { provider as getProvider, Address, Handle, withoutEmptyValues } from './
 const NETWORK = '137';
 const provider = getProvider(NETWORK);
 
+function normalizeHandles(handles: Handle[]): Handle[] {
+  return handles.map(h => (h.match(RegExp('^[.a-z0-9-]+$')) ? h : ''));
+}
+
 export async function lookupAddresses(addresses: Address[]): Promise<Record<Address, Handle>> {
   const abi = ['function reverseNameOf(address addr) view returns (string reverseUri)'];
 
@@ -27,9 +31,13 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
 export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Address>> {
   const abi = ['function ownerOf(uint256 tokenId) external view returns (address address)'];
 
+  const normalizedHandles = normalizeHandles(handles).filter(h => h);
+
+  if (normalizedHandles.length === 0) return {};
+
   try {
     const results = await Promise.all(
-      handles.map(async handle => {
+      normalizedHandles.map(async handle => {
         try {
           const tokenId = new Resolution().namehash(handle, NamingServiceName.UNS);
           return await snapshot.utils.call(
@@ -49,10 +57,10 @@ export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Ad
     );
 
     return withoutEmptyValues(
-      Object.fromEntries(handles.map((handle, index) => [handle, results[index]]))
+      Object.fromEntries(normalizedHandles.map((handle, index) => [handle, results[index]]))
     );
   } catch (e) {
-    capture(e, { handles });
+    capture(e, { handles: normalizedHandles });
     return {};
   }
 }
