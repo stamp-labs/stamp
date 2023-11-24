@@ -35,7 +35,7 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
         .filter((_, index) => !!validNames[index])
     );
   } catch (e) {
-    capture(e, { addresses });
+    capture(e, { input: { addresses } });
     return {};
   }
 }
@@ -69,7 +69,7 @@ export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Ad
       ])
     );
   } catch (e) {
-    capture(e, { handles });
+    capture(e, { input: { handles } });
     return {};
   }
 }
