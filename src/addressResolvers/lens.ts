@@ -35,7 +35,7 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
 
     return Object.fromEntries(items.map(i => [i.ownedBy, i.handle])) || {};
   } catch (e) {
-    capture(e, { addresses });
+    capture(e, { input: { addresses } });
     return {};
   }
 }
@@ -50,7 +50,7 @@ export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Ad
 
     return Object.fromEntries(items.map(i => [i.handle, i.ownedBy])) || {};
   } catch (e) {
-    capture(e, { handles: normalizedHandles });
+    capture(e, { input: { handles: normalizedHandles } });
     return {};
   }
 }

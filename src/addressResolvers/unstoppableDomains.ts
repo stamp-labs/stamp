@@ -23,7 +23,7 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
 
     return withoutEmptyValues(names);
   } catch (e) {
-    capture(e, { addresses });
+    capture(e, { input: { addresses } });
     return {};
   }
 }
@@ -60,7 +60,7 @@ export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Ad
       Object.fromEntries(normalizedHandles.map((handle, index) => [handle, results[index]]))
     );
   } catch (e) {
-    capture(e, { handles: normalizedHandles });
+    capture(e, { input: { handles: normalizedHandles } });
     return {};
   }
 }
