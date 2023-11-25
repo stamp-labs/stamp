@@ -9,12 +9,12 @@ describe('addressResolvers', () => {
   });
 
   describe('lookupAddresses()', () => {
-    describe('when passing more than 250 addresses', () => {
+    describe('when passing more than 50 addresses', () => {
       it('rejects with an error', async () => {
-        const params = Array(251);
+        const params = Array(51);
 
         return expect(lookupAddresses(params)).rejects.toEqual({
-          error: 'params must contains less than 250 addresses',
+          error: 'params must contains less than 50 addresses',
           code: 400
         });
       });
