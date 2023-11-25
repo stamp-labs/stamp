@@ -5,7 +5,7 @@ import cache from './cache';
 import { Address, Handle, normalizeAddresses, withoutEmptyValues } from './utils';
 
 const RESOLVERS = [ensResolver, unstoppableDomainResolver, lensResolver];
-const MAX_LOOKUP_ADDRESSES = 250;
+const MAX_LOOKUP_ADDRESSES = 50;
 const MAX_RESOLVE_NAMES = 5;
 
 export async function lookupAddresses(addresses: Address[]) {
