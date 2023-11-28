@@ -1,7 +1,13 @@
 import snapshot from '@snapshot-labs/snapshot.js';
 import Resolution, { NamingServiceName } from '@unstoppabledomains/resolution';
 import { capture } from '@snapshot-labs/snapshot-sentry';
-import { provider as getProvider, Address, Handle, withoutEmptyValues } from './utils';
+import {
+  provider as getProvider,
+  Address,
+  Handle,
+  withoutEmptyValues,
+  isSilencedContractError
+} from './utils';
 
 const NETWORK = '137';
 const provider = getProvider(NETWORK);
@@ -23,7 +29,9 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
 
     return withoutEmptyValues(names);
   } catch (e) {
-    capture(e, { input: { addresses } });
+    if (isSilencedContractError(e)) {
+      capture(e, { input: { addresses } });
+    }
     return {};
   }
 }
@@ -47,9 +55,8 @@ export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Ad
             { blockTag: 'latest' }
           );
         } catch (e) {
-          const message = (e as Error).message;
-          if (!['invalid token ID', 'is not supported'].some(m => message.includes(m))) {
-            capture(e);
+          if (isSilencedContractError(e)) {
+            capture(e, { input: { handle } });
           }
           return;
         }

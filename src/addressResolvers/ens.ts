@@ -2,7 +2,13 @@ import { getAddress } from '@ethersproject/address';
 import snapshot from '@snapshot-labs/snapshot.js';
 import { capture } from '@snapshot-labs/snapshot-sentry';
 import { ens_normalize } from '@adraffy/ens-normalize';
-import { provider as getProvider, graphQlCall, Address, Handle } from './utils';
+import {
+  provider as getProvider,
+  graphQlCall,
+  Address,
+  Handle,
+  isSilencedContractError
+} from './utils';
 
 const NETWORK = '1';
 const provider = getProvider(NETWORK);
@@ -35,7 +41,9 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
         .filter((_, index) => !!validNames[index])
     );
   } catch (e) {
-    capture(e, { input: { addresses } });
+    if (isSilencedContractError(e)) {
+      capture(e, { input: { addresses } });
+    }
     return {};
   }
 }
