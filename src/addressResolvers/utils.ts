@@ -37,3 +37,11 @@ export function normalizeAddresses(addresses: Address[]): Address[] {
     })
     .filter(a => a) as Address[];
 }
+
+export function isSilencedContractError(error: any): boolean {
+  return (
+    !['invalid token ID', 'is not supported', 'execution reverted'].some(m =>
+      error.message?.includes(m)
+    ) || error.code === 'TIMEOUT'
+  );
+}
