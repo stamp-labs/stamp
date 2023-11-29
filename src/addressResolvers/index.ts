@@ -3,78 +3,52 @@ import * as lensResolver from './lens';
 import * as unstoppableDomainResolver from './unstoppableDomains';
 import cache from './cache';
 import { Address, Handle, normalizeAddresses, withoutEmptyValues } from './utils';
-import { timeAddressResolverResponse } from '../helpers/metrics';
+import { timeAddressResolverResponse as timeResponse } from '../helpers/metrics';
 
 const RESOLVERS = [ensResolver, unstoppableDomainResolver, lensResolver];
 const MAX_LOOKUP_ADDRESSES = 50;
 const MAX_RESOLVE_NAMES = 5;
 
-async function instrumentCall(method: string, provider: string, action) {
-  const end = timeAddressResolverResponse.startTimer({
-    provider,
-    method
-  });
-  let result = {};
-  let status = 0;
+async function _call(fnName: string, input: string[], maxInputLength: number) {
+  if (input.length > maxInputLength) {
+    return Promise.reject({
+      error: `params must contains less than ${maxInputLength} items`,
+      code: 400
+    });
+  }
 
-  try {
-    result = await action();
-    status = 1;
-  } catch (e) {}
-  end({ status });
-  return result;
+  return withoutEmptyValues(
+    await cache(input, async (_input: string[]) => {
+      const results = await Promise.all(
+        RESOLVERS.map(async r => {
+          const end = timeResponse.startTimer({
+            provider: r.NAME,
+            method: fnName
+          });
+          let result = {};
+          let status = 0;
+
+          try {
+            result = await r[fnName](_input);
+            status = 1;
+          } catch (e) {}
+          end({ status });
+
+          return result;
+        })
+      );
+
+      return Object.fromEntries(
+        _input.map(item => [item, results.map(r => r[item]).filter(i => !!i)[0] || ''])
+      );
+    })
+  );
 }
 
 export async function lookupAddresses(addresses: Address[]) {
-  if (addresses.length > MAX_LOOKUP_ADDRESSES) {
-    return Promise.reject({
-      error: `params must contains less than ${MAX_LOOKUP_ADDRESSES} addresses`,
-      code: 400
-    });
-  }
-
-  const normalizedAddresses = normalizeAddresses(addresses);
-
-  if (normalizedAddresses.length === 0) return 0;
-
-  return withoutEmptyValues(
-    await cache(normalizedAddresses, async (addresses: Address[]) => {
-      const results = await Promise.all(
-        RESOLVERS.map(r =>
-          instrumentCall('lookup_addresses', r.NAME, () => r.lookupAddresses(addresses))
-        )
-      );
-
-      return Object.fromEntries(
-        addresses.map(address => [
-          address,
-          results.map(r => r[address]).filter(handle => !!handle)[0] || ''
-        ])
-      );
-    })
-  );
+  return _call('lookupAddresses', normalizeAddresses(addresses), MAX_LOOKUP_ADDRESSES);
 }
 
-export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Address>> {
-  if (handles.length > MAX_RESOLVE_NAMES) {
-    return Promise.reject({
-      error: `params must contains less than ${MAX_RESOLVE_NAMES} handles`,
-      code: 400
-    });
-  }
-
-  return withoutEmptyValues(
-    await cache(handles, async (handles: Handle[]) => {
-      const results = await Promise.all(
-        RESOLVERS.map(r => instrumentCall('resolve_names', r.NAME, () => r.resolveNames(handles)))
-      );
-
-      return Object.fromEntries(
-        handles.map(handle => [
-          handle,
-          results.map(r => r[handle]).filter(address => !!address)[0] || ''
-        ])
-      );
-    })
-  );
+export async function resolveNames(handles: Handle[]) {
+  return _call('resolveNames', handles, MAX_RESOLVE_NAMES);
 }

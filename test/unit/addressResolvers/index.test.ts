@@ -14,7 +14,7 @@ describe('addressResolvers', () => {
         const params = Array(51);
 
         return expect(lookupAddresses(params)).rejects.toEqual({
-          error: 'params must contains less than 50 addresses',
+          error: 'params must contains less than 50 items',
           code: 400
         });
       });
@@ -97,7 +97,7 @@ describe('addressResolvers', () => {
         const params = Array(6);
 
         return expect(resolveNames(params)).rejects.toEqual({
-          error: 'params must contains less than 5 handles',
+          error: 'params must contains less than 5 items',
           code: 400
         });
       });
