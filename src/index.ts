@@ -3,7 +3,7 @@ import express from 'express';
 import compression from 'compression';
 import cors from 'cors';
 import { initLogger, fallbackLogger } from '@snapshot-labs/snapshot-sentry';
-import initMetrics from './metrics';
+import initMetrics from './helpers/metrics';
 import api from './api';
 import { name, version } from '../package.json';
 
