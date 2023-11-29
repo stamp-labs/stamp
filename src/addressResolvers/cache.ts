@@ -1,5 +1,6 @@
 import redis from '../helpers/redis';
 import constants from '../constants.json';
+import { addressResolversCacheHitCount } from '../helpers/metrics';
 
 const KEY = 'address-resolvers';
 
@@ -29,8 +30,11 @@ export function setCache(payload: Record<string, string>) {
 export default async function cache(input: string[], callback) {
   const cache = await getCache(input);
   const cachedKeys = Object.keys(cache);
-
   const uncachedInputs = input.filter(a => !cachedKeys.includes(a));
+
+  addressResolversCacheHitCount.inc({ status: 'MISS' }, uncachedInputs.length);
+  addressResolversCacheHitCount.inc({ status: 'HIT' }, cachedKeys.length);
+
   if (uncachedInputs.length > 0) {
     const results = await callback(uncachedInputs);
     setCache(results);
