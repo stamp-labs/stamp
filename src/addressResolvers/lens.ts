@@ -26,7 +26,7 @@ async function apiCall(filterName: string, filters: string[]) {
 }
 
 function normalizeHandles(handles: Handle[]): Handle[] {
-  return handles.map(h => (h.match(/^[a-z0-9-_]{5,31}\.lens$/) ? h : ''));
+  return handles.map(h => (/^[a-z0-9-_]{5,31}\.lens$/.test(h) ? h : ''));
 }
 
 export async function lookupAddresses(addresses: Address[]): Promise<Record<Address, Handle>> {

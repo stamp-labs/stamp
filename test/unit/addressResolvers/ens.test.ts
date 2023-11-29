@@ -1,5 +1,5 @@
 import { lookupAddresses, resolveNames } from '../../../src/addressResolvers/ens';
-import testAddressResolver from './utils';
+import testAddressResolver from './helper';
 
 testAddressResolver(
   'ENS',
