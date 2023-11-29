@@ -9,6 +9,22 @@ const RESOLVERS = [ensResolver, unstoppableDomainResolver, lensResolver];
 const MAX_LOOKUP_ADDRESSES = 50;
 const MAX_RESOLVE_NAMES = 5;
 
+async function instrumentCall(method: string, provider: string, action) {
+  const end = timeAddressResolverResponse.startTimer({
+    provider,
+    method
+  });
+  let result = {};
+  let status = 0;
+
+  try {
+    result = await action();
+    status = 1;
+  } catch (e) {}
+  end({ status });
+  return result;
+}
+
 export async function lookupAddresses(addresses: Address[]) {
   if (addresses.length > MAX_LOOKUP_ADDRESSES) {
     return Promise.reject({
@@ -24,21 +40,9 @@ export async function lookupAddresses(addresses: Address[]) {
   return withoutEmptyValues(
     await cache(normalizedAddresses, async (addresses: Address[]) => {
       const results = await Promise.all(
-        RESOLVERS.map(async r => {
-          const end = timeAddressResolverResponse.startTimer({
-            provider: r.NAME,
-            method: 'lookup_addresses'
-          });
-          let result = {};
-          let status = 0;
-
-          try {
-            result = await r.lookupAddresses(addresses);
-            status = 1;
-          } catch (e) {}
-          end({ status });
-          return result;
-        })
+        RESOLVERS.map(r =>
+          instrumentCall('lookup_addresses', r.NAME, () => r.lookupAddresses(addresses))
+        )
       );
 
       return Object.fromEntries(
@@ -61,7 +65,10 @@ export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Ad
 
   return withoutEmptyValues(
     await cache(handles, async (handles: Handle[]) => {
-      const results = await Promise.all(RESOLVERS.map(r => r.resolveNames(handles)));
+      const results = await Promise.all(
+        RESOLVERS.map(r => instrumentCall('resolve_names', r.NAME, () => r.resolveNames(handles)))
+      );
+
       return Object.fromEntries(
         handles.map(handle => [
           handle,

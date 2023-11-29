@@ -52,6 +52,6 @@ export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Ad
     return Object.fromEntries(items.map(i => [i.handle, i.ownedBy])) || {};
   } catch (e) {
     capture(e, { input: { handles: normalizedHandles } });
-    return {};
+    throw new FetchError();
   }
 }

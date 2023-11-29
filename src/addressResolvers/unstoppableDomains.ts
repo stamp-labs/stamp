@@ -70,6 +70,6 @@ export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Ad
     );
   } catch (e) {
     capture(e, { input: { handles: normalizedHandles } });
-    return {};
+    throw new FetchError();
   }
 }
