@@ -2,13 +2,13 @@ import * as ensResolver from './ens';
 import * as lensResolver from './lens';
 import * as unstoppableDomainResolver from './unstoppableDomains';
 import cache from './cache';
-import { Address, Handle, normalizeAddresses, withoutEmptyValues } from './utils';
+import { Address, Handle, normalizeAddresses, normalizeHandles, withoutEmptyValues } from './utils';
 
 const RESOLVERS = [ensResolver, unstoppableDomainResolver, lensResolver];
 const MAX_LOOKUP_ADDRESSES = 50;
 const MAX_RESOLVE_NAMES = 5;
 
-export async function lookupAddresses(addresses: Address[]) {
+export async function lookupAddresses(addresses: Address[]): Promise<Record<Address, Handle>> {
   if (addresses.length > MAX_LOOKUP_ADDRESSES) {
     return Promise.reject({
       error: `params must contains less than ${MAX_LOOKUP_ADDRESSES} addresses`,
@@ -16,9 +16,9 @@ export async function lookupAddresses(addresses: Address[]) {
     });
   }
 
-  const normalizedAddresses = normalizeAddresses(addresses);
+  const normalizedAddresses = Array.from(new Set(normalizeAddresses(addresses)));
 
-  if (normalizedAddresses.length === 0) return 0;
+  if (normalizedAddresses.length === 0) return {};
 
   return withoutEmptyValues(
     await cache(normalizedAddresses, async (addresses: Address[]) => {
@@ -42,9 +42,14 @@ export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Ad
     });
   }
 
+  const normalizedHandles = Array.from(new Set(normalizeHandles(handles)));
+
+  if (normalizedHandles.length === 0) return {};
+
   return withoutEmptyValues(
-    await cache(handles, async (handles: Handle[]) => {
+    await cache(normalizedHandles, async (handles: Handle[]) => {
       const results = await Promise.all(RESOLVERS.map(r => r.resolveNames(handles)));
+
       return Object.fromEntries(
         handles.map(handle => [
           handle,
