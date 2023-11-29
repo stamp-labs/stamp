@@ -2,7 +2,7 @@ import * as ensResolver from './ens';
 import * as lensResolver from './lens';
 import * as unstoppableDomainResolver from './unstoppableDomains';
 import cache from './cache';
-import { Address, Handle, normalizeAddresses, withoutEmptyValues } from './utils';
+import { Address, Handle, normalizeAddresses, normalizeHandles, withoutEmptyValues } from './utils';
 import { timeAddressResolverResponse as timeResponse } from '../helpers/metrics';
 
 const RESOLVERS = [ensResolver, unstoppableDomainResolver, lensResolver];
@@ -16,6 +16,8 @@ async function _call(fnName: string, input: string[], maxInputLength: number) {
       code: 400
     });
   }
+
+  if (input.length === 0) return {};
 
   return withoutEmptyValues(
     await cache(input, async (_input: string[]) => {
@@ -45,10 +47,18 @@ async function _call(fnName: string, input: string[], maxInputLength: number) {
   );
 }
 
-export async function lookupAddresses(addresses: Address[]) {
-  return _call('lookupAddresses', normalizeAddresses(addresses), MAX_LOOKUP_ADDRESSES);
+export async function lookupAddresses(addresses: Address[]): Promise<Record<Address, Handle>> {
+  return await _call(
+    'lookupAddresses',
+    Array.from(new Set(normalizeAddresses(addresses))),
+    MAX_LOOKUP_ADDRESSES
+  );
 }
 
-export async function resolveNames(handles: Handle[]) {
-  return _call('resolveNames', handles, MAX_RESOLVE_NAMES);
+export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Address>> {
+  return await _call(
+    'resolveNames',
+    Array.from(new Set(normalizeHandles(handles))),
+    MAX_RESOLVE_NAMES
+  );
 }
