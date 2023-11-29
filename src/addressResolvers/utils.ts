@@ -24,7 +24,7 @@ export function graphQlCall(url, query: string) {
     headers: {
       'Content-Type': 'application/json'
     },
-    timeout: 10e3,
+    timeout: 5e3,
     data: {
       query
     }
