@@ -41,6 +41,10 @@ export function normalizeAddresses(addresses: Address[]): Address[] {
     .filter(a => a) as Address[];
 }
 
+export function normalizeHandles(handles: Handle[]): Handle[] {
+  return handles.filter(h => /^[^\s]*\.[^\s]*$/.test(h));
+}
+
 export function isSilencedContractError(error: any): boolean {
   return (
     ['invalid token ID', 'is not supported', 'execution reverted'].some(m =>

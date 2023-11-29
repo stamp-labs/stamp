@@ -15,7 +15,7 @@ const NETWORK = '137';
 const provider = getProvider(NETWORK);
 
 function normalizeHandles(handles: Handle[]): Handle[] {
-  return handles.map(h => (h.match(RegExp('^[.a-z0-9-]+$')) ? h : ''));
+  return handles.map(h => (/^[.a-z0-9-]+$/.test(h) ? h : ''));
 }
 
 export async function lookupAddresses(addresses: Address[]): Promise<Record<Address, Handle>> {
