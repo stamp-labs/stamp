@@ -1,6 +1,7 @@
 import { capture } from '@snapshot-labs/snapshot-sentry';
-import { graphQlCall, Address, Handle } from './utils';
+import { graphQlCall, Address, Handle, FetchError } from './utils';
 
+export const NAME = 'Lens';
 const API_URL = 'https://api.lens.dev/graphql';
 
 async function apiCall(filterName: string, filters: string[]) {
@@ -36,7 +37,7 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
     return Object.fromEntries(items.map(i => [i.ownedBy, i.handle])) || {};
   } catch (e) {
     capture(e, { input: { addresses } });
-    return {};
+    throw new FetchError();
   }
 }
 

@@ -1,4 +1,4 @@
-import init from '@snapshot-labs/snapshot-metrics';
+import init, { client } from '@snapshot-labs/snapshot-metrics';
 import { capture } from '@snapshot-labs/snapshot-sentry';
 import { Express } from 'express';
 import constants from './constants.json';
@@ -19,3 +19,8 @@ export default function initMetrics(app: Express) {
     errorHandler: (e: any) => capture(e)
   });
 }
+export const timeAddressResolverResponse = new client.Histogram({
+  name: 'address_resolver_response_duration_seconds',
+  help: "Duration in seconds of each address resolver's response.",
+  labelNames: ['provider', 'method', 'status']
+});

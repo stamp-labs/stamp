@@ -7,6 +7,8 @@ export type Handle = string;
 
 const broviderUrl = process.env.BROVIDER_URL || 'https://rpc.brovider.xyz';
 
+export class FetchError extends Error {}
+
 export function provider(network: string) {
   return snapshot.utils.getProvider(network, { broviderUrl });
 }
