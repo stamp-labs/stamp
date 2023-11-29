@@ -1,6 +1,7 @@
 import { lookupAddresses, resolveNames } from '../../../src/addressResolvers';
 import { getCache, setCache } from '../../../src/addressResolvers/cache';
 import redis from '../../../src/helpers/redis';
+import randomAddresses from '../../fixtures/addresses';
 
 describe('addressResolvers', () => {
   afterAll(async () => {
@@ -11,9 +12,7 @@ describe('addressResolvers', () => {
   describe('lookupAddresses()', () => {
     describe('when passing more than 50 addresses', () => {
       it('rejects with an error', async () => {
-        const params = Array(51);
-
-        return expect(lookupAddresses(params)).rejects.toEqual({
+        return expect(lookupAddresses(randomAddresses)).rejects.toEqual({
           error: 'params must contains less than 50 items',
           code: 400
         });
@@ -94,7 +93,7 @@ describe('addressResolvers', () => {
   describe('resolveNames()', () => {
     describe('when passing more than 5 addresses', () => {
       it('rejects with an error', async () => {
-        const params = Array(6);
+        const params = ['1.com', '2.com', '3.com', '4.com', '5.com', '6.com'];
 
         return expect(resolveNames(params)).rejects.toEqual({
           error: 'params must contains less than 5 items',
