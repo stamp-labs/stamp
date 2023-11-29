@@ -43,7 +43,7 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
         .filter((_, index) => !!validNames[index])
     );
   } catch (e) {
-    if (isSilencedContractError(e)) {
+    if (!isSilencedContractError(e)) {
       capture(e, { input: { addresses } });
     }
     throw new FetchError();
