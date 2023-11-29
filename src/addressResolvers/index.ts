@@ -3,7 +3,7 @@ import * as lensResolver from './lens';
 import * as unstoppableDomainResolver from './unstoppableDomains';
 import cache from './cache';
 import { Address, Handle, normalizeAddresses, withoutEmptyValues } from './utils';
-import { timeAddressResolverResponse } from '../metrics';
+import { timeAddressResolverResponse } from '../helpers/metrics';
 
 const RESOLVERS = [ensResolver, unstoppableDomainResolver, lensResolver];
 const MAX_LOOKUP_ADDRESSES = 50;
