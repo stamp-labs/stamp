@@ -1,17 +1,29 @@
 import { getAddress } from '@ethersproject/address';
-import snapshot from '@snapshot-labs/snapshot.js';
 import { capture } from '@snapshot-labs/snapshot-sentry';
 import { ens_normalize } from '@adraffy/ens-normalize';
-import {
-  provider as getProvider,
-  graphQlCall,
-  Address,
-  Handle,
-  isSilencedContractError
-} from './utils';
+import { graphQlCall, Address, Handle } from './utils';
 
-const NETWORK = '1';
-const provider = getProvider(NETWORK);
+const API_URL = 'https://api.thegraph.com/subgraphs/name/ensdomains/ens';
+
+async function apiCall(filterName: string, filters: string[]) {
+  const {
+    data: {
+      data: { domains: items }
+    }
+  } = await graphQlCall(
+    API_URL,
+    `query Domains {
+      domains(where: { ${filterName}: ["${filters.join('","')}"]}) {
+        name
+        resolvedAddress {
+          id
+        }
+      }
+    }`
+  );
+
+  return items;
+}
 
 function normalizeHandles(names: string[]) {
   return names.map(name => {
@@ -24,26 +36,20 @@ function normalizeHandles(names: string[]) {
 }
 
 export async function lookupAddresses(addresses: Address[]): Promise<Record<Address, Handle>> {
-  const abi = ['function getNames(address[] addresses) view returns (string[] r)'];
-
   try {
-    const reverseRecords = await snapshot.utils.call(
-      provider,
-      abi,
-      ['0x3671aE578E63FdF66ad4F3E12CC0c0d71Ac7510C', 'getNames', [addresses]],
-      { blockTag: 'latest' }
+    const items = await apiCall(
+      'resolvedAddress_in',
+      addresses.map(a => a.toLowerCase())
     );
-    const validNames = normalizeHandles(reverseRecords);
 
     return Object.fromEntries(
-      addresses
-        .map((address, index) => [address, validNames[index]])
-        .filter((_, index) => !!validNames[index])
+      items.map(item => [
+        item.resolvedAddress ? getAddress(item.resolvedAddress.id) : '',
+        item.name
+      ])
     );
   } catch (e) {
-    if (isSilencedContractError(e)) {
-      capture(e, { input: { addresses } });
-    }
+    capture(e, { input: { addresses } });
     return {};
   }
 }
@@ -54,21 +60,7 @@ export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Ad
   if (normalizedHandles.length === 0) return {};
 
   try {
-    const {
-      data: {
-        data: { domains: items }
-      }
-    } = await graphQlCall(
-      'https://api.thegraph.com/subgraphs/name/ensdomains/ens',
-      `query Domains {
-        domains(where: {name_in: ["${normalizedHandles.join('","')}"]}) {
-          name
-          resolvedAddress {
-            id
-          }
-        }
-      }`
-    );
+    const items = await apiCall('name_in', normalizedHandles);
 
     return Object.fromEntries(
       items.map(item => [
