@@ -1,3 +1,5 @@
+import { FetchError } from '../../../src/addressResolvers/utils';
+
 export default function testAddressResolver(
   name,
   lookupAddresses,
@@ -32,8 +34,10 @@ export default function testAddressResolver(
       });
 
       describe('when passing invalid addresses', () => {
-        it('returns an empty object', () => {
-          return expect(lookupAddresses([validAddress, `${blankAddress}xxx`])).resolves.toEqual({});
+        it('throws an error', () => {
+          return expect(lookupAddresses([validAddress, `${blankAddress}xxx`])).rejects.toThrow(
+            FetchError
+          );
         }, 10e3);
       });
     });

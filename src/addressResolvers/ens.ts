@@ -1,8 +1,9 @@
 import { getAddress } from '@ethersproject/address';
 import { capture } from '@snapshot-labs/snapshot-sentry';
 import { ens_normalize } from '@adraffy/ens-normalize';
-import { graphQlCall, Address, Handle } from './utils';
+import { graphQlCall, Address, Handle, FetchError } from './utils';
 
+export const NAME = 'Ens';
 const API_URL = 'https://api.thegraph.com/subgraphs/name/ensdomains/ens';
 
 async function apiCall(filterName: string, filters: string[]) {
@@ -50,7 +51,7 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
     );
   } catch (e) {
     capture(e, { input: { addresses } });
-    return {};
+    throw new FetchError();
   }
 }
 
@@ -70,6 +71,6 @@ export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Ad
     );
   } catch (e) {
     capture(e, { input: { handles } });
-    return {};
+    throw new FetchError();
   }
 }
