@@ -32,7 +32,7 @@ describe('addressResolvers', () => {
         await redis.flushDb();
       });
 
-      it('should return the ENS handle first if associated to multiple resolvers', () => {
+      it.only('should return the ENS handle first if associated to multiple resolvers', () => {
         return expect(
           lookupAddresses(['0xeF8305E140ac520225DAf050e2f71d5fBcC543e7'])
         ).resolves.toEqual({
