@@ -44,10 +44,9 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
     );
 
     return Object.fromEntries(
-      items.map(item => [
-        item.resolvedAddress ? getAddress(item.resolvedAddress.id) : '',
-        item.name
-      ])
+      items
+        .map(item => [item.resolvedAddress ? getAddress(item.resolvedAddress.id) : '', item.name])
+        .reverse()
     );
   } catch (e) {
     capture(e, { input: { addresses } });
