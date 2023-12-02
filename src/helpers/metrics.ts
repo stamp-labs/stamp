@@ -20,6 +20,12 @@ export default function initMetrics(app: Express) {
   });
 }
 
+export const timeAddressResolverResponse = new client.Histogram({
+  name: 'address_resolver_response_duration_seconds',
+  help: "Duration in seconds of each address resolver's response.",
+  labelNames: ['provider', 'method', 'status']
+});
+
 export const addressResolversCacheHitCount = new client.Counter({
   name: 'address_resolvers_cache_hit_count',
   help: 'Number of hit/miss of the address resolvers cache layer',

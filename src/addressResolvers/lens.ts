@@ -1,6 +1,7 @@
 import { capture } from '@snapshot-labs/snapshot-sentry';
-import { graphQlCall, Address, Handle } from './utils';
+import { graphQlCall, Address, Handle, FetchError } from './utils';
 
+export const NAME = 'Lens';
 const API_URL = 'https://api-v2.lens.dev/graphql';
 
 async function apiCall(filterName: string, filters: string[]) {
@@ -42,7 +43,7 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
     );
   } catch (e) {
     capture(e, { input: { addresses } });
-    return {};
+    throw new FetchError();
   }
 }
 
@@ -59,6 +60,6 @@ export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Ad
     );
   } catch (e) {
     capture(e, { input: { handles: normalizedHandles } });
-    return {};
+    throw new FetchError();
   }
 }

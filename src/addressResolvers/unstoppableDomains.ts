@@ -6,9 +6,11 @@ import {
   Address,
   Handle,
   withoutEmptyValues,
-  isSilencedContractError
+  isSilencedContractError,
+  FetchError
 } from './utils';
 
+export const NAME = 'Unstoppable Domains';
 const NETWORK = '137';
 const provider = getProvider(NETWORK);
 
@@ -29,10 +31,10 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
 
     return withoutEmptyValues(names);
   } catch (e) {
-    if (isSilencedContractError(e)) {
+    if (!isSilencedContractError(e)) {
       capture(e, { input: { addresses } });
     }
-    return {};
+    throw new FetchError();
   }
 }
 
@@ -68,6 +70,6 @@ export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Ad
     );
   } catch (e) {
     capture(e, { input: { handles: normalizedHandles } });
-    return {};
+    throw new FetchError();
   }
 }

@@ -7,6 +7,8 @@ export type Handle = string;
 
 const broviderUrl = process.env.BROVIDER_URL || 'https://rpc.brovider.xyz';
 
+export class FetchError extends Error {}
+
 export function provider(network: string) {
   return snapshot.utils.getProvider(network, { broviderUrl });
 }
@@ -22,7 +24,7 @@ export function graphQlCall(url, query: string) {
     headers: {
       'Content-Type': 'application/json'
     },
-    timeout: 5000,
+    timeout: 5e3,
     data: {
       query
     }
@@ -45,7 +47,7 @@ export function normalizeHandles(handles: Handle[]): Handle[] {
 
 export function isSilencedContractError(error: any): boolean {
   return (
-    !['invalid token ID', 'is not supported', 'execution reverted'].some(m =>
+    ['invalid token ID', 'is not supported', 'execution reverted'].some(m =>
       error.message?.includes(m)
     ) || error.code === 'TIMEOUT'
   );

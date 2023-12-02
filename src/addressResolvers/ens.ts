@@ -7,9 +7,11 @@ import {
   graphQlCall,
   Address,
   Handle,
-  isSilencedContractError
+  isSilencedContractError,
+  FetchError
 } from './utils';
 
+export const NAME = 'Ens';
 const NETWORK = '1';
 const provider = getProvider(NETWORK);
 
@@ -41,10 +43,10 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
         .filter((_, index) => !!validNames[index])
     );
   } catch (e) {
-    if (isSilencedContractError(e)) {
+    if (!isSilencedContractError(e)) {
       capture(e, { input: { addresses } });
     }
-    return {};
+    throw new FetchError();
   }
 }
 
@@ -78,6 +80,6 @@ export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Ad
     );
   } catch (e) {
     capture(e, { input: { handles } });
-    return {};
+    throw new FetchError();
   }
 }
