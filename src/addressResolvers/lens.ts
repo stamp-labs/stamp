@@ -1,7 +1,7 @@
 import { capture } from '@snapshot-labs/snapshot-sentry';
 import { graphQlCall, Address, Handle } from './utils';
 
-const API_URL = 'https://api.lens.dev/graphql';
+const API_URL = 'https://api-v2.lens.dev/graphql';
 
 async function apiCall(filterName: string, filters: string[]) {
   const {
@@ -13,10 +13,12 @@ async function apiCall(filterName: string, filters: string[]) {
   } = await graphQlCall(
     API_URL,
     `query Profile {
-      profiles(request: { ${filterName}: ["${filters.join('","')}"] }) {
+      profiles(request: { where: { ${filterName}: ["${filters.join('","')}"] } }) {
         items {
-          handle
-          ownedBy
+          handle {
+            ownedBy
+            localName
+          }
         }
       }
     }`
@@ -26,14 +28,18 @@ async function apiCall(filterName: string, filters: string[]) {
 }
 
 function normalizeHandles(handles: Handle[]): Handle[] {
-  return handles.map(h => (/^[a-z0-9-_]{5,31}\.lens$/.test(h) ? h : ''));
+  return handles.map(h =>
+    /^[a-z0-9-_]{5,31}\.lens$/.test(h) ? `lens/${h.replace(/\.lens$/, '')}` : ''
+  );
 }
 
 export async function lookupAddresses(addresses: Address[]): Promise<Record<Address, Handle>> {
   try {
     const items = await apiCall('ownedBy', addresses);
 
-    return Object.fromEntries(items.map(i => [i.ownedBy, i.handle])) || {};
+    return (
+      Object.fromEntries(items.map(i => [i.handle.ownedBy, `${i.handle.localName}.lens`])) || {}
+    );
   } catch (e) {
     capture(e, { input: { addresses } });
     return {};
@@ -48,7 +54,9 @@ export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Ad
   try {
     const items = await apiCall('handles', normalizedHandles);
 
-    return Object.fromEntries(items.map(i => [i.handle, i.ownedBy])) || {};
+    return (
+      Object.fromEntries(items.map(i => [`${i.handle.localName}.lens`, i.handle.ownedBy])) || {}
+    );
   } catch (e) {
     capture(e, { input: { handles: normalizedHandles } });
     return {};
