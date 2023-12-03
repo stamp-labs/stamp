@@ -39,7 +39,9 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
     const items = await apiCall('ownedBy', addresses);
 
     return (
-      Object.fromEntries(items.map(i => [i.handle.ownedBy, `${i.handle.localName}.lens`])) || {}
+      Object.fromEntries(
+        items.filter(i => i.handle).map(i => [i.handle.ownedBy, `${i.handle.localName}.lens`])
+      ) || {}
     );
   } catch (e) {
     capture(e, { input: { addresses } });
