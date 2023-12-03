@@ -65,7 +65,7 @@ export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Ad
       `query Domains {
         domains(where: {
           name_in: ["${normalizedHandles.join('","')}"],
-          expiryDate_lt: "${Math.floor(Date.now() / 1e3)}"}
+          expiryDate_gt: "${Math.floor(Date.now() / 1e3)}"}
         ) {
           name
           resolvedAddress {
