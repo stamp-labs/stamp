@@ -7,7 +7,13 @@ export default function testAddressResolver(
   validAddress,
   validDomain,
   blankAddress,
-  invalidDomains
+  invalidDomains,
+  extraLookupAddressesTests = () => {
+    return;
+  },
+  extraResolveNamesTests = () => {
+    return;
+  }
 ) {
   describe(`${name} address resolver`, () => {
     describe('lookupAddresses()', () => {
@@ -40,6 +46,8 @@ export default function testAddressResolver(
           );
         }, 10e3);
       });
+
+      extraLookupAddressesTests();
     });
 
     describe('resolveNames()', () => {
@@ -64,6 +72,8 @@ export default function testAddressResolver(
           });
         }, 10e3);
       });
+
+      extraResolveNamesTests();
     });
   });
 }
