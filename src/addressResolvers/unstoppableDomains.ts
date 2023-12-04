@@ -57,7 +57,7 @@ export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Ad
             { blockTag: 'latest' }
           );
         } catch (e) {
-          if (isSilencedContractError(e)) {
+          if (!isSilencedContractError(e)) {
             capture(e, { input: { handle } });
           }
           return;
