@@ -52,3 +52,24 @@ export function isSilencedContractError(error: any): boolean {
     ) || error.code === 'TIMEOUT'
   );
 }
+
+export function mapOriginalInput(
+  input: string[],
+  results: Record<string, string>
+): Record<string, string> {
+  const inputLc = input.map(i => {
+    try {
+      return getAddress(i);
+    } catch (e) {
+      return i;
+    }
+  });
+
+  return withoutEmptyValues(
+    Object.fromEntries(
+      inputLc.map((key, index) => {
+        return [input[index], results[key]];
+      })
+    )
+  );
+}
