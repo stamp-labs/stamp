@@ -50,6 +50,20 @@ describe('addressResolvers', () => {
           '0xeF8305E140ac520225DAf050e2f71d5fBcC543e7': 'fabien.eth'
         });
       }, 10e3);
+
+      it('keeps the original input case formatting', () => {
+        return expect(
+          lookupAddresses([
+            '0xeF8305E140ac520225DAf050e2f71d5fBcC543e7',
+            '0xEF8305E140AC520225DAF050E2F71D5FBCC543E7',
+            '0xef8305e140ac520225daf050e2f71d5fbcc543e7'
+          ])
+        ).resolves.toEqual({
+          '0xeF8305E140ac520225DAf050e2f71d5fBcC543e7': 'fabien.eth',
+          '0xEF8305E140AC520225DAF050E2F71D5FBCC543E7': 'fabien.eth',
+          '0xef8305e140ac520225daf050e2f71d5fbcc543e7': 'fabien.eth'
+        });
+      }, 10e3);
     });
 
     describe('when cached', () => {
@@ -79,12 +93,19 @@ describe('addressResolvers', () => {
       });
 
       it('should return the cached results', async () => {
-        await setCache({ '0xeF8305E140ac520225DAf050e2f71d5fBcC543e7': 'test.eth' });
+        await setCache({
+          '0xeF8305E140ac520225DAf050e2f71d5fBcC543e7': 'test.eth',
+          '0xef8305e140ac520225daf050e2f71d5fbcc543e7': 'test1.eth'
+        });
 
         return expect(
-          lookupAddresses(['0xeF8305E140ac520225DAf050e2f71d5fBcC543e7'])
+          lookupAddresses([
+            '0xeF8305E140ac520225DAf050e2f71d5fBcC543e7',
+            '0xef8305e140ac520225daf050e2f71d5fbcc543e7'
+          ])
         ).resolves.toEqual({
-          '0xeF8305E140ac520225DAf050e2f71d5fBcC543e7': 'test.eth'
+          '0xeF8305E140ac520225DAf050e2f71d5fBcC543e7': 'test.eth',
+          '0xef8305e140ac520225daf050e2f71d5fbcc543e7': 'test.eth'
         });
       });
     });
@@ -118,6 +139,16 @@ describe('addressResolvers', () => {
           'test-snapshot.eth': undefined
         });
       }, 10e3);
+
+      it('keeps the original case formatting', () => {
+        return expect(
+          resolveNames(['snapshot.crypto', 'SNAPSHOT.CRYPTO', 'Snapshot.Crypto'])
+        ).resolves.toEqual({
+          'snapshot.crypto': '0xeF8305E140ac520225DAf050e2f71d5fBcC543e7',
+          'SNAPSHOT.CRYPTO': '0xeF8305E140ac520225DAf050e2f71d5fBcC543e7',
+          'Snapshot.Crypto': '0xeF8305E140ac520225DAf050e2f71d5fBcC543e7'
+        });
+      }, 10e3);
     });
 
     describe('when cached', () => {
@@ -136,10 +167,11 @@ describe('addressResolvers', () => {
       });
 
       it('should return the cached results', async () => {
-        await setCache({ 'snapshot.crypto': '0x0' });
+        await setCache({ 'snapshot.crypto': '0x0', 'SNAPSHOT.CRYPTO': '0x1' });
 
-        return expect(resolveNames(['snapshot.crypto'])).resolves.toEqual({
-          'snapshot.crypto': '0x0'
+        return expect(resolveNames(['snapshot.crypto', 'SNAPSHOT.CRYPTO'])).resolves.toEqual({
+          'snapshot.crypto': '0x0',
+          'SNAPSHOT.CRYPTO': '0x0'
         });
       });
     });

@@ -42,7 +42,7 @@ export function normalizeAddresses(addresses: Address[]): Address[] {
 }
 
 export function normalizeHandles(handles: Handle[]): Handle[] {
-  return handles.filter(h => /^[^\s]*\.[^\s]*$/.test(h));
+  return handles.filter(h => /^[^\s]*\.[^\s]*$/.test(h)).map(h => h.toLowerCase());
 }
 
 export function isSilencedContractError(error: any): boolean {
@@ -57,18 +57,15 @@ export function mapOriginalInput(
   input: string[],
   results: Record<string, string>
 ): Record<string, string> {
-  const inputLc = input.map(i => {
-    try {
-      return getAddress(i);
-    } catch (e) {
-      return i;
-    }
-  });
+  const inputLc = input.map(i => i.toLowerCase());
+  const resultLc = Object.fromEntries(
+    Object.entries(results).map(([key, value]) => [key.toLowerCase(), value])
+  );
 
   return withoutEmptyValues(
     Object.fromEntries(
       inputLc.map((key, index) => {
-        return [input[index], results[key]];
+        return [input[index], resultLc[key]];
       })
     )
   );
