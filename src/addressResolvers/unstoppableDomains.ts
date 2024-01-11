@@ -6,7 +6,7 @@ import {
   Address,
   Handle,
   withoutEmptyValues,
-  isSilencedContractError,
+  isSilencedError,
   FetchError
 } from './utils';
 
@@ -31,7 +31,7 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
 
     return withoutEmptyValues(names);
   } catch (e) {
-    if (!isSilencedContractError(e)) {
+    if (!isSilencedError(e)) {
       capture(e, { input: { addresses } });
     }
     throw new FetchError();
@@ -57,7 +57,7 @@ export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Ad
             { blockTag: 'latest' }
           );
         } catch (e) {
-          if (!isSilencedContractError(e)) {
+          if (!isSilencedError(e)) {
             capture(e, { input: { handle } });
           }
           return;
@@ -69,7 +69,9 @@ export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Ad
       Object.fromEntries(normalizedHandles.map((handle, index) => [handle, results[index]]))
     );
   } catch (e) {
-    capture(e, { input: { handles: normalizedHandles } });
+    if (!isSilencedError(e)) {
+      capture(e, { input: { handles: normalizedHandles } });
+    }
     throw new FetchError();
   }
 }
