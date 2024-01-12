@@ -1,5 +1,5 @@
 import { capture } from '@snapshot-labs/snapshot-sentry';
-import { graphQlCall, Address, Handle, FetchError } from './utils';
+import { graphQlCall, Address, Handle, FetchError, isSilencedError } from './utils';
 
 export const NAME = 'Lens';
 const API_URL = 'https://api-v2.lens.dev/graphql';
@@ -44,7 +44,10 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
       ) || {}
     );
   } catch (e) {
-    capture(e, { input: { addresses } });
+    if (!isSilencedError(e)) {
+      capture(e, { input: { addresses } });
+    }
+
     throw new FetchError();
   }
 }
@@ -61,7 +64,9 @@ export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Ad
       Object.fromEntries(items.map(i => [`${i.handle.localName}.lens`, i.handle.ownedBy])) || {}
     );
   } catch (e) {
-    capture(e, { input: { handles: normalizedHandles } });
+    if (!isSilencedError(e)) {
+      capture(e, { input: { handles: normalizedHandles } });
+    }
     throw new FetchError();
   }
 }

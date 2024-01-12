@@ -45,10 +45,10 @@ export function normalizeHandles(handles: Handle[]): Handle[] {
   return handles.filter(h => /^[^\s]*\.[^\s]*$/.test(h));
 }
 
-export function isSilencedContractError(error: any): boolean {
+export function isSilencedError(error: any): boolean {
   return (
     ['invalid token ID', 'is not supported', 'execution reverted'].some(m =>
       error.message?.includes(m)
-    ) || error.code === 'TIMEOUT'
+    ) || ['TIMEOUT', 'ECONNABORTED', 'ETIMEDOUT'].some(c => error.code?.includes(c))
   );
 }

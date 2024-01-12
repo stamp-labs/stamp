@@ -7,7 +7,7 @@ import {
   graphQlCall,
   Address,
   Handle,
-  isSilencedContractError,
+  isSilencedError,
   FetchError
 } from './utils';
 
@@ -43,7 +43,7 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
         .filter((_, index) => !!validNames[index])
     );
   } catch (e) {
-    if (!isSilencedContractError(e)) {
+    if (!isSilencedError(e)) {
       capture(e, { input: { addresses } });
     }
     throw new FetchError();
@@ -79,7 +79,9 @@ export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Ad
       ])
     );
   } catch (e) {
-    capture(e, { input: { handles } });
+    if (!isSilencedError(e)) {
+      capture(e, { input: { handles } });
+    }
     throw new FetchError();
   }
 }
