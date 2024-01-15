@@ -35,7 +35,7 @@ export function normalizeAddresses(addresses: Address[]): Address[] {
   return addresses
     .map(a => {
       try {
-        return getAddress(a);
+        return getAddress(a.toLowerCase());
       } catch (e) {}
     })
     .filter(a => a) as Address[];
