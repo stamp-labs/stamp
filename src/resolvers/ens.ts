@@ -10,10 +10,8 @@ export default async function resolve(name: string) {
       return false;
     }
 
-    const url = await ensResolver.getText('avatar');
-    if (!url || !url.startsWith('http')) {
-      return false;
-    }
+    let url = await ensResolver.getText('avatar');
+    url = url?.startsWith('http') ? url : `https://metadata.ens.domains/mainnet/avatar/${name}`;
 
     const input = (await axios({ url, responseType: 'arraybuffer' })).data as Buffer;
 
