@@ -11,9 +11,7 @@ export default async function resolve(name: string) {
     }
 
     let url = await ensResolver.getText('avatar');
-    if (!url || !url.startsWith('http')) {
-      url = `https://metadata.ens.domains/mainnet/avatar/${name}`;
-    }
+    url = url?.startsWith('http') ? url : `https://metadata.ens.domains/mainnet/avatar/${name}`;
 
     const input = (await axios({ url, responseType: 'arraybuffer' })).data as Buffer;
 
