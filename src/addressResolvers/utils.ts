@@ -57,7 +57,7 @@ export function mapOriginalInput(
   input: string[],
   results: Record<string, string>
 ): Record<string, string> {
-  const inputLc = input.map(i => i.toLowerCase());
+  const inputLc = input.map(i => i?.toLowerCase());
   const resultLc = Object.fromEntries(
     Object.entries(results).map(([key, value]) => [key.toLowerCase(), value])
   );
