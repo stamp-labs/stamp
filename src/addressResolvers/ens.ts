@@ -63,7 +63,10 @@ export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Ad
     } = await graphQlCall(
       'https://api.thegraph.com/subgraphs/name/ensdomains/ens',
       `query Domains {
-        domains(where: {name_in: ["${normalizedHandles.join('","')}"]}) {
+        domains(where: {
+          name_in: ["${normalizedHandles.join('","')}"],
+          expiryDate_gt: "${Math.floor(Date.now() / 1e3)}"}
+        ) {
           name
           resolvedAddress {
             id
