@@ -50,7 +50,7 @@ export function isSilencedError(error: any): boolean {
     ['invalid token ID', 'is not supported', 'execution reverted'].some(m =>
       error.message?.includes(m)
     ) ||
-    ['TIMEOUT', 'ECONNABORTED', 'ETIMEDOUT'].some(c =>
+    ['TIMEOUT', 'ECONNABORTED', 'ETIMEDOUT', 'ECONNRESET'].some(c =>
       (error.error?.code || error.code)?.includes(c)
     )
   );
