@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { getUrl, resize } from '../utils';
 import { max } from '../constants.json';
+import { fetchHttpImage, axiosDefaultParams } from './utils';
 
 const SUBGRAPH_URLS = [
   'https://api.studio.thegraph.com/query/23545/sx-goerli/version/latest',
@@ -25,7 +26,8 @@ async function getSpaceProperty(key: string, url: string, property: 'avatar' | '
             }
           }
         }`
-    }
+    },
+    ...axiosDefaultParams
   });
 
   if (!data.data?.data?.space?.metadata?.[property]) return Promise.reject(false);
@@ -41,7 +43,7 @@ function createPropertyResolver(property: 'avatar' | 'cover') {
       );
 
       const url = getUrl(value);
-      const input = (await axios({ url, responseType: 'arraybuffer' })).data as Buffer;
+      const input = await fetchHttpImage(url);
 
       if (property === 'cover') return input;
       return await resize(input, max, max);
