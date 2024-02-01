@@ -7,7 +7,8 @@ export default function testAddressResolver(
   validAddress,
   validDomain,
   blankAddress,
-  invalidDomains
+  invalidDomains,
+  failOnBlankAddress = true
 ) {
   describe(`${name} address resolver`, () => {
     describe('lookupAddresses()', () => {
@@ -34,11 +35,19 @@ export default function testAddressResolver(
       });
 
       describe('when passing invalid addresses', () => {
-        it('throws an error', () => {
-          return expect(lookupAddresses([validAddress, `${blankAddress}xxx`])).rejects.toThrow(
-            FetchError
-          );
-        }, 10e3);
+        if (failOnBlankAddress) {
+          it('throws an error', () => {
+            return expect(lookupAddresses([validAddress, `${blankAddress}xxx`])).rejects.toThrow(
+              FetchError
+            );
+          }, 10e3);
+        } else {
+          it('returns an object with only valid addresses associated to a domain', () => {
+            return expect(lookupAddresses([validAddress, `${blankAddress}xxx`])).resolves.toEqual({
+              [validAddress]: validDomain
+            });
+          }, 10e3);
+        }
       });
     });
 
