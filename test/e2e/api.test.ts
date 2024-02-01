@@ -1,3 +1,4 @@
+import axios from 'axios';
 import redis from '../../src/helpers/redis';
 import { purge as purgeCache } from '../../src/addressResolvers/cache';
 
@@ -43,11 +44,12 @@ describe('E2E api', () => {
     });
 
     describe('on lookup_addresses', () => {
-      function fetchLookupAddresses(params: string[]) {
-        return fetch(HOST, {
+      function fetchLookupAddresses(params: any) {
+        return axios({
+          url: HOST,
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ method: 'lookup_addresses', params })
+          responseType: 'json',
+          data: { method: 'lookup_addresses', params }
         });
       }
 
@@ -62,9 +64,7 @@ describe('E2E api', () => {
         ];
         // @ts-ignore
         it.each(tests)('returns an error when passing %s', async (title: string, params: any) => {
-          const response = await fetchLookupAddresses(params);
-
-          expect(response.status).toBe(400);
+          expect(fetchLookupAddresses(params)).rejects.toThrowError(/status code 400/);
         });
       });
 
@@ -75,10 +75,9 @@ describe('E2E api', () => {
             '0xe6d0dd18c6c3a9af8c2fab57d6e6a38e29d513cc',
             '0x0C67A201b93cf58D4a5e8D4E970093f0FB4bb0D1'
           ]);
-          const body = await response.json();
 
           expect(response.status).toBe(200);
-          expect(body.result).toEqual({
+          expect(response.data.result).toEqual({
             '0xE6D0Dd18C6C3a9Af8C2FaB57d6e6A38E29d513cC': 'sdntestens.eth',
             '0xe6d0dd18c6c3a9af8c2fab57d6e6a38e29d513cc': 'sdntestens.eth'
           });
@@ -92,10 +91,9 @@ describe('E2E api', () => {
             '0x07ff6b17f07c4d83236e3fc5f94259a19d1ed41bbcf1822397ea17882e9b038d',
             '0x040f81578c2ab498c1252fdebdf1ed5dc083906dc7b9e3552c362db1c7c23a02'
           ]);
-          const body = await response.json();
 
           expect(response.status).toBe(200);
-          expect(body.result).toEqual({
+          expect(response.data.result).toEqual({
             '0x07FF6B17F07C4D83236E3FC5F94259A19D1ED41BBCF1822397EA17882E9B038D':
               'checkpoint.stark',
             '0x07ff6b17f07c4d83236e3fc5f94259a19d1ed41bbcf1822397ea17882e9b038d': 'checkpoint.stark'
@@ -112,10 +110,9 @@ describe('E2E api', () => {
             '0xE6D0Dd18C6C3a9Af8C2FaB57d6e6A38E29d513cC',
             '0xe6d0dd18c6c3a9af8c2fab57d6e6a38e29d513cc'
           ]);
-          const body = await response.json();
 
           expect(response.status).toBe(200);
-          expect(body.result).toEqual({
+          expect(response.data.result).toEqual({
             '0x07FF6B17F07C4D83236E3FC5F94259A19D1ED41BBCF1822397EA17882E9B038D':
               'checkpoint.stark',
             '0x07ff6b17f07c4d83236e3fc5f94259a19d1ed41bbcf1822397ea17882e9b038d':
