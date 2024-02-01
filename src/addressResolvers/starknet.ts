@@ -36,7 +36,7 @@ async function apiCall(
 }
 
 function normalizeHandles(handles: Handle[]): Handle[] {
-  return handles.map(h => (h.endsWith('.stark') ? h.toLowerCase() : ''));
+  return handles.filter(h => h.endsWith('.stark'));
 }
 
 function normalizeAddresses(addresses: Address[]): Address[] {
