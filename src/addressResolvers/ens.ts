@@ -42,7 +42,7 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
     const reverseRecords = await snapshot.utils.call(
       provider,
       abi,
-      ['0x3671aE578E63FdF66ad4F3E12CC0c0d71Ac7510C', 'getNames', [addresses]],
+      ['0x3671aE578E63FdF66ad4F3E12CC0c0d71Ac7510C', 'getNames', [normalizedAddresses]],
       { blockTag: 'latest' }
     );
     const validNames = normalizeHandles(reverseRecords);

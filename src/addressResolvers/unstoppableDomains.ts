@@ -35,7 +35,9 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
 
   try {
     const multi = new snapshot.utils.Multicaller(NETWORK, provider, ABI);
-    addresses.forEach(address => multi.call(address, CONTRACT_ADDRESS, 'reverseNameOf', [address]));
+    addresses.forEach(address =>
+      multi.call(address, CONTRACT_ADDRESS, 'reverseNameOf', [normalizedAddresses])
+    );
 
     const names = (await multi.execute()) as Record<Address, Handle>;
 

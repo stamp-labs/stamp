@@ -44,7 +44,7 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
   if (normalizedAddresses.length === 0) return {};
 
   try {
-    const items = await apiCall('ownedBy', addresses);
+    const items = await apiCall('ownedBy', normalizedAddresses);
 
     return (
       Object.fromEntries(
