@@ -1,6 +1,7 @@
 import * as ensResolver from './ens';
 import * as lensResolver from './lens';
 import * as unstoppableDomainResolver from './unstoppableDomains';
+import * as starknetResolver from './starknet';
 import cache from './cache';
 import {
   Address,
@@ -12,7 +13,7 @@ import {
 } from './utils';
 import { timeAddressResolverResponse as timeResponse } from '../helpers/metrics';
 
-const RESOLVERS = [ensResolver, unstoppableDomainResolver, lensResolver];
+const RESOLVERS = [ensResolver, unstoppableDomainResolver, lensResolver, starknetResolver];
 const MAX_LOOKUP_ADDRESSES = 50;
 const MAX_RESOLVE_NAMES = 5;
 
