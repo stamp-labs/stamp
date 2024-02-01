@@ -8,25 +8,35 @@ import {
   Address,
   Handle,
   isSilencedError,
-  FetchError
+  FetchError,
+  isEvmAddress
 } from './utils';
 
 export const NAME = 'Ens';
 const NETWORK = '1';
 const provider = getProvider(NETWORK);
 
-function normalizeHandles(names: string[]) {
-  return names.map(name => {
-    try {
-      return ens_normalize(name) === name ? name : '';
-    } catch (e) {
-      return '';
-    }
-  });
+function normalizeAddresses(addresses: Address[]): Address[] {
+  return addresses.filter(isEvmAddress);
+}
+
+function normalizeHandles(names: Handle[]): Handle[] {
+  return names
+    .map(name => {
+      try {
+        return ens_normalize(name) === name ? name : '';
+      } catch (e) {
+        return '';
+      }
+    })
+    .filter(h => h);
 }
 
 export async function lookupAddresses(addresses: Address[]): Promise<Record<Address, Handle>> {
   const abi = ['function getNames(address[] addresses) view returns (string[] r)'];
+  const normalizedAddresses = normalizeAddresses(addresses);
+
+  if (normalizedAddresses.length === 0) return {};
 
   try {
     const reverseRecords = await snapshot.utils.call(
@@ -51,7 +61,7 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
 }
 
 export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Address>> {
-  const normalizedHandles = normalizeHandles(handles).filter(h => h);
+  const normalizedHandles = normalizeHandles(handles);
 
   if (normalizedHandles.length === 0) return {};
 

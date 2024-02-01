@@ -1,5 +1,12 @@
 import { capture } from '@snapshot-labs/snapshot-sentry';
-import { Address, Handle, withoutEmptyValues, isSilencedError, FetchError } from './utils';
+import {
+  Address,
+  Handle,
+  withoutEmptyValues,
+  isSilencedError,
+  FetchError,
+  isNonEvmAddress
+} from './utils';
 import axios from 'axios';
 
 export const NAME = 'Starknet';
@@ -35,14 +42,12 @@ async function apiCall(
   );
 }
 
-function normalizeHandles(handles: Handle[]): Handle[] {
-  return handles.filter(h => h.endsWith('.stark'));
+function normalizeAddresses(addresses: Address[]): Address[] {
+  return addresses.filter(isNonEvmAddress);
 }
 
-function normalizeAddresses(addresses: Address[]): Address[] {
-  return addresses
-    .map(a => (/^(0x)?[0-9a-fA-F]{64}$/.test(a) ? a.toLocaleLowerCase() : ''))
-    .filter(a => a);
+function normalizeHandles(handles: Handle[]): Handle[] {
+  return handles.filter(h => h.endsWith('.stark'));
 }
 
 export async function lookupAddresses(addresses: Address[]): Promise<Record<Address, Handle>> {
