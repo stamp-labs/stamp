@@ -10,7 +10,7 @@
     "dev": "nodemon src/index.ts",
     "start": "node dist/src/index.js",
     "start:test": "dotenv -e test/.env.test yarn dev",
-    "test": "dotenv -e test/.env.test yarn jest",
+    "test": "PORT=3003 start-server-and-test 'yarn start:test' 3003 'dotenv -e test/.env.test yarn jest'",
     "test:integration": "dotenv -e test/.env.test yarn jest --runInBand --collectCoverage=false test/integration",
     "test:e2e": "PORT=3003 start-server-and-test 'yarn start:test' 3003 'dotenv -e test/.env.test jest --runInBand --collectCoverage=false test/e2e/'"
   },
