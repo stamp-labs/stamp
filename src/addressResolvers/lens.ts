@@ -53,7 +53,7 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
     );
   } catch (e) {
     if (!isSilencedError(e)) {
-      capture(e, { input: { addresses } });
+      capture(e, { input: { addresses: normalizedAddresses } });
     }
 
     throw new FetchError();

@@ -5,7 +5,7 @@ const HOST = `http://localhost:${process.env.PORT || 3003}`;
 
 describe('E2E api', () => {
   afterAll(async () => {
-    await redis.quit();
+    await redis?.quit();
   });
 
   describe('GET type/TYPE/ID', () => {

@@ -52,30 +52,30 @@ function normalizeHandles(handles: Handle[]): Handle[] {
 }
 
 export async function lookupAddresses(addresses: Address[]): Promise<Record<Address, Handle>> {
+  const normalizedAddresses = normalizeAddresses(addresses);
+
+  if (normalizedAddresses.length === 0) return {};
+
   try {
-    const normalizedAddresses = normalizeAddresses(addresses);
-
-    if (normalizedAddresses.length === 0) return {};
-
     return await apiCall('addr_to_domain', normalizedAddresses);
   } catch (e) {
     if (!isSilencedError(e)) {
-      capture(e, { input: { addresses } });
+      capture(e, { input: { addresses: normalizedAddresses } });
     }
     throw new FetchError();
   }
 }
 
 export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Address>> {
+  const normalizedHandles = normalizeHandles(handles);
+
+  if (normalizedHandles.length === 0) return {};
+
   try {
-    const normalizedHandles = normalizeHandles(handles);
-
-    if (normalizedHandles.length === 0) return {};
-
     return await apiCall('domain_to_addr', normalizedHandles);
   } catch (e) {
     if (!isSilencedError(e)) {
-      capture(e, { input: { handles } });
+      capture(e, { input: { handles: normalizedHandles } });
     }
     throw new FetchError();
   }

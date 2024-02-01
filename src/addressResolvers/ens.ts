@@ -48,13 +48,13 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
     const validNames = normalizeHandles(reverseRecords);
 
     return Object.fromEntries(
-      addresses
+      normalizedAddresses
         .map((address, index) => [address, validNames[index]])
         .filter((_, index) => !!validNames[index])
     );
   } catch (e) {
     if (!isSilencedError(e)) {
-      capture(e, { input: { addresses } });
+      capture(e, { input: { addresses: normalizedAddresses } });
     }
     throw new FetchError();
   }
@@ -90,7 +90,7 @@ export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Ad
     );
   } catch (e) {
     if (!isSilencedError(e)) {
-      capture(e, { input: { handles } });
+      capture(e, { input: { handles: normalizedHandles } });
     }
     throw new FetchError();
   }
