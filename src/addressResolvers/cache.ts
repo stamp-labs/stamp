@@ -44,3 +44,13 @@ export default async function cache(input: string[], callback) {
 
   return cache;
 }
+
+export async function purge(): Promise<void> {
+  if (!redis) return;
+
+  const keys = await redis.keys(`${KEY}:*`);
+  const transaction = redis.multi();
+
+  keys.map((key: string) => transaction.del(key));
+  transaction.exec();
+}

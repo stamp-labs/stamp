@@ -1,6 +1,13 @@
+import redis from '../../src/helpers/redis';
+import { purge as purgeCache } from '../../src/addressResolvers/cache';
+
 const HOST = `http://localhost:${process.env.PORT || 3003}`;
 
 describe('E2E api', () => {
+  afterAll(async () => {
+    await redis.quit();
+  });
+
   describe('GET type/TYPE/ID', () => {
     it.todo('returns a 500 status on invalid query');
 
@@ -23,6 +30,10 @@ describe('E2E api', () => {
   });
 
   describe('POST /', () => {
+    afterEach(async () => {
+      await purgeCache();
+    });
+
     describe('when passing invalid method', () => {
       it.todo('returns an error');
     });
@@ -88,6 +99,29 @@ describe('E2E api', () => {
             '0x07FF6B17F07C4D83236E3FC5F94259A19D1ED41BBCF1822397EA17882E9B038D':
               'checkpoint.stark',
             '0x07ff6b17f07c4d83236e3fc5f94259a19d1ed41bbcf1822397ea17882e9b038d': 'checkpoint.stark'
+          });
+        });
+      });
+
+      describe('when passing a mix of EVM and non-EVM addresses', () => {
+        it('returns only addresses with associated domains', async () => {
+          const response = await fetchLookupAddresses([
+            '0x07FF6B17F07C4D83236E3FC5F94259A19D1ED41BBCF1822397EA17882E9B038D',
+            '0x07ff6b17f07c4d83236e3fc5f94259a19d1ed41bbcf1822397ea17882e9b038d',
+            '0x040f81578c2ab498c1252fdebdf1ed5dc083906dc7b9e3552c362db1c7c23a02',
+            '0xE6D0Dd18C6C3a9Af8C2FaB57d6e6A38E29d513cC',
+            '0xe6d0dd18c6c3a9af8c2fab57d6e6a38e29d513cc'
+          ]);
+          const body = await response.json();
+
+          expect(response.status).toBe(200);
+          expect(body.result).toEqual({
+            '0x07FF6B17F07C4D83236E3FC5F94259A19D1ED41BBCF1822397EA17882E9B038D':
+              'checkpoint.stark',
+            '0x07ff6b17f07c4d83236e3fc5f94259a19d1ed41bbcf1822397ea17882e9b038d':
+              'checkpoint.stark',
+            '0xE6D0Dd18C6C3a9Af8C2FaB57d6e6A38E29d513cC': 'sdntestens.eth',
+            '0xe6d0dd18c6c3a9af8c2fab57d6e6a38e29d513cc': 'sdntestens.eth'
           });
         });
       });
