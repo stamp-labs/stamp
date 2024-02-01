@@ -13,7 +13,7 @@ export function provider(network: string) {
   return snapshot.utils.getProvider(network, { broviderUrl });
 }
 
-export function withoutEmptyValues(obj: Record<string, any> | [string, any]) {
+export function withoutEmptyValues(obj: any[] | Record<string, any>) {
   const data = Array.isArray(obj) ? obj : Object.entries(obj);
 
   return Object.fromEntries(data.filter(([, value]) => value));
