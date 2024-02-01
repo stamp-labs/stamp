@@ -14,17 +14,18 @@ const BASE_URL = 'https://api.starknet.id';
 
 type RESOLVE_TYPE = 'addr_to_domain' | 'domain_to_addr';
 
+function buildApiUrl(resolve_type: RESOLVE_TYPE, needle: string): string {
+  return `${BASE_URL}/${resolve_type}?${
+    resolve_type === 'addr_to_domain' ? 'addr' : 'domain'
+  }=${needle}`;
+}
+
 async function apiCall(
   resolve_type: RESOLVE_TYPE,
   needles: string[]
 ): Promise<Record<string, string>> {
   const requests = needles.map(needle =>
-    axios.get(
-      `${BASE_URL}/${resolve_type}?${
-        resolve_type === 'addr_to_domain' ? 'addr' : 'domain'
-      }=${needle}`,
-      { timeout: 5e3 }
-    )
+    axios.get(buildApiUrl(resolve_type, needle), { timeout: 5e3 })
   );
   const responses = await Promise.allSettled(requests);
 
