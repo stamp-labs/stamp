@@ -1,12 +1,12 @@
 import { lookupAddresses, resolveNames } from '../../../src/addressResolvers/unstoppableDomains';
 import testAddressResolver from './helper';
 
-testAddressResolver(
-  'UnstoppableDomains',
+testAddressResolver({
+  name: 'UnstoppableDomains',
   lookupAddresses,
   resolveNames,
-  '0xeF8305E140ac520225DAf050e2f71d5fBcC543e7',
-  'snapshot.crypto',
-  '0x0C67A201b93cf58D4a5e8D4E970093f0FB4bb0D1',
-  ['domain.eth', 'domain.lens', 'domain.com']
-);
+  validAddress: '0xeF8305E140ac520225DAf050e2f71d5fBcC543e7',
+  validDomain: 'snapshot.crypto',
+  blankAddress: '0x0C67A201b93cf58D4a5e8D4E970093f0FB4bb0D1',
+  invalidDomains: ['domain.eth', 'domain.lens', 'domain.com']
+});

@@ -36,13 +36,14 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
   try {
     const multi = new snapshot.utils.Multicaller(NETWORK, provider, ABI);
     normalizedAddresses.forEach(address =>
-      multi.call(address, CONTRACT_ADDRESS, 'reverseNameOf', [normalizedAddresses])
+      multi.call(address, CONTRACT_ADDRESS, 'reverseNameOf', [address])
     );
 
     const names = (await multi.execute()) as Record<Address, Handle>;
 
     return withoutEmptyValues(names);
   } catch (e) {
+    console.log(e);
     if (!isSilencedError(e)) {
       capture(e, { input: { addresses, normalizedAddresses } });
     }

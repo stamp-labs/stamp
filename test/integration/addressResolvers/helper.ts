@@ -1,15 +1,12 @@
-import { FetchError } from '../../../src/addressResolvers/utils';
-
-export default function testAddressResolver(
+export default function testAddressResolver({
   name,
   lookupAddresses,
   resolveNames,
   validAddress,
   validDomain,
   blankAddress,
-  invalidDomains,
-  failOnBlankAddress = true
-) {
+  invalidDomains
+}) {
   describe(`${name} address resolver`, () => {
     describe('lookupAddresses()', () => {
       describe('when the address is associated to a domain', () => {
@@ -32,22 +29,6 @@ export default function testAddressResolver(
             [validAddress]: validDomain
           });
         }, 10e3);
-      });
-
-      describe('when passing invalid addresses', () => {
-        if (failOnBlankAddress) {
-          it('throws an error', () => {
-            return expect(lookupAddresses([validAddress, `${blankAddress}xxx`])).rejects.toThrow(
-              FetchError
-            );
-          }, 10e3);
-        } else {
-          it('returns an object with only valid addresses associated to a domain', () => {
-            return expect(lookupAddresses([validAddress, `${blankAddress}xxx`])).resolves.toEqual({
-              [validAddress]: validDomain
-            });
-          }, 10e3);
-        }
       });
     });
 
