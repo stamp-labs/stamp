@@ -1,6 +1,7 @@
 import { createHash } from 'crypto';
 import { set as setCache, get as getCache, clear as clearCache } from '../aws';
 import constants from '../constants.json';
+import { imageResolversCacheHitCount } from '../helpers/metrics';
 import { capture } from '@snapshot-labs/snapshot-sentry';
 
 export function sha256(str: string) {
@@ -64,7 +65,11 @@ export default class Cache {
   private async _getCache(key: string) {
     try {
       console.log(`[cache:resolver] Getting cache ${key}`);
-      return await getCache(key);
+      const cache = await getCache(key);
+
+      imageResolversCacheHitCount.inc({ status: cache ? 'HIT' : 'MISS' }, 1);
+
+      return cache;
     } catch (e) {
       capture(e);
       console.log(`[cache:resolver] Failed to get cache ${key}`);
