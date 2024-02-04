@@ -8,7 +8,7 @@ const endpoint = process.env.AWS_ENDPOINT || undefined;
 if (region) client = new AWS.S3({ region, endpoint });
 const dir = 'stamp-3';
 
-export async function streamToBuffer(stream: Readable) {
+export async function streamToBuffer(stream: Readable): Promise<Buffer> {
   return await new Promise((resolve, reject) => {
     const chunks: Uint8Array[] = [];
     stream.on('data', chunk => chunks.push(Buffer.from(chunk)));
@@ -18,43 +18,33 @@ export async function streamToBuffer(stream: Readable) {
 }
 
 export async function set(key, value) {
-  try {
-    const command = new AWS.PutObjectCommand({
-      Bucket: bucket,
-      Key: `public/${dir}/${key}`,
-      Body: value,
-      ContentType: 'image/webp'
-    });
+  const command = new AWS.PutObjectCommand({
+    Bucket: bucket,
+    Key: `public/${dir}/${key}`,
+    Body: value,
+    ContentType: 'image/webp'
+  });
 
-    await client.send(command);
-  } catch (e) {
-    console.log('Store cache failed', e);
-    throw e;
-  }
+  return await client.send(command);
 }
 
-export async function clear(path) {
-  try {
-    const listedObjects = await client.listObjectsV2({
-      Bucket: bucket,
-      Prefix: `public/${dir}/${path}`
-    });
-    if (!listedObjects.Contents || listedObjects.Contents.length === 0) return false;
-    const objs = listedObjects.Contents.map(obj => ({ Key: obj.Key }));
-    await client.deleteObjects({
-      Bucket: bucket,
-      Delete: { Objects: objs }
-    });
-    if (listedObjects.IsTruncated) await clear(path);
-    console.log('Cleared cache', path);
-    return path;
-  } catch (e) {
-    console.log('Clear cache failed', e);
-    throw e;
-  }
+export async function clear(path: string) {
+  const listedObjects = await client.listObjectsV2({
+    Bucket: bucket,
+    Prefix: `public/${dir}/${path}`
+  });
+  if (!listedObjects.Contents || listedObjects.Contents.length === 0) return false;
+  const objs = listedObjects.Contents.map(obj => ({ Key: obj.Key }));
+  await client.deleteObjects({
+    Bucket: bucket,
+    Delete: { Objects: objs }
+  });
+  if (listedObjects.IsTruncated) await clear(path);
+  console.log('Cleared cache', path);
+  return path;
 }
 
-export async function get(key) {
+export async function get(key: string) {
   try {
     const command = new AWS.GetObjectCommand({
       Bucket: bucket,

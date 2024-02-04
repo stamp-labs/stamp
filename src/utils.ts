@@ -1,4 +1,3 @@
-import { createHash } from 'crypto';
 import sharp from 'sharp';
 import { Response } from 'express';
 import { StaticJsonRpcProvider } from '@ethersproject/providers';
@@ -19,12 +18,6 @@ export function getProvider(network: number): StaticJsonRpcProvider {
     );
 
   return providers[`_${network}`];
-}
-
-export function sha256(str) {
-  return createHash('sha256')
-    .update(str)
-    .digest('hex');
 }
 
 export async function resize(input, w, h) {
@@ -76,6 +69,7 @@ export async function parseQuery(id, type, query) {
   if (h < 1 || h > maxSize || isNaN(h)) h = size;
 
   return {
+    type,
     address,
     network,
     w,
@@ -98,30 +92,6 @@ export function chainIdToName(chainId: string) {
 export function getUrl(url) {
   const gateway: string = process.env.IPFS_GATEWAY || 'cloudflare-ipfs.com';
   return snapshot.utils.getUrl(url, gateway);
-}
-
-export function getCacheKey({
-  type,
-  network,
-  address,
-  w,
-  h,
-  fallback,
-  cb
-}: {
-  type: string;
-  network: string;
-  address: string;
-  w: number;
-  h: number;
-  fallback: string;
-  cb?: string;
-}) {
-  const data = { type, network, address, w, h };
-  if (fallback !== 'blockie') data['fallback'] = fallback;
-  if (cb) data['cb'] = cb;
-
-  return sha256(JSON.stringify(data));
 }
 
 export function setHeader(res: Response, cacheType: 'SHORT_CACHE' | 'LONG_CACHE' = 'LONG_CACHE') {

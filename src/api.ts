@@ -1,7 +1,8 @@
 import express from 'express';
 import { capture } from '@snapshot-labs/snapshot-sentry';
-import { parseQuery, resize, setHeader, getCacheKey } from './utils';
-import { set, get, streamToBuffer, clear } from './aws';
+import { parseQuery, resize, setHeader } from './utils';
+import { streamToBuffer } from './aws';
+import Cache from './resolvers/cache';
 import resolvers from './resolvers';
 import constants from './constants.json';
 import { rpcError, rpcSuccess } from './helpers/utils';
@@ -33,13 +34,14 @@ router.post('/', async (req, res) => {
 router.get(`/clear/:type(${TYPE_CONSTRAINTS})/:id`, async (req, res) => {
   const { type, id } = req.params;
   try {
-    const { address, network, w, h, fallback, cb } = await parseQuery(id, type, {
-      s: constants.max,
-      fb: req.query.fb,
-      cb: req.query.cb
-    });
-    const key = getCacheKey({ type, network, address, w, h, fallback, cb });
-    const result = await clear(key);
+    const cache = new Cache(
+      await parseQuery(id, type, {
+        s: constants.max,
+        fb: req.query.fb,
+        cb: req.query.cb
+      })
+    );
+    const result = await cache.clear();
     res.status(result ? 200 : 404).json({ status: result ? 'ok' : 'not found' });
   } catch (e) {
     capture(e);
@@ -49,42 +51,31 @@ router.get(`/clear/:type(${TYPE_CONSTRAINTS})/:id`, async (req, res) => {
 
 router.get(`/:type(${TYPE_CONSTRAINTS})/:id`, async (req, res) => {
   const { type, id } = req.params;
-  let address, network, w, h, fallback, cb;
+  let parsedParams, address, network, w, h, fallback;
 
   try {
-    ({ address, network, w, h, fallback, cb } = await parseQuery(id, type, req.query));
+    parsedParams = await parseQuery(id, type, req.query);
+    ({ address, network, w, h, fallback } = parsedParams);
   } catch (e) {
     return res.status(500).json({ status: 'error', error: 'failed to load content' });
   }
 
-  const key1 = getCacheKey({
-    type,
-    network,
-    address,
-    w: constants.max,
-    h: constants.max,
-    fallback,
-    cb
-  });
-  const key2 = getCacheKey({ type, network, address, w, h, fallback, cb });
+  const cache = new Cache(parsedParams);
 
   // Check resized cache
-  const cache = await get(`${key1}/${key2}`);
-  if (cache) {
-    // console.log('Got cache', address);
+  const cachedResizedImage = await cache.getResizedImage();
+  if (cachedResizedImage) {
     setHeader(res);
-    return cache.pipe(res);
+    return cachedResizedImage.pipe(res);
   }
 
   // Check base cache
-  const base = await get(`${key1}/${key1}`);
-  let baseImage;
-  if (base) {
-    baseImage = await streamToBuffer(base);
-    // console.log('Got base cache');
-  } else {
-    // console.log('No cache for', key1, base);
+  const cachedBaseImage = await cache.getBasedImage();
+  let baseImage: Buffer;
 
+  if (cachedBaseImage) {
+    baseImage = await streamToBuffer(cachedBaseImage);
+  } else {
     let currentResolvers: string[] = constants.resolvers.avatar;
     if (type === 'token') currentResolvers = constants.resolvers.token;
     if (type === 'space') currentResolvers = constants.resolvers.space;
@@ -109,17 +100,10 @@ router.get(`/:type(${TYPE_CONSTRAINTS})/:id`, async (req, res) => {
   res.send(resizedImage);
 
   // Store cache
-  try {
-    if (!base) {
-      await set(`${key1}/${key1}`, baseImage);
-      console.log('Stored base cache', key1);
-    }
-    await set(`${key1}/${key2}`, resizedImage);
-    console.log('Stored cache', address);
-  } catch (e) {
-    capture(e);
-    console.log('Store cache failed', address, e);
+  if (!cachedBaseImage) {
+    await cache.setBaseImage(baseImage);
   }
+  await cache.setResizedImage(resizedImage);
 });
 
 export default router;
