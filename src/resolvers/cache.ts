@@ -1,4 +1,5 @@
 import { createHash } from 'crypto';
+import { Readable } from 'stream';
 import { set as setCache, get as getCache, clear as clearCache } from '../aws';
 import constants from '../constants.json';
 import { imageResolversCacheHitCount } from '../helpers/metrics';
@@ -36,11 +37,11 @@ export default class Cache {
     this.resizedImageCacheKey = `${baseImageKey}/${resizedImageKey}`;
   }
 
-  async getBasedImage() {
+  async getBasedImage(): Promise<Readable | boolean> {
     return await this._getCache(this.baseImageCacheKey);
   }
 
-  async getResizedImage() {
+  async getResizedImage(): Promise<Readable | boolean> {
     return await this._getCache(this.resizedImageCacheKey);
   }
 
@@ -52,7 +53,7 @@ export default class Cache {
     return await this._setCache(this.resizedImageCacheKey, value);
   }
 
-  async clear() {
+  async clear(): Promise<boolean> {
     try {
       return await clearCache(this.baseImageCacheKey);
     } catch (e) {
@@ -73,7 +74,7 @@ export default class Cache {
     } catch (e) {
       capture(e);
       console.log(`[cache:resolver] Failed to get cache ${key}`);
-      return null;
+      return false;
     }
   }
 

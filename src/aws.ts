@@ -17,7 +17,7 @@ export async function streamToBuffer(stream: Readable): Promise<Buffer> {
   });
 }
 
-export async function set(key, value) {
+export async function set(key: string, value: Buffer) {
   const command = new AWS.PutObjectCommand({
     Bucket: bucket,
     Key: `public/${dir}/${key}`,
@@ -28,7 +28,7 @@ export async function set(key, value) {
   return await client.send(command);
 }
 
-export async function clear(path: string) {
+export async function clear(path: string): Promise<boolean> {
   const listedObjects = await client.listObjectsV2({
     Bucket: bucket,
     Prefix: `public/${dir}/${path}`
@@ -41,19 +41,17 @@ export async function clear(path: string) {
   });
   if (listedObjects.IsTruncated) await clear(path);
   console.log('Cleared cache', path);
-  return path;
+  return true;
 }
 
-export async function get(key: string) {
+export async function get(key: string): Promise<Readable | boolean> {
   try {
     const command = new AWS.GetObjectCommand({
       Bucket: bucket,
       Key: `public/${dir}/${key}`
     });
 
-    const { Body } = await client.send(command);
-
-    return Body;
+    return (await client.send(command)).Body;
   } catch (e) {
     return false;
   }
