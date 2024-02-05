@@ -11,7 +11,7 @@ const image_buffer = fs.readFileSync(path.join(__dirname, '../../fixtures/sample
 describe('image resolver cache', () => {
   let cache: Cache;
 
-  if (isConfigured) {
+  if (!isConfigured) {
     it.todo('needs to configure the cache for the tests to run');
   } else {
     describe('getBaseImage()', () => {
