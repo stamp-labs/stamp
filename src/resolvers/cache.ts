@@ -22,8 +22,8 @@ type ParamsType = {
 };
 
 export default class Cache {
-  private baseImageCacheKey: string;
-  private resizedImageCacheKey: string;
+  baseImageCacheKey: string;
+  resizedImageCacheKey: string;
 
   constructor({ type, network, address, w, h, fallback, cb }: ParamsType) {
     const data = { type, network, address, w, h };
@@ -37,7 +37,7 @@ export default class Cache {
     this.resizedImageCacheKey = `${baseImageKey}/${resizedImageKey}`;
   }
 
-  async getBasedImage(): Promise<Readable | boolean> {
+  async getBaseImage(): Promise<Readable | boolean> {
     return await this._getCache(this.baseImageCacheKey);
   }
 
@@ -55,7 +55,11 @@ export default class Cache {
 
   async clear(): Promise<boolean> {
     try {
-      return await clearCache(this.baseImageCacheKey);
+      const result = await clearCache(this.baseImageCacheKey);
+
+      console.log(`[cache:resolver] Cached cleared ${this.baseImageCacheKey}`);
+
+      return result;
     } catch (e) {
       console.log(`[cache:resolver] Failed to clear cache ${this.baseImageCacheKey}`);
       capture(e);

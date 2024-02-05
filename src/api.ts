@@ -1,4 +1,5 @@
 import express from 'express';
+import { Readable } from 'stream';
 import { capture } from '@snapshot-labs/snapshot-sentry';
 import { parseQuery, resize, setHeader } from './utils';
 import { streamToBuffer } from './aws';
@@ -66,15 +67,15 @@ router.get(`/:type(${TYPE_CONSTRAINTS})/:id`, async (req, res) => {
   const cachedResizedImage = await cache.getResizedImage();
   if (cachedResizedImage) {
     setHeader(res);
-    return cachedResizedImage.pipe(res);
+    return (cachedResizedImage as Readable).pipe(res);
   }
 
   // Check base cache
-  const cachedBaseImage = await cache.getBasedImage();
+  const cachedBaseImage = await cache.getBaseImage();
   let baseImage: Buffer;
 
   if (cachedBaseImage) {
-    baseImage = await streamToBuffer(cachedBaseImage);
+    baseImage = await streamToBuffer(cachedBaseImage as Readable);
   } else {
     let currentResolvers: string[] = constants.resolvers.avatar;
     if (type === 'token') currentResolvers = constants.resolvers.token;

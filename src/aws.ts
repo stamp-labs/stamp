@@ -40,7 +40,6 @@ export async function clear(path: string): Promise<boolean> {
     Delete: { Objects: objs }
   });
   if (listedObjects.IsTruncated) await clear(path);
-  console.log('Cleared cache', path);
   return true;
 }
 
