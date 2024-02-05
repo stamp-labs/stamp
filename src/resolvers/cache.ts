@@ -1,6 +1,6 @@
 import { createHash } from 'crypto';
 import { Readable } from 'stream';
-import { set as setCache, get as getCache, clear as clearCache } from '../aws';
+import { set as setCache, get as getCache, clear as clearCache, isConfigured } from '../aws';
 import constants from '../constants.json';
 import { imageResolversCacheHitCount } from '../helpers/metrics';
 import { capture } from '@snapshot-labs/snapshot-sentry';
@@ -24,6 +24,7 @@ type ParamsType = {
 export default class Cache {
   baseImageCacheKey: string;
   resizedImageCacheKey: string;
+  isConfigured: boolean;
 
   constructor({ type, network, address, w, h, fallback, cb }: ParamsType) {
     const data = { type, network, address, w, h };
@@ -35,6 +36,11 @@ export default class Cache {
 
     this.baseImageCacheKey = `${baseImageKey}/${baseImageKey}`;
     this.resizedImageCacheKey = `${baseImageKey}/${resizedImageKey}`;
+    this.isConfigured = isConfigured;
+
+    if (!this.isConfigured) {
+      console.log('[cache:resolver] Cache is not configured');
+    }
   }
 
   async getBaseImage(): Promise<Readable | boolean> {
@@ -54,6 +60,8 @@ export default class Cache {
   }
 
   async clear(): Promise<boolean> {
+    if (this.isConfigured) return false;
+
     try {
       const result = await clearCache(this.baseImageCacheKey);
 
@@ -68,6 +76,8 @@ export default class Cache {
   }
 
   private async _getCache(key: string) {
+    if (this.isConfigured) return false;
+
     try {
       console.log(`[cache:resolver] Getting cache ${key}`);
       const cache = await getCache(key);
@@ -83,6 +93,8 @@ export default class Cache {
   }
 
   private async _setCache(key: string, value: Buffer) {
+    if (this.isConfigured) return false;
+
     try {
       console.log(`[cache:resolver] Setting cache ${key}`);
       return await setCache(key, value);
