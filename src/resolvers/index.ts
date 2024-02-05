@@ -8,8 +8,9 @@ import { resolveAvatar as sxResolveAvatar, resolveCover as sxResolveCover } from
 import selfid from './selfid';
 import lens from './lens';
 import zapper from './zapper';
+import constants from '../constants.json';
 
-export default {
+const RESOLVERS = {
   blockie,
   jazzicon,
   ens,
@@ -21,4 +22,19 @@ export default {
   selfid,
   lens,
   zapper
-};
+} as const;
+
+export function resolve(
+  type: string,
+  address: string,
+  network: string,
+  resolvers?: string[]
+): Promise<any> {
+  let _resolvers: string[] = resolvers ?? [];
+
+  _resolvers = constants.resolvers[type] || constants.resolvers.avatar;
+
+  return Promise.all(_resolvers.map(r => RESOLVERS[r](address, network)));
+}
+
+export default RESOLVERS;
