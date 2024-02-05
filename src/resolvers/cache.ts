@@ -60,7 +60,7 @@ export default class Cache {
   }
 
   async clear(): Promise<boolean> {
-    if (this.isConfigured) return false;
+    if (!this.isConfigured) return false;
 
     try {
       const result = await clearCache(this.baseImageCacheKey);
@@ -76,7 +76,7 @@ export default class Cache {
   }
 
   private async _getCache(key: string) {
-    if (this.isConfigured) return false;
+    if (!this.isConfigured) return false;
 
     try {
       console.log(`[cache:resolver] Getting cache ${key}`);
@@ -93,7 +93,7 @@ export default class Cache {
   }
 
   private async _setCache(key: string, value: Buffer) {
-    if (this.isConfigured) return false;
+    if (!this.isConfigured) return false;
 
     try {
       console.log(`[cache:resolver] Setting cache ${key}`);
