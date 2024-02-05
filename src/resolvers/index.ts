@@ -30,9 +30,8 @@ export function resolve(
   network: string,
   resolvers?: string[]
 ): Promise<any> {
-  let _resolvers: string[] = resolvers ?? [];
-
-  _resolvers = constants.resolvers[type] || constants.resolvers.avatar;
+  const _resolvers: string[] =
+    resolvers ?? (constants.resolvers[type] || constants.resolvers.avatar);
 
   return Promise.all(_resolvers.map(r => RESOLVERS[r](address, network)));
 }

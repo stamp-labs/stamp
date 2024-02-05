@@ -86,7 +86,7 @@ router.get(`/:type(${TYPE_CONSTRAINTS})/:id`, async (req, res) => {
     baseImage = [...images].reverse().find(file => !!file);
 
     if (!baseImage) {
-      const fallbackImage = await resolve(type, address, network, [fallback]);
+      const fallbackImage = (await resolve(type, address, network, [fallback]))[0];
       const resizedImage = await resize(fallbackImage, w, h);
 
       setHeader(res, 'SHORT_CACHE');
