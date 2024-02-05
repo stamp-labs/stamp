@@ -100,6 +100,10 @@ describe('image resolver cache', () => {
         cache = new Cache(parsedQuery);
         await cache.setBaseImage(image_buffer);
 
+        await new Promise(resolve => {
+          setTimeout(resolve, 3e3);
+        });
+
         expect(cache.clear()).resolves.toBe(true);
         expect(cache.getBaseImage()).resolves.toBe(false);
         expect(cache.getResizedImage()).resolves.toBe(false);
