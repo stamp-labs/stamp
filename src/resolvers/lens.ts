@@ -2,6 +2,7 @@ import axios from 'axios';
 import { getAddress, isAddress } from '@ethersproject/address';
 import { getUrl, resize } from '../utils';
 import { max } from '../constants.json';
+import { fetchHttpImage, axiosDefaultParams } from './utils';
 
 const API_URL = 'https://api.lens.dev';
 
@@ -45,14 +46,15 @@ export default async function resolve(address) {
               }
             }
           `
-      }
+      },
+      ...axiosDefaultParams
     });
 
     const sourceUrl = getDefaultImage(data.data.profiles.items[0]?.picture);
     if (!sourceUrl) return false;
 
     const url = getUrl(sourceUrl);
-    const input = (await axios({ url, responseType: 'arraybuffer' })).data as Buffer;
+    const input = await fetchHttpImage(url);
     return await resize(input, max, max);
   } catch (e) {
     return false;
