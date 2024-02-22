@@ -16,20 +16,22 @@ export const NAME = 'Ens';
 const NETWORK = '1';
 const provider = getProvider(NETWORK);
 
+function normalizeEns(names: Handle[]): Handle[] {
+  return names.map(name => {
+    try {
+      return ens_normalize(name) === name ? name : '';
+    } catch (e) {
+      return '';
+    }
+  });
+}
+
 function normalizeAddresses(addresses: Address[]): Address[] {
   return addresses.filter(isEvmAddress);
 }
 
 function normalizeHandles(names: Handle[]): Handle[] {
-  return names
-    .map(name => {
-      try {
-        return ens_normalize(name) === name ? name : '';
-      } catch (e) {
-        return '';
-      }
-    })
-    .filter(h => h);
+  return normalizeEns(names).filter(h => h);
 }
 
 export async function lookupAddresses(addresses: Address[]): Promise<Record<Address, Handle>> {
@@ -45,7 +47,7 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
       ['0x3671aE578E63FdF66ad4F3E12CC0c0d71Ac7510C', 'getNames', [normalizedAddresses]],
       { blockTag: 'latest' }
     );
-    const validNames = normalizeHandles(reverseRecords);
+    const validNames = normalizeEns(reverseRecords);
 
     return Object.fromEntries(
       normalizedAddresses
