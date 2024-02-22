@@ -1,6 +1,6 @@
-import axios from 'axios';
 import { getProvider, resize } from '../utils';
 import { max } from '../constants.json';
+import { fetchHttpImage } from './utils';
 
 export default async function resolve(name: string) {
   try {
@@ -13,7 +13,7 @@ export default async function resolve(name: string) {
     let url = await ensResolver.getText('avatar');
     url = url?.startsWith('http') ? url : `https://metadata.ens.domains/mainnet/avatar/${name}`;
 
-    const input = (await axios({ url, responseType: 'arraybuffer' })).data as Buffer;
+    const input = await fetchHttpImage(url);
 
     return await resize(input, max, max);
   } catch (e) {
