@@ -43,7 +43,6 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
 
     return withoutEmptyValues(names);
   } catch (e) {
-    console.log(e);
     if (!isSilencedError(e)) {
       capture(e, { input: { addresses, normalizedAddresses } });
     }
