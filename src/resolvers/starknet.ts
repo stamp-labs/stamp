@@ -29,18 +29,20 @@ async function getImageFromAddress(address: string): Promise<string> {
   throw new Error('No image found for starknet address');
 }
 
+function isStarknetAddress(address: string): boolean {
+  return /^0x[a-f0-9]{64}$/i.test(address);
+}
+
+function isStarknetDomain(domain: string): boolean {
+  return domain.endsWith('.stark');
+}
+
 export default async function resolve(domainOrAddress: string) {
   try {
     let img_url: string | null = null;
-    if (domainOrAddress.includes('.')) {
-      if (!domainOrAddress.endsWith('.stark')) {
-        throw new Error('Unsupported starknet domain');
-      }
+    if (isStarknetDomain(domainOrAddress)) {
       img_url = await getImageFromDomain(domainOrAddress);
-    } else if (domainOrAddress.startsWith('0x')) {
-      if (!/^0x[a-f0-9]{64}$/i.test(domainOrAddress)) {
-        throw new Error('Invalid starknet address');
-      }
+    } else if (isStarknetAddress(domainOrAddress)) {
       img_url = await getImageFromAddress(domainOrAddress);
     }
 
