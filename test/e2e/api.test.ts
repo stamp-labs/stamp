@@ -1,8 +1,18 @@
 import axios from 'axios';
 import redis from '../../src/helpers/redis';
-import { purge as purgeCache } from '../../src/addressResolvers/cache';
+import { KEY_PREFIX } from '../../src/addressResolvers/cache';
 
 const HOST = `http://localhost:${process.env.PORT || 3003}`;
+
+async function purge(): Promise<void> {
+  if (!redis) return;
+
+  const keys = await redis.keys(`${KEY_PREFIX}:*`);
+  const transaction = redis.multi();
+
+  keys.map((key: string) => transaction.del(key));
+  transaction.exec();
+}
 
 describe('E2E api', () => {
   afterAll(async () => {
@@ -32,7 +42,7 @@ describe('E2E api', () => {
 
   describe('POST /', () => {
     afterEach(async () => {
-      await purgeCache();
+      await purge();
     });
 
     describe('when passing invalid method', () => {

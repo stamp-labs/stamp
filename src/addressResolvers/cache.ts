@@ -2,13 +2,13 @@ import redis from '../helpers/redis';
 import constants from '../constants.json';
 import { addressResolversCacheHitCount } from '../helpers/metrics';
 
-const KEY = 'address-resolvers';
+export const KEY_PREFIX = 'address-resolvers';
 
 export async function getCache(keys: string[]): Promise<Record<string, string>> {
   if (!redis) return {};
 
   const transaction = redis.multi();
-  keys.map(key => transaction.get(`${KEY}:${key}`));
+  keys.map(key => transaction.get(`${KEY_PREFIX}:${key}`));
   const results = await transaction.exec();
 
   return Object.fromEntries(
@@ -21,7 +21,7 @@ export function setCache(payload: Record<string, string>) {
 
   const transaction = redis.multi();
   Object.entries(payload).map(([key, value]) =>
-    transaction.set(`${KEY}:${key}`, value || '', { EX: constants.ttl })
+    transaction.set(`${KEY_PREFIX}:${key}`, value || '', { EX: constants.ttl })
   );
 
   return transaction.exec();
@@ -43,14 +43,4 @@ export default async function cache(input: string[], callback) {
   }
 
   return cache;
-}
-
-export async function purge(): Promise<void> {
-  if (!redis) return;
-
-  const keys = await redis.keys(`${KEY}:*`);
-  const transaction = redis.multi();
-
-  keys.map((key: string) => transaction.del(key));
-  transaction.exec();
 }
