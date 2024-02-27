@@ -46,11 +46,10 @@ export function normalizeAddresses(addresses: Address[]): Address[] {
     .map(a => {
       if (isStarknetAddress(a)) {
         return a.toLowerCase();
-      } else if (isEvmAddress(a)) {
-        try {
-          return getAddress(a.toLowerCase());
-        } catch (e) {}
       }
+      try {
+        return getAddress(a.toLowerCase());
+      } catch (e) {}
     })
     .filter(a => a) as Address[];
 }
