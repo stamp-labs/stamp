@@ -30,16 +30,18 @@ async function apiCall(
   const responses = await Promise.allSettled(requests);
 
   return withoutEmptyValues(
-    needles.map((needle, i) => {
-      const response = responses[i];
-      let value: string | undefined;
+    Object.fromEntries(
+      needles.map((needle, i) => {
+        const response = responses[i];
+        let value: string | undefined;
 
-      if (response.status === 'fulfilled') {
-        value = response.value.data[resolve_type === 'addr_to_domain' ? 'domain' : 'addr'];
-      }
+        if (response.status === 'fulfilled') {
+          value = response.value.data[resolve_type === 'addr_to_domain' ? 'domain' : 'addr'];
+        }
 
-      return [needle, value];
-    })
+        return [needle, value];
+      })
+    )
   );
 }
 
