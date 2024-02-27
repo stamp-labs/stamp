@@ -13,7 +13,7 @@ export function isEvmAddress(address: Address): boolean {
   return /^0x[a-fA-F0-9]{40}$/.test(address);
 }
 
-export function isNonEvmAddress(address: Address): boolean {
+export function isStarknetAddress(address: Address): boolean {
   return /^0x[a-fA-F0-9]{64}$/.test(address);
 }
 
@@ -44,7 +44,7 @@ export function graphQlCall(url, query: string) {
 export function normalizeAddresses(addresses: Address[]): Address[] {
   return addresses
     .map(a => {
-      if (isNonEvmAddress(a)) {
+      if (isStarknetAddress(a)) {
         return a.toLowerCase();
       } else if (isEvmAddress(a)) {
         try {

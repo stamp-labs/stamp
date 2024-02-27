@@ -5,7 +5,7 @@ import {
   withoutEmptyValues,
   isSilencedError,
   FetchError,
-  isNonEvmAddress
+  isStarknetAddress
 } from './utils';
 import axios from 'axios';
 
@@ -44,7 +44,7 @@ async function apiCall(
 }
 
 function normalizeAddresses(addresses: Address[]): Address[] {
-  return addresses.filter(isNonEvmAddress);
+  return addresses.filter(isStarknetAddress);
 }
 
 function normalizeHandles(handles: Handle[]): Handle[] {
