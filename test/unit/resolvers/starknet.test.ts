@@ -9,7 +9,7 @@ describe('resolvers', () => {
     }, 10e3);
 
     it('should resolve a domain', async () => {
-      const result = await resolvers.starknet('checkpoint.stark');
+      const result = await resolvers.starknet('fricoben.stark');
 
       expect(result).toBeInstanceOf(Buffer);
       expect(result.length).toBeGreaterThan(1000);
@@ -17,7 +17,7 @@ describe('resolvers', () => {
 
     it('should resolve an address', async () => {
       const result = await resolvers.starknet(
-        '0x07FF6B17f07c4d83236E3Fc5f94259A19D1Ed41bBCf1822397EA17882E9b038d'
+        '0x061b6c0a78f9edf13cea17b50719f3344533fadd470b8cb29c2b4318014f52d3'
       );
 
       expect(result).toBeInstanceOf(Buffer);
