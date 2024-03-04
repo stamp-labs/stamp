@@ -6,6 +6,8 @@ const dir = 'stamp-3';
 const bucket = process.env.AWS_BUCKET_NAME;
 const region = process.env.AWS_REGION;
 const endpoint = process.env.AWS_ENDPOINT || undefined;
+if (region) client = new AWS.S3({ region, endpoint });
+const dir = 'stamp-4';
 
 export const isConfigured = !!(bucket && region);
 

@@ -9,6 +9,14 @@ const broviderUrl = process.env.BROVIDER_URL || 'https://rpc.brovider.xyz';
 
 export class FetchError extends Error {}
 
+export function isEvmAddress(address: Address): boolean {
+  return /^0x[a-fA-F0-9]{40}$/.test(address);
+}
+
+export function isStarknetAddress(address: Address): boolean {
+  return /^0x[a-fA-F0-9]{64}$/.test(address);
+}
+
 export function provider(network: string) {
   return snapshot.utils.getProvider(network, { broviderUrl });
 }
@@ -34,6 +42,9 @@ export function graphQlCall(url, query: string) {
 export function normalizeAddresses(addresses: Address[]): Address[] {
   return addresses
     .map(a => {
+      if (isStarknetAddress(a)) {
+        return a.toLowerCase();
+      }
       try {
         return getAddress(a.toLowerCase());
       } catch (e) {}
@@ -50,8 +61,8 @@ export function isSilencedError(error: any): boolean {
     ['invalid token ID', 'is not supported', 'execution reverted'].some(m =>
       error.message?.includes(m)
     ) ||
-    ['TIMEOUT', 'ECONNABORTED', 'ETIMEDOUT', 'ECONNRESET'].some(c =>
-      (error.error?.code || error.code)?.includes(c)
+    ['TIMEOUT', 'ECONNABORTED', 'ETIMEDOUT', 'ECONNRESET', 504].some(c =>
+      (error.error?.code || error.error?.status || error.code)?.includes(c)
     )
   );
 }

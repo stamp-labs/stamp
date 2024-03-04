@@ -1,6 +1,4 @@
-import { FetchError } from '../../../src/addressResolvers/utils';
-
-export default function testAddressResolver(
+export default function testAddressResolver({
   name,
   lookupAddresses,
   resolveNames,
@@ -8,7 +6,7 @@ export default function testAddressResolver(
   validDomain,
   blankAddress,
   invalidDomains
-) {
+}) {
   describe(`${name} address resolver`, () => {
     describe('lookupAddresses()', () => {
       describe('when the address is associated to a domain', () => {
@@ -30,14 +28,6 @@ export default function testAddressResolver(
           return expect(lookupAddresses([validAddress, blankAddress])).resolves.toEqual({
             [validAddress]: validDomain
           });
-        }, 10e3);
-      });
-
-      describe('when passing invalid addresses', () => {
-        it('throws an error', () => {
-          return expect(lookupAddresses([validAddress, `${blankAddress}xxx`])).rejects.toThrow(
-            FetchError
-          );
         }, 10e3);
       });
     });

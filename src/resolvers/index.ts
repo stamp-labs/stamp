@@ -8,6 +8,7 @@ import { resolveAvatar as sxResolveAvatar, resolveCover as sxResolveCover } from
 import selfid from './selfid';
 import lens from './lens';
 import zapper from './zapper';
+import starknet from './starknet';
 
 export default {
   blockie,
@@ -20,5 +21,6 @@ export default {
   'space-cover-sx': sxResolveCover,
   selfid,
   lens,
-  zapper
+  zapper,
+  starknet
 };
