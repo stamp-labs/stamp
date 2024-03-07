@@ -31,3 +31,9 @@ export const addressResolversCacheHitCount = new client.Counter({
   help: 'Number of hit/miss of the address resolvers cache layer',
   labelNames: ['status']
 });
+
+export const imageResolversCacheHitCount = new client.Counter({
+  name: 'image_resolvers_cache_hit_count',
+  help: 'Number of hit/miss of the image resolvers cache layer',
+  labelNames: ['status']
+});
