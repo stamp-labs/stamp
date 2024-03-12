@@ -18,6 +18,8 @@ export async function streamToBuffer(stream: Readable) {
 }
 
 export async function set(key, value) {
+  if (!client) throw new Error('AWS cache not initialized');
+
   try {
     const command = new AWS.PutObjectCommand({
       Bucket: bucket,
@@ -34,6 +36,8 @@ export async function set(key, value) {
 }
 
 export async function clear(path) {
+  if (!client) throw new Error('AWS cache not initialized');
+
   try {
     const listedObjects = await client.listObjectsV2({
       Bucket: bucket,
