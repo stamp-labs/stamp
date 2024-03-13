@@ -1,17 +1,32 @@
 import { getProvider, resize } from '../utils';
 import { max } from '../constants.json';
 import { fetchHttpImage } from './utils';
+import { isAddress } from '@ethersproject/address';
+import { lookupAddresses } from '../addressResolvers';
 
-export default async function resolve(name: string) {
+async function castToEnsName(nameOrAddress: string): Promise<string | undefined> {
+  if (isAddress(nameOrAddress)) {
+    return (await lookupAddresses([nameOrAddress]))[nameOrAddress];
+  }
+
+  return nameOrAddress;
+}
+
+export default async function resolve(nameOrAddress: string) {
   try {
     const provider = getProvider(1);
-    const ensResolver = await provider.getResolver(name);
+    const ensName = await castToEnsName(nameOrAddress);
+
+    if (!ensName) return false;
+
+    const ensResolver = await provider.getResolver(ensName);
+
     if (!ensResolver) {
       return false;
     }
 
     let url = await ensResolver.getText('avatar');
-    url = url?.startsWith('http') ? url : `https://metadata.ens.domains/mainnet/avatar/${name}`;
+    url = url?.startsWith('http') ? url : `https://metadata.ens.domains/mainnet/avatar/${ensName}`;
 
     const input = await fetchHttpImage(url);
 
