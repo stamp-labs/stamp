@@ -1,27 +1,85 @@
 import axios from 'axios';
 import { getAddress, isAddress } from '@ethersproject/address';
-import { resize } from '../utils';
+import { getUrl, resize } from '../utils';
 import { max } from '../constants.json';
-import { fetchHttpImage } from './utils';
+import { fetchHttpImage, axiosDefaultParams } from './utils';
 
-const API_URL = 'https://searchcaster.xyz/api/profiles';
+const LENS_API_URL = 'https://api.lens.dev';
+const FARCASTER_API_URL = 'https://searchcaster.xyz/api/profiles';
 
-export default async function resolve(address) {
-  const formattedAddress = getAddress(address);
-  if (!isAddress(formattedAddress)) return false;
+function getDefaultImage(picture) {
+  if (picture?.original) return picture.original.url;
+  if (picture?.uri) return picture.uri;
+
+  return null;
+}
+
+export async function resolveLens(address) {
+  const request = isAddress(address)
+    ? `{ ownedBy: "${getAddress(address)}", limit: 1 }`
+    : `{ handles: ["${address}"], limit: 1 }`;
 
   try {
-    const response = await axios.get(`${API_URL}?connected_address=${formattedAddress}`);
-    const profiles = response.data;
+    const { data } = await axios({
+      url: `${LENS_API_URL}/graphql`,
+      method: 'post',
+      data: {
+        query: `
+            query Profile {
+              profiles(request: ${request}) {
+                items {
+                  picture {
+                    ... on NftImage {
+                      contractAddress
+                      tokenId
+                      uri
+                      chainId
+                      verified
+                    }
+                    ... on MediaSet {
+                      original {
+                        url
+                        mimeType
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          `
+      },
+      ...axiosDefaultParams
+    });
 
-    if (profiles.length === 0) return false;
+    const sourceUrl = getDefaultImage(data.data.profiles.items[0]?.picture);
+    if (!sourceUrl) return false;
 
-    const avatarUrl = profiles[0]?.body?.avatarUrl;
+    const url = getUrl(sourceUrl);
+    const input = await fetchHttpImage(url);
+    return await resize(input, max, max);
+  } catch (e) {
+    return false;
+  }
+}
+
+export async function resolveFarcaster(address) {
+  try {
+    const { data } = await axios.get(
+      `${FARCASTER_API_URL}?connected_address=${address}`,
+      axiosDefaultParams
+    );
+
+    const profile = data[0];
+    if (!profile) return false;
+
+    const avatarUrl = profile.body.avatarUrl;
     if (!avatarUrl) return false;
 
-    const input = await fetchHttpImage(avatarUrl);
+    const url = getUrl(avatarUrl);
+    const input = await fetchHttpImage(url);
     return await resize(input, max, max);
-  } catch (error) {
+  } catch (e) {
+    console.error('Error resolving Farcaster avatar:', e);
     return false;
   }
 }
