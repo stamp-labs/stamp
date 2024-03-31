@@ -8,3 +8,4 @@ coverage
 # Remove some common IDE working directories
 .idea
 .vscode
+try.ts
