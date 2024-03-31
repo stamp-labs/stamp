@@ -1,62 +1,28 @@
 import axios from 'axios';
 import { getAddress, isAddress } from '@ethersproject/address';
-import { getUrl, resize } from '../utils';
+import { resize } from '../utils';
 import { max } from '../constants.json';
-import { fetchHttpImage, axiosDefaultParams } from './utils';
+import { fetchHttpImage } from './utils';
 
-const API_URL = 'https://api.lens.dev';
-
-function getDefaultImage(picture) {
-  if (picture?.original) return picture.original.url;
-  if (picture?.uri) return picture.uri;
-
-  return null;
-}
+const API_URL = 'https://searchcaster.xyz/api/profiles';
 
 export default async function resolve(address) {
-  const request = isAddress(address)
-    ? `{ ownedBy: "${getAddress(address)}", limit: 1 }`
-    : `{ handles: ["${address}"], limit: 1 }`;
+  const formattedAddress = getAddress(address);
+  if (!isAddress(formattedAddress)) return false;
 
   try {
-    const { data } = await axios({
-      url: `${API_URL}/graphql`,
-      method: 'post',
-      data: {
-        query: `
-            query Profile {
-              profiles(request: ${request}) {
-                items {
-                  picture {
-                    ... on NftImage {
-                      contractAddress
-                      tokenId
-                      uri
-                      chainId
-                      verified
-                    }
-                    ... on MediaSet {
-                      original {
-                        url
-                        mimeType
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          `
-      },
-      ...axiosDefaultParams
-    });
+    const response = await axios.get(`${API_URL}?connected_address=${formattedAddress}`);
+    const profiles = response.data;
 
-    const sourceUrl = getDefaultImage(data.data.profiles.items[0]?.picture);
-    if (!sourceUrl) return false;
+    if (profiles.length === 0) return false;
 
-    const url = getUrl(sourceUrl);
-    const input = await fetchHttpImage(url);
+    const avatarUrl = profiles[0]?.body?.avatarUrl;
+    if (!avatarUrl) return false;
+
+    const input = await fetchHttpImage(avatarUrl);
     return await resize(input, max, max);
-  } catch (e) {
+  } catch (error) {
+    console.error('Error resolving Farcaster avatar:', error);
     return false;
   }
 }
