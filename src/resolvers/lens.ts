@@ -5,7 +5,7 @@ import { max } from '../constants.json';
 import { fetchHttpImage, axiosDefaultParams } from './utils';
 
 const LENS_API_URL = 'https://api.lens.dev';
-const FARCASTER_API_URL = 'https://searchcaster.xyz/api/profiles';
+const FARCASTER_API_URL = 'https://api.neynar.com/v2/farcaster/user/bulk-by-address';
 
 function getDefaultImage(picture) {
   if (picture?.original) return picture.original.url;
@@ -14,6 +14,11 @@ function getDefaultImage(picture) {
   return null;
 }
 
+/**
+ * Resolve avatar from Lens API.
+ * @param {string} address - Ethereum address.
+ * @returns {string|boolean} - Avatar URL if found, otherwise false.
+ */
 export async function resolveLens(address) {
   const request = isAddress(address)
     ? `{ ownedBy: "${getAddress(address)}", limit: 1 }`
@@ -62,23 +67,46 @@ export async function resolveLens(address) {
   }
 }
 
+/**
+ * Resolve avatar from Neynar API (Farcaster).
+ * @param {string} address - Ethereum address.
+ * @returns {string|boolean} - Avatar URL if found, otherwise false.
+ */
 export async function resolveFarcaster(address) {
   try {
-    const { data } = await axios.get(
-      `${FARCASTER_API_URL}?connected_address=${address}`,
-      axiosDefaultParams
-    );
+    const { data } = await axios.get(`${FARCASTER_API_URL}?addresses=${address}`, {
+      headers: {
+        accept: 'application/json',
+        api_key: 'NEYNAR_API_DOCS' // Replace with your actual API key
+      }
+    });
 
-    const profile = data[0];
-    if (!profile) return false;
+    const user = data[address]?.[0];
+    if (!user) return false;
 
-    const avatarUrl = profile.body.avatarUrl;
+    const avatarUrl = user.pfp_url;
     if (!avatarUrl) return false;
 
     const url = getUrl(avatarUrl);
     const input = await fetchHttpImage(url);
     return await resize(input, max, max);
-  } catch (e) {
+  } catch (error) {
     return false;
+  }
+}
+
+/**
+ * Resolve avatar using the specified resolver.
+ * @param {string} address - Ethereum address.
+ * @param {string} resolver - The resolver to use ('lens' or 'farcaster').
+ * @returns {string|boolean} - Avatar URL if found, otherwise false.
+ */
+export async function resolve(address, resolver) {
+  if (resolver === 'lens') {
+    return await resolveLens(address);
+  } else if (resolver === 'farcaster') {
+    return await resolveFarcaster(address);
+  } else {
+    throw new Error('Invalid resolver specified');
   }
 }
