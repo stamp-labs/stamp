@@ -79,7 +79,6 @@ export async function resolveFarcaster(address) {
     const input = await fetchHttpImage(url);
     return await resize(input, max, max);
   } catch (e) {
-    console.error('Error resolving Farcaster avatar:', e);
     return false;
   }
 }
