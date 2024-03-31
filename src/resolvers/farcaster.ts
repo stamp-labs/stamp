@@ -10,8 +10,8 @@ const EXTERNAL_API_KEY = "NEYNAR_API_DOCS";
 
 
 export default async function resolve(address) { 
-    if (!isAddress(address)) return false;
     const eth_address = getAddress(address);
+    if (!isAddress(address)) return false;
     
     try {
         let { data } = await axios({
@@ -24,8 +24,10 @@ export default async function resolve(address) {
             ...axiosDefaultParams
         })
         if (!data[Object.keys(data)[0]][0].pfp_url) return false;
+
         const url = getUrl(data[Object.keys(data)[0]][0].pfp_url);
         if (!url) return false;
+        
         const input = await fetchHttpImage(url);
         return await resize(input, max, max);
     } catch (e) {
