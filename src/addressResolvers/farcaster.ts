@@ -3,7 +3,7 @@ import { graphQlCall, Address, Handle, FetchError, isSilencedError, isEvmAddress
 
 export const NAME = 'Farcaster';
 const FNAMES_API_URL = 'https://fnames.farcaster.xyz/transfers?name=';
-const NEYNAR_API_URL = 'https://api.neynar.com/v2/farcaster/user/search';
+const NEYNAR_API_URL = 'https://api.neynar.com/v2/farcaster/user/';
 const API_KEY = 'NEYNAR_API_DOCS'; // add api key on .env
 
 interface User {
@@ -32,7 +32,7 @@ export async function lookupAddresses(addresses) {
     const addressesQuery = addresses.join(',');
 
     try {
-        const url = `${NEYNAR_API_URL}?addresses=${addressesQuery}`;
+        const url = `${NEYNAR_API_URL}bulk-by-address?addresses=${addressesQuery}`;
         const userDetails = await fetchData(url, {
             method: 'GET'
         });
@@ -68,9 +68,12 @@ async function fetchUserDetailsByUsername(username) {
         const transferData = await fetchData(`${FNAMES_API_URL}${username}`);
         if (transferData.transfers.length > 0) {
             const fid = 197049; // using fid arbitrary to use neymar search api
-            const userDetails = await fetchData(`${NEYNAR_API_URL}?q=${username}&viewer_fid=${fid}`, {
-                method: 'GET',
-            });
+            const userDetails = await fetchData(
+              `${NEYNAR_API_URL}search?q=${username}&viewer_fid=${fid}`,
+              {
+                method: 'GET'
+              }
+            );
             if (userDetails.result && userDetails.result.users.length > 0) {
                 const user = userDetails.result.users[0];
                 return {
