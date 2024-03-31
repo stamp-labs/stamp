@@ -27,8 +27,9 @@ export default async function resolve(address) {
 
         const url = getUrl(data[Object.keys(data)[0]][0].pfp_url);
         if (!url) return false;
-        
+
         const input = await fetchHttpImage(url);
+        
         return await resize(input, max, max);
     } catch (e) {
         return false;
