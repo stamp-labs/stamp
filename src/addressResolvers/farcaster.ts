@@ -22,7 +22,7 @@ interface UserDetails {
 async function fetchData(url, options = {}) {
     const response = await fetch(url, { ...options, headers: { accept: 'application/json', api_key: API_KEY, ...options.headers } });
     if (!response.ok) {
-        throw new Error(`Falha ao buscar dados da API. Status: ${response.status}`);
+        throw new Error(`Failed to fetch data from the API. Status: ${response.status}`);
     }
     return response.json();
 }
