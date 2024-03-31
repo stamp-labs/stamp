@@ -22,7 +22,6 @@ export default async function resolve(address) {
     const input = await fetchHttpImage(avatarUrl);
     return await resize(input, max, max);
   } catch (error) {
-    console.error('Error resolving Farcaster avatar:', error);
     return false;
   }
 }
