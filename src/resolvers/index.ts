@@ -6,7 +6,8 @@ import snapshot from './snapshot';
 import space from './space';
 import { resolveAvatar as sxResolveAvatar, resolveCover as sxResolveCover } from './space-sx';
 import selfid from './selfid';
-import { resolveLens } from './lens';
+import lens from './lens';
+import farcaster from './farcaster';
 import zapper from './zapper';
 import starknet from './starknet';
 
@@ -20,7 +21,8 @@ export default {
   'space-sx': sxResolveAvatar,
   'space-cover-sx': sxResolveCover,
   selfid,
-  resolveLens,
+  lens,
+  farcaster,
   zapper,
   starknet
 };
