@@ -6,6 +6,7 @@ import resolvers from './resolvers';
 import constants from './constants.json';
 import { rpcError, rpcSuccess } from './helpers/utils';
 import { lookupAddresses, resolveNames } from './addressResolvers';
+import following from './following';
 
 const router = express.Router();
 const TYPE_CONSTRAINTS = Object.keys(constants.resolvers).join('|');
@@ -19,6 +20,7 @@ router.post('/', async (req, res) => {
 
     if (method === 'lookup_addresses') result = await lookupAddresses(params);
     else if (method === 'resolve_names') result = await resolveNames(params);
+    else if (method === 'following') result = await following(params);
     else return rpcError(res, 400, 'invalid method', id);
 
     if (result?.error) return rpcError(res, result.code || 500, result.error, id);

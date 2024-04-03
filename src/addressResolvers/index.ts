@@ -62,7 +62,7 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
     MAX_LOOKUP_ADDRESSES
   );
 
-  return mapOriginalInput(addresses, result);
+  return mapOriginalInput(addresses, result) as Record<Address, Handle>;
 }
 
 export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Address>> {
@@ -72,5 +72,5 @@ export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Ad
     MAX_RESOLVE_NAMES
   );
 
-  return mapOriginalInput(handles, result);
+  return mapOriginalInput(handles, result) as Record<Handle, Address>;
 }
