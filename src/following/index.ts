@@ -1,31 +1,23 @@
-import { Address, mapOriginalInput, normalizeAddresses } from '../addressResolvers/utils';
+import { Address, normalizeAddresses } from '../addressResolvers/utils';
 import * as lensFollowing from './lens';
 
 const PROVIDERS = [lensFollowing];
 
-export default async function following(addresses: Address[]) {
-  if (addresses.length !== 1) {
-    return Promise.reject({
-      error: `params must contain 1 item`,
-      code: 400
-    });
-  }
+export default async function following(address: Address): Promise<Address[]> {
+  const normalizedAddress = normalizeAddresses([address])[0];
 
-  const normalizedAddresses = Array.from(new Set(normalizeAddresses(addresses)));
+  if (!normalizedAddress) return [];
 
   // TODO: Add cache
   const result = await Promise.all(
     PROVIDERS.flatMap(provider => {
       try {
-        return provider.following(normalizedAddresses[0]);
+        return provider.following(normalizedAddress);
       } catch (e) {
         return [];
       }
     })
   );
 
-  return mapOriginalInput(addresses, { [normalizedAddresses[0]]: result.flat() }) as Record<
-    Address,
-    Address[]
-  >;
+  return result.flat();
 }

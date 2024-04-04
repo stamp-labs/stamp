@@ -16,12 +16,18 @@ router.post('/', async (req, res) => {
   if (!method) return rpcError(res, 400, 'missing method', id);
   try {
     let result: any = {};
-    if (!Array.isArray(params)) return rpcError(res, 400, 'params must be an array of string', id);
 
-    if (method === 'lookup_addresses') result = await lookupAddresses(params);
-    else if (method === 'resolve_names') result = await resolveNames(params);
-    else if (method === 'following') result = await following(params);
-    else return rpcError(res, 400, 'invalid method', id);
+    if (['lookup_addresses', 'resolve_names'].includes(method)) {
+      if (!Array.isArray(params))
+        return rpcError(res, 400, 'params must be an array of string', id);
+
+      if (method === 'lookup_addresses') result = await lookupAddresses(params);
+      else if (method === 'resolve_names') result = await resolveNames(params);
+    } else if (method === 'following') {
+      if (Array.isArray(params)) return rpcError(res, 400, 'params must be a string', id);
+
+      result = await following(params);
+    } else return rpcError(res, 400, 'invalid method', id);
 
     if (result?.error) return rpcError(res, result.code || 500, result.error, id);
     return rpcSuccess(res, result, id);
