@@ -4,9 +4,10 @@ import { graphQlCall, Address, Handle, FetchError, isSilencedError, isEvmAddress
 export const NAME = 'Farcaster';
 const FNAMES_API_URL = 'https://fnames.farcaster.xyz/transfers?name=';
 const NEYNAR_API_URL = 'https://api.neynar.com/v2/farcaster/user/';
-const API_KEY = 'NEYNAR_API_DOCS'; // add api key on .env
+const API_KEY = process.env.NEYNAR_API_KEY ?? '';
 
-interface User {
+
+interface UserDetails {
   username: string;
   verified_addresses: {
     eth_addresses: string[];
@@ -15,101 +16,92 @@ interface User {
   pfp_url: string;
 }
 
-interface UserDetails {
-  [address: string]: User[] | string;
+interface ApiResponse {
+  [address: string]: UserDetails[];
 }
 
-async function fetchData(url, options = {}) {
-    const response = await fetch(url, { ...options, headers: { accept: 'application/json', api_key: API_KEY, ...options.headers } });
-    if (!response.ok) {
-        throw new Error(`Failed to fetch data from the API. Status: ${response.status}`);
-    }
-    return response.json();
+interface UserResult {
+  username?: string;
+  eth_addresses?: string[];
+  sol_addresses?: string[];
+  pfp_url?: string;
 }
 
-export async function lookupAddresses(addresses) {
-    const results = {};
+
+async function fetchData<T>(url: string, method: string = 'GET'): Promise<T> {
+  const headers = {
+    Accept: 'application/json',
+    api_key: API_KEY
+  };
+  const response = await fetch(url, { method, headers });
+  if (!response.ok) {
+    throw new Error(`Failed to fetch data from the API. Status: ${response.status}`);
+  }
+  return response.json() as Promise<T>;
+}
+
+export async function lookupAddresses(
+  addresses: string[]
+): Promise<{ [key: string]: UserResult | string }> {
+  const results: { [key: string]: UserResult | string } = {};
+  try {
     const addressesQuery = addresses.join(',');
+    const url = `${NEYNAR_API_URL}bulk-by-address?addresses=${addressesQuery}`;
+    const userDetails = await fetchData<ApiResponse>(url);
 
-    try {
-        const url = `${NEYNAR_API_URL}bulk-by-address?addresses=${addressesQuery}`;
-        const userDetails = await fetchData(url, {
-            method: 'GET'
-        });
-
-        Object.entries(userDetails).forEach(([address, data]) => {
-          if (Array.isArray(data) && data.length > 0) {
-            const user = data[0];
-            if ('username' in user && 'verified_addresses' in user && 'pfp_url' in user) {
-              results[address] = {
-                username: user.username,
-                eth_addresses: user.verified_addresses.eth_addresses ?? [],
-                sol_addresses: user.verified_addresses.sol_addresses ?? [],
-                pfp_url: user.pfp_url
-              };
-            } else {
-              console.warn(`Incomplete user data for address: ${address}`);
-              results[address] = "Incomplete user data.";
-            }
-          } else {
-            results[address] = "No user found for this address.";
-          }
-        });
-
-        return results;
-    } catch (error) {
-        console.error(`Error fetching address details:`, error);
-        throw new Error(`Error fetching address details.`);
+    for (const [address, data] of Object.entries(userDetails)) {
+      if (Array.isArray(data) && data.length > 0) {
+        const {
+          username,
+          verified_addresses: { eth_addresses = [], sol_addresses = [] },
+          pfp_url
+        } = data[0];
+        results[address] = { username, eth_addresses, sol_addresses, pfp_url };
+      } else {
+        results[address] = 'No user found for this address.';
+      }
     }
+  } catch (error) {
+    console.error(`Error fetching address details:`, error);
+    throw new Error(`Error fetching address details.`);
+  }
+  return results;
 }
 
-async function fetchUserDetailsByUsername(username) {
-    try {
-        const transferData = await fetchData(`${FNAMES_API_URL}${username}`);
-        if (transferData.transfers.length > 0) {
-            const fid = 197049; // using fid arbitrary to use neymar search api
-            const userDetails = await fetchData(
-              `${NEYNAR_API_URL}search?q=${username}&viewer_fid=${fid}`,
-              {
-                method: 'GET'
-              }
-            );
-            if (userDetails.result && userDetails.result.users.length > 0) {
-                const user = userDetails.result.users[0];
-                return {
-                    username: user.username,
-                    verified_addresses: {
-                        eth_addresses: user.verified_addresses.eth_addresses,
-                        sol_addresses: user.verified_addresses.sol_addresses
-                    },
-                    pfp: user.pfp.url
-                };
-            }
-        }
-    } catch (error) {
-        console.error(`Error fetching user details ${username}:`, error);
-        throw new FetchError(`Error fetching user details ${username}.`);
+async function fetchUserDetailsByUsername(username: string): Promise<UserResult | null> {
+  try {
+    const transferData = await fetchData<{ transfers: any[] }>(`${FNAMES_API_URL}${username}`);
+    if (transferData.transfers.length > 0) {
+      const userDetails = await fetchData<{ result: { users: UserDetails[] } }>(
+        `${NEYNAR_API_URL}search?q=${username}&viewer_fid=197049`
+      );
+      if (userDetails.result && userDetails.result.users.length > 0) {
+        const { username, verified_addresses, pfp_url } = userDetails.result.users[0];
+        return {
+          eth_addresses: verified_addresses.eth_addresses,
+          username
+        };
+      }
     }
-    return null;
+  } catch (error) {
+    console.error(`Error fetching user details for ${username}:`, error);
+    throw new Error(`Error fetching user details for ${username}.`);
+  }
+  return null;
 }
 
-
-export async function resolveNames(handles) {
-    const results = {};
-
-    for (const handle of handles) {
-        const normalizedHandle = handle.includes('.fcast.id') ? handle.split('.fcast.id')[0] : handle;
-        const userDetails = await fetchUserDetailsByUsername(normalizedHandle);
-        if (userDetails) {
-            results[handle] = {
-                eth_addresses: userDetails.verified_addresses.eth_addresses,
-                sol_addresses: userDetails.verified_addresses.sol_addresses,
-                pfp_url: userDetails.pfp
-            };
-        } else {
-            results[handle] = "User not found or error searching for details.";
-        }
+export async function resolveNames(
+  handles: string[]
+): Promise<{ [handle: string]: UserResult | string }> {
+  const results: { [handle: string]: UserResult | string } = {};
+  for (const handle of handles) {
+    const normalizedHandle = handle.replace('.fcast.id', '');
+    const userDetails = await fetchUserDetailsByUsername(normalizedHandle);
+    if (userDetails) {
+      results[handle] = userDetails;
+    } else {
+      results[handle] = 'User not found or error searching for details.';
     }
-
-    return results;
+  }
+  return results;
 }
