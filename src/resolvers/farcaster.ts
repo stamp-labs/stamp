@@ -2,7 +2,7 @@ import axios from 'axios';
 import { getAddress, isAddress } from '@ethersproject/address';
 import { resize } from '../utils';
 import { max } from '../constants.json';
-import { fetchHttpImage, axiosDefaultParams } from './utils';
+import { fetchHttpImage } from './utils';
 
 const NEYNAR_API_KEY = process.env.NEYNAR_API_KEY!!;
 
@@ -12,18 +12,15 @@ export default async function resolve(address) {
 
   try {
     // https://docs.neynar.com/reference/user-bulk-by-address
-    const response = await axios.get(
-      'https://api.neynar.com/v2/farcaster/user/bulk-by-address',
-      {
-        params: {
-          addresses: formattedAddress,
-        },
-        headers: {
-          accept: 'application/json',
-          api_key: NEYNAR_API_KEY,
-        }
+    const response = await axios.get('https://api.neynar.com/v2/farcaster/user/bulk-by-address', {
+      params: {
+        addresses: formattedAddress
+      },
+      headers: {
+        accept: 'application/json',
+        api_key: NEYNAR_API_KEY
       }
-    );
+    });
     if (response.status !== 200) return false;
 
     const avatarUrl: string = response.data[formattedAddress]?.[0]?.pfp_url;

@@ -9,7 +9,7 @@ describe('resolvers', () => {
     });
 
     it('should resolve with address', async () => {
-      const result = await resolvers.farcaster('0x09CEdb7bb69f9F6DF646dBa107D2bAACda93D6C9')
+      const result = await resolvers.farcaster('0x09CEdb7bb69f9F6DF646dBa107D2bAACda93D6C9');
 
       expect(result).toBeInstanceOf(Buffer);
       expect(result.length).toBeGreaterThan(1000);
