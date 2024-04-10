@@ -8,11 +8,19 @@ describe('resolvers', () => {
       expect(result).toBe(false);
     });
 
+    it('should resolve with handle', async () => {
+      const result = await resolvers.lens('fabien.lens');
+
+      expect(result).toBeInstanceOf(Buffer);
+      expect(result.length).toBeGreaterThan(1000);
+    });
+
     it('should resolve with address', async () => {
-      const result = await resolvers.farcaster('0x09CEdb7bb69f9F6DF646dBa107D2bAACda93D6C9')
+      const result = await resolvers.lens('0xeF8305E140ac520225DAf050e2f71d5fBcC543e7');
 
       expect(result).toBeInstanceOf(Buffer);
       expect(result.length).toBeGreaterThan(1000);
     });
   });
 });
+
