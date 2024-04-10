@@ -26,11 +26,7 @@ export default async function resolve(address) {
     );
     if (response.status !== 200) return false;
 
-    const { data } = response;
-
-    const avatarUrl: string = data.foreach((user) => {
-      return user.pfp_url;
-    });
+    const avatarUrl: string = response.data[formattedAddress]?.[0]?.pfp_url;
 
     const input = await fetchHttpImage(avatarUrl);
     return await resize(input, max, max);
