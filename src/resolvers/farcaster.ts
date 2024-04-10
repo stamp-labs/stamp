@@ -4,23 +4,33 @@ import { resize } from '../utils';
 import { max } from '../constants.json';
 import { fetchHttpImage, axiosDefaultParams } from './utils';
 
-const API_URL = 'https://searchcaster.xyz/api/profiles';
+const NEYNAR_API_KEY = process.env.NEYNAR_API_KEY!!;
 
 export default async function resolve(address) {
   const formattedAddress = getAddress(address);
   if (!isAddress(formattedAddress)) return false;
 
   try {
+    // https://docs.neynar.com/reference/user-bulk-by-address
     const response = await axios.get(
-      `${API_URL}?connected_address=${formattedAddress}`,
-      axiosDefaultParams
+      'https://api.neynar.com/v2/farcaster/user/bulk-by-address',
+      {
+        params: {
+          addresses: formattedAddress,
+        },
+        headers: {
+          accept: 'application/json',
+          api_key: NEYNAR_API_KEY,
+        }
+      }
     );
-    const profiles = response.data;
+    if (response.status !== 200) return false;
 
-    if (profiles.length === 0) return false;
+    const { data } = response;
 
-    const avatarUrl = profiles[0]?.body?.avatarUrl;
-    if (!avatarUrl) return false;
+    const avatarUrl: string = data.foreach((user) => {
+      return user.pfp_url;
+    });
 
     const input = await fetchHttpImage(avatarUrl);
     return await resize(input, max, max);
