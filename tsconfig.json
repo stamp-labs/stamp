@@ -12,6 +12,12 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "inlineSources": true,
-    "sourceRoot": "/"
+    "sourceRoot": "/",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@/resolvers": ["./src/resolvers/*"],
+      "@/address": ["./src/addressResolvers/*"]
+    },
   }
 }

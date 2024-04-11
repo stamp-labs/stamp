@@ -46,58 +46,90 @@ export async function fetchData<T>(url: string): Promise<T> {
 
 export async function lookupAddresses(addresses: Address[]): Promise<{ [key: Handle]: Address }> {
   const results: { [key: Handle]: Address } = {};
-  try {
-    const addressesQuery = addresses.join(',');
-    const url = `${NEYNAR_API_URL}bulk-by-address?addresses=${addressesQuery}`;
-    const userDetails = await fetchData<ApiResponse>(url);
 
-    for (const [address, data] of Object.entries(userDetails)) {
-      if (Array.isArray(data) && data.length > 0 && data[0].username) {
-        const checksumAddress = getAddress(address);
-        results[checksumAddress] = data[0].username + '.fcast.id';
-      } else {
-        results[address] = 'No user found for this address.';
-      }
-    }
+  try {
+    const url = buildLookupUrl(addresses);
+    const userDetails = await fetchData<ApiResponse>(url);
+    processUserDetails(userDetails, results);
   } catch (error) {
-    if (!isSilencedError(error)) {
-      capture(error, { input: { addresses }, tags: { issue: 'lookup_addresses_failure' } });
-    }
-    throw new FetchError('Error fetching address details.');
+    handleLookupError(error, addresses);
   }
+
   return results;
 }
+
+export function buildLookupUrl(addresses: Address[]): string {
+  const addressesQuery = addresses.join(',');
+  return `${NEYNAR_API_URL}bulk-by-address?addresses=${addressesQuery}`;
+}
+
+export function processUserDetails(userDetails: ApiResponse, results: { [key: Handle]: Address }): void {
+  for (const [address, data] of Object.entries(userDetails)) {
+    if (isValidUserData(data)) {
+      const checksumAddress = getAddress(address);
+      results[checksumAddress] = `${data[0].username}.fcast.id`;
+    } else {
+      results[address] = 'No user found for this address.';
+    }
+  }
+}
+
+export function isValidUserData(data: any): boolean {
+  return Array.isArray(data) && data.length > 0 && data[0].username;
+}
+
+export function handleLookupError(error: any, addresses: Address[]): void {
+  if (!isSilencedError(error)) {
+    capture(error, { input: { addresses }, tags: { issue: 'lookup_addresses_failure' } });
+  }
+  throw new FetchError('Error fetching address details.');
+}
+
 
 
 export async function fetchUserDetailsByUsername(username: Handle): Promise<UserResult | null> {
   try {
-    const transferData = await fetchData<{ transfers: any[] }>(`${FNAMES_API_URL}${username}`);
-    if (transferData.transfers.length > 0) {
-      const userDetails = await fetchData<{ result: { users: UserDetails[] } }>(
-        `${NEYNAR_API_URL}search?q=${username}&viewer_fid=197049`
-      );
-      if (userDetails.result && userDetails.result.users.length > 0) {
-        const user = userDetails.result.users[0];
-        const eth_addresses_checksummed = user.verified_addresses.eth_addresses.filter(
-          isEvmAddress
-        );
-
-        return {
-          username: user.username,
-          eth_addresses: eth_addresses_checksummed,
-          sol_addresses: user.verified_addresses.sol_addresses,
-          pfp_url: user.pfp_url
-        };
-      }
+    const userDetails = await getUserDetails(username);
+    if (userDetails) {
+      return formatUserDetails(userDetails);
     }
   } catch (error) {
-    if (!isSilencedError(error)) {
-      capture(error, { input: { username }, tags: { issue: 'fetch_user_details_failure' } });
-    }
-    throw new FetchError(`Error fetching user details for ${username}.`);
+    handleUserDetailsError(error, username);
   }
   return null;
 }
+
+export async function getUserDetails(username: Handle): Promise<{ users: UserDetails[] } | null> {
+  const transferData = await fetchData<{ transfers: any[] }>(`${FNAMES_API_URL}${username}`);
+  if (transferData.transfers.length > 0) {
+    const userDetails = await fetchData<{ result: { users: UserDetails[] } }>(
+      `${NEYNAR_API_URL}search?q=${username}&viewer_fid=197049`
+    );
+    if (userDetails.result && userDetails.result.users.length > 0) {
+      return userDetails.result;
+    }
+  }
+  return null;
+}
+
+export function formatUserDetails(userDetails: { users: UserDetails[] }): UserResult {
+  const user = userDetails.users[0];
+  const eth_addresses_checksummed = user.verified_addresses.eth_addresses.filter(isEvmAddress);
+  return {
+    username: user.username,
+    eth_addresses: eth_addresses_checksummed,
+    sol_addresses: user.verified_addresses.sol_addresses,
+    pfp_url: user.pfp_url
+  };
+}
+
+export function handleUserDetailsError(error: any, username: Handle): void {
+  if (!isSilencedError(error)) {
+    capture(error, { input: { username }, tags: { issue: 'fetch_user_details_failure' } });
+  }
+  throw new FetchError(`Error fetching user details for ${username}.`);
+}
+
 
 
 export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Address>> {
