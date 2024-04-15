@@ -13,11 +13,6 @@
     "sourceMap": true,
     "inlineSources": true,
     "sourceRoot": "/",
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./src/*"],
-      "@/resolvers": ["./src/resolvers/*"],
-      "@/address": ["./src/addressResolvers/*"]
-    },
+    "baseUrl": "."
   }
 }
