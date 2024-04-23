@@ -3,8 +3,8 @@
   "ttl": 86400,
   "shortTtl": 3600,
   "resolvers": {
-    "avatar": ["lens", "ens", "snapshot", "starknet", "farcaster"],
-    "token": ["trustwallet", "zapper"],
+    "avatar": ["snapshot", "ens", "lens", "farcaster", "starknet"],
+    "token": [ "zapper", "trustwallet"],
     "space": ["space"],
     "space-sx": ["space-sx"],
     "space-cover-sx": ["space-cover-sx"]
