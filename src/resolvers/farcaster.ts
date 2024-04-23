@@ -40,7 +40,7 @@ async function fetchUserDetailsByAddress(normalizedAddress: string): Promise<Use
     });
 
     if (!response.ok) {
-      throw new Error('Network response was not ok.');
+      throw new Error(`Network response was not ok (${response.url} ${response.status})`);
     }
 
     const data: ApiResponse = await response.json();
