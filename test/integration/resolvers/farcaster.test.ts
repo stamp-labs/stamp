@@ -8,13 +8,13 @@ describe('farcaster', () => {
     });
 
     it('should return false if user details cannot be fetched', async () => {
-      const result = await resolvers.farcaster('0xeF8305E140ac520225DAf050e2f71d5fBcC543e7');
+      const result = await resolvers.farcaster('0x2963fD170E12d748d0A80430DdC090e059f6013F');
       expect(result).toBe(false);
     });
 
-    it('should return an image URL if user details are successfully fetched and the user has a profile picture', async () => {
+   it('should return a Buffer if user details are successfully fetched and the user has a profile picture', async () => {
       const result = await resolvers.farcaster('0xd1a8Dd23e356B9fAE27dF5DeF9ea025A602EC81e');
-      expect(result).toEqual(expect.stringContaining('http://'));
+      expect(result).toBeInstanceOf(Buffer);
     });
   });
 });
