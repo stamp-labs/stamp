@@ -16,6 +16,12 @@ interface ApiResponse {
   [key: string]: Array<UserDetails>;
 }
 
+function withCache(url: string): string {
+  return url.includes('imgur.com')
+    ? `https://wrpcd.net/cdn-cgi/image/fit=contain,f=auto,w=${max}/${encodeURIComponent(url)}`
+    : url;
+}
+
 const normalizeAddress = (address: Address): Address | null => {
   try {
     return isAddress(address) ? getAddress(address) : null;
@@ -66,17 +72,10 @@ export default async function resolve(address: string): Promise<Buffer | false> 
   }
 
   try {
-    const imageUrl = new URL(userDetails.pfp_url);
-    const imageBlob = await fetchHttpImage(imageUrl.toString());
-    const resizedImage = await resize(imageBlob, max, max);
-    if (Buffer.isBuffer(resizedImage)) {
-      return resizedImage;
-    } else {
-      logError('Error processing image: Resized image is not a Buffer');
-      return false;
-    }
-  } catch (error) {
-    logError('Error processing image:', error);
+    const imageUrl = withCache(userDetails.pfp_url);
+    const input = await fetchHttpImage(imageUrl);
+    return await resize(input, max, max);
+  } catch (e) {
     return false;
   }
 }
