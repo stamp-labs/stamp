@@ -4,7 +4,7 @@
   "shortTtl": 3600,
   "resolvers": {
     "avatar": ["snapshot", "ens", "lens", "farcaster", "starknet"],
-    "token": [ "zapper", "trustwallet"],
+    "token": ["trustwallet", "zapper"],
     "space": ["space"],
     "space-sx": ["space-sx"],
     "space-cover-sx": ["space-cover-sx"]
