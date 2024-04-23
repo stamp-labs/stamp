@@ -49,13 +49,15 @@ router.get(`/clear/:type(${TYPE_CONSTRAINTS})/:id`, async (req, res) => {
 
 router.get(`/:type(${TYPE_CONSTRAINTS})/:id`, async (req, res) => {
   const { type, id } = req.params;
-  let address, network, w, h, fallback, cb;
+  let address, network, w, h, fallback, cb, resolver;
 
   try {
-    ({ address, network, w, h, fallback, cb } = await parseQuery(id, type, req.query));
+    ({ address, network, w, h, fallback, cb, resolver } = await parseQuery(id, type, req.query));
   } catch (e) {
     return res.status(500).json({ status: 'error', error: 'failed to load content' });
   }
+
+  const disableCache = !!resolver;
 
   const key1 = getCacheKey({
     type,
@@ -70,7 +72,7 @@ router.get(`/:type(${TYPE_CONSTRAINTS})/:id`, async (req, res) => {
 
   // Check resized cache
   const cache = await get(`${key1}/${key2}`);
-  if (cache) {
+  if (cache && !disableCache) {
     // console.log('Got cache', address);
     setHeader(res);
     return cache.pipe(res);
@@ -91,8 +93,16 @@ router.get(`/:type(${TYPE_CONSTRAINTS})/:id`, async (req, res) => {
     if (type === 'space-sx') currentResolvers = constants.resolvers['space-sx'];
     if (type === 'space-cover-sx') currentResolvers = constants.resolvers['space-cover-sx'];
 
+    if (resolver) {
+      currentResolvers = currentResolvers.filter(r => resolver.includes(r));
+    }
+
+    if (!currentResolvers.length) {
+      return res.status(500).json({ status: 'error', error: 'invalid resolvers' });
+    }
+
     const files = await Promise.all(currentResolvers.map(r => resolvers[r](address, network)));
-    baseImage = [...files].reverse().find(file => !!file);
+    baseImage = files.find(Boolean);
 
     if (!baseImage) {
       const fallbackImage = await resolvers[fallback](address, network);
@@ -107,6 +117,8 @@ router.get(`/:type(${TYPE_CONSTRAINTS})/:id`, async (req, res) => {
   const resizedImage = await resize(baseImage, w, h);
   setHeader(res);
   res.send(resizedImage);
+
+  if (disableCache) return;
 
   // Store cache
   try {
