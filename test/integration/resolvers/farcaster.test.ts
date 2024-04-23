@@ -12,7 +12,7 @@ describe('farcaster', () => {
       expect(result).toBe(false);
     });
 
-   it('should return a Buffer if user details are successfully fetched and the user has a profile picture', async () => {
+    it('should return a Buffer if user details are successfully fetched and the user has a profile picture', async () => {
       const result = await resolvers.farcaster('0xd1a8Dd23e356B9fAE27dF5DeF9ea025A602EC81e');
       expect(result).toBeInstanceOf(Buffer);
     });
