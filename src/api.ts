@@ -93,11 +93,7 @@ router.get(`/:type(${TYPE_CONSTRAINTS})/:id`, async (req, res) => {
     if (type === 'space-sx') currentResolvers = constants.resolvers['space-sx'];
     if (type === 'space-cover-sx') currentResolvers = constants.resolvers['space-cover-sx'];
 
-    if (resolver) {
-      currentResolvers = currentResolvers.filter(r => resolver.includes(r));
-    }
-
-    if (!currentResolvers.length) {
+    if (resolver && !currentResolvers.includes(resolver)) {
       return res.status(500).json({ status: 'error', error: 'invalid resolvers' });
     }
 
