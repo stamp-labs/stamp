@@ -9,6 +9,7 @@ import selfid from './selfid';
 import lens from './lens';
 import zapper from './zapper';
 import starknet from './starknet';
+import farcaster from './farcaster';
 
 export default {
   blockie,
@@ -22,5 +23,6 @@ export default {
   selfid,
   lens,
   zapper,
-  starknet
+  starknet,
+  farcaster
 };
