@@ -81,7 +81,8 @@ export async function parseQuery(id, type, query) {
     w,
     h,
     fallback: query.fb === 'jazzicon' ? 'jazzicon' : 'blockie',
-    cb: query.cb
+    cb: query.cb,
+    resolver: query.resolver
   };
 }
 
