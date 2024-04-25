@@ -6462,11 +6462,6 @@ starknet@^6.7.0:
     ts-mixer "^6.0.3"
     url-join "^4.0.1"
 
-starknetid.js@^3.0.4:
-  version "3.0.4"
-  resolved "https://registry.yarnpkg.com/starknetid.js/-/starknetid.js-3.0.4.tgz#abc455d2206132b9a8cd038fc6355a5d3dbada4f"
-  integrity sha512-FlUN286uErpHmBBp1AzdvyFHxhYXfxOkbb9nfEqTb+vqQQuWC13/Ik5YwuZD/6HXrtvgSnqtaPySrIqrDaIhng==
-
 start-server-and-test@^2.0.3:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/start-server-and-test/-/start-server-and-test-2.0.3.tgz#15c53c85e23cba7698b498b8a2598cab95f3f802"
