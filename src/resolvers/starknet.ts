@@ -6,7 +6,7 @@ import { fetchHttpImage } from './utils';
 
 const provider = new Provider(
   new RpcProvider({
-    nodeUrl: `https://starknet-mainnet.infura.io/v3/${process.env.SN_INFURA_API_KEY}`
+    nodeUrl: `https://starknet-mainnet.infura.io/v3/${process.env.INFURA_API_KEY}`
   })
 );
 
