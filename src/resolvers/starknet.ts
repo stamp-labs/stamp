@@ -14,6 +14,12 @@ function isStarknetDomain(domain: string): boolean {
   return domain.endsWith('.stark');
 }
 
+function normalizeAddress(address: string): string {
+  if (!address.match(/^(0x)?[0-9a-fA-F]{64}$/)) throw new Error('Invalid starknet address');
+
+  return address;
+}
+
 async function getStarknetAddress(domain: string): Promise<string | null> {
   const address = await provider.getAddressFromStarkName(domain);
 
@@ -23,7 +29,7 @@ async function getStarknetAddress(domain: string): Promise<string | null> {
 async function getImage(domainOrAddress: string): Promise<string | null> {
   const address = isStarknetDomain(domainOrAddress)
     ? await getStarknetAddress(domainOrAddress)
-    : domainOrAddress;
+    : normalizeAddress(domainOrAddress);
 
   if (!address) return null;
 
