@@ -4,11 +4,11 @@ import { max } from '../constants.json';
 import { fetchHttpImage, axiosDefaultParams } from './utils';
 
 const SUBGRAPH_URLS = [
-  'https://api.studio.thegraph.com/query/23545/sx-goerli/version/latest',
+  'https://api.studio.thegraph.com/query/23545/sx/version/latest',
   'https://api.studio.thegraph.com/query/23545/sx-sepolia/version/latest',
   'https://api.studio.thegraph.com/query/23545/sx-polygon/version/latest',
   'https://api.studio.thegraph.com/query/23545/sx-arbitrum/version/latest',
-  'https://thegraph.goerli.zkevm.consensys.net/subgraphs/name/snapshot-labs/sx-subgraph',
+  'https://api.studio.thegraph.com/query/23545/sx-optimism/version/latest',
   'https://api-1.snapshotx.xyz',
   'https://testnet-api-1.snapshotx.xyz'
 ];
