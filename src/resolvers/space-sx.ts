@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getAddress } from '@ethersproject/address';
 import { getUrl, resize } from '../utils';
 import { max } from '../constants.json';
 import { fetchHttpImage, axiosDefaultParams } from './utils';
@@ -20,7 +21,7 @@ async function getSpaceProperty(key: string, url: string, property: 'avatar' | '
     data: {
       query: `
         query {
-          space(id: "${key}") {
+          spaces(where: { id_in: ["${key}", "${getAddress(key)}"] }) {
             metadata {
               ${property}
             }
@@ -30,9 +31,11 @@ async function getSpaceProperty(key: string, url: string, property: 'avatar' | '
     ...axiosDefaultParams
   });
 
-  if (!data.data?.data?.space?.metadata?.[property]) return Promise.reject(false);
+  const result = data.data?.data?.spaces
+    ?.map(space => space.metadata?.[property])
+    .filter(Boolean)[0];
 
-  return data.data.data.space.metadata?.[property];
+  return result || Promise.reject(false);
 }
 
 function createPropertyResolver(property: 'avatar' | 'cover') {
