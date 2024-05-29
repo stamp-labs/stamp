@@ -16,9 +16,9 @@ const SUBGRAPH_URLS = [
 ];
 
 async function getSpaceProperty(key: string, url: string, property: 'avatar' | 'cover') {
-  const id = [key];
+  const ids = [key];
   if (!isStarknetAddress(key)) {
-    id.push(getAddress(key));
+    ids.push(getAddress(key));
   }
 
   const data = await axios({
@@ -27,7 +27,7 @@ async function getSpaceProperty(key: string, url: string, property: 'avatar' | '
     data: {
       query: `
         query {
-          spaces(where: { id_in: [${id.map(item => `"${item}"`).join(', ')}] }) {
+          spaces(where: { id_in: [${ids.map(item => `"${item}"`).join(', ')}] }) {
             metadata {
               ${property}
             }
