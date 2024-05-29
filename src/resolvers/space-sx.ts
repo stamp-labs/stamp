@@ -27,7 +27,7 @@ async function getSpaceProperty(key: string, url: string, property: 'avatar' | '
     data: {
       query: `
         query {
-          spaces(where: { id_in: ["${id.join('", "')}"] }) {
+          spaces(where: { id_in: [${id.map(item => `"${item}"`).join(', ')}] }) {
             metadata {
               ${property}
             }
