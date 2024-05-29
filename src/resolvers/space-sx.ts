@@ -3,6 +3,7 @@ import { getAddress } from '@ethersproject/address';
 import { getUrl, resize } from '../utils';
 import { max } from '../constants.json';
 import { fetchHttpImage, axiosDefaultParams } from './utils';
+import { isStarknetAddress } from '../addressResolvers/utils';
 
 const SUBGRAPH_URLS = [
   'https://api.studio.thegraph.com/query/23545/sx/version/latest',
@@ -15,13 +16,18 @@ const SUBGRAPH_URLS = [
 ];
 
 async function getSpaceProperty(key: string, url: string, property: 'avatar' | 'cover') {
+  const id = [key];
+  if (!isStarknetAddress(key)) {
+    id.push(getAddress(key));
+  }
+
   const data = await axios({
     url,
     method: 'POST',
     data: {
       query: `
         query {
-          spaces(where: { id_in: ["${key}", "${getAddress(key)}"] }) {
+          spaces(where: { id_in: ["${id.join('", "')}"] }) {
             metadata {
               ${property}
             }
