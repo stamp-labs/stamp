@@ -1,6 +1,8 @@
 import resolvers from '../../../src/resolvers';
 
 describe('resolvers', () => {
+  jest.retryTimes(3);
+
   describe('ens', () => {
     it('should return false if avatar is not set', async () => {
       const result = await resolvers.ens('0x556B14CbdA79A36dC33FcD461a04A5BCb5dC2A70');
