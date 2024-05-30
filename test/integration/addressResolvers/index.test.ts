@@ -4,11 +4,6 @@ import redis from '../../../src/helpers/redis';
 import randomAddresses from '../../fixtures/addresses';
 
 describe('addressResolvers', () => {
-  afterAll(async () => {
-    await redis.flushDb();
-    await redis.quit();
-  });
-
   describe('lookupAddresses()', () => {
     describe('when passing more than 50 addresses', () => {
       it('rejects with an error', async () => {
