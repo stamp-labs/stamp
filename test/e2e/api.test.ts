@@ -15,10 +15,6 @@ async function purge(): Promise<void> {
 }
 
 describe('E2E api', () => {
-  afterAll(async () => {
-    await redis?.quit();
-  });
-
   describe('GET type/TYPE/ID', () => {
     it.todo('returns a 500 status on invalid query');
 
