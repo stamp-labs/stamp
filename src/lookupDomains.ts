@@ -1,5 +1,6 @@
 import { capture } from '@snapshot-labs/snapshot-sentry';
-import { Address, FetchError, graphQlCall, isSilencedError } from './addressResolvers/utils';
+import { FetchError, isSilencedError } from './addressResolvers/utils';
+import { Address, graphQlCall } from './utils';
 
 const ENS_GRAPHQL_URL = 'https://api.thegraph.com/subgraphs/name/ensdomains/ens';
 

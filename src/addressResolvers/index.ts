@@ -4,13 +4,12 @@ import * as unstoppableDomainResolver from './unstoppableDomains';
 import * as starknetResolver from './starknet';
 import cache from './cache';
 import {
-  Address,
-  Handle,
   normalizeAddresses,
   normalizeHandles,
   withoutEmptyValues,
   mapOriginalInput
 } from './utils';
+import { Address, Handle } from '../utils';
 import { timeAddressResolverResponse as timeResponse } from '../helpers/metrics';
 
 const RESOLVERS = [ensResolver, unstoppableDomainResolver, lensResolver, starknetResolver];

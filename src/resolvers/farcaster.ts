@@ -1,7 +1,6 @@
 import fetch from 'node-fetch';
 import { getAddress } from '@ethersproject/address';
-import { Address } from '../addressResolvers/utils';
-import { resize } from '../utils';
+import { Address, resize } from '../utils';
 import { max } from '../constants.json';
 import { fetchHttpImage } from './utils';
 
