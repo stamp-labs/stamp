@@ -18,7 +18,7 @@ router.post('/', async (req, res) => {
     let result: any = {};
 
     if (method === 'lookup_domains') {
-      result = await lookupDomains(params);
+      result = await lookupDomains(params, req.body.network);
     } else if (['lookup_addresses', 'resolve_names'].includes(method)) {
       if (!Array.isArray(params))
         return rpcError(res, 400, 'params must be an array of string', id);

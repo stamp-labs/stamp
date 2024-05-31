@@ -3,7 +3,12 @@ import { FetchError, isSilencedError } from './addressResolvers/utils';
 import { Address, graphQlCall } from './utils';
 import { isAddress } from '@ethersproject/address';
 
-const ENS_GRAPHQL_URL = 'https://api.thegraph.com/subgraphs/name/ensdomains/ens';
+const ENS_GRAPHQL_URL = {
+  '1': 'https://api.thegraph.com/subgraphs/name/ensdomains/ens',
+  '11155111': 'https://api.studio.thegraph.com/proxy/49574/enssepolia/version/latest'
+};
+
+const DEFAULT_CHAIN_ID = '1';
 
 type Domain = {
   name: string;
@@ -11,7 +16,7 @@ type Domain = {
   expiryDate?: number;
 };
 
-async function fetchDomainData(domain: Domain): Promise<Domain> {
+async function fetchDomainData(domain: Domain, chainId: string): Promise<Domain> {
   const hash = domain.name.match(/\[(.*?)\]/)?.[1];
 
   if (!hash) return domain;
@@ -19,7 +24,7 @@ async function fetchDomainData(domain: Domain): Promise<Domain> {
   const {
     data: { data }
   } = await graphQlCall(
-    ENS_GRAPHQL_URL,
+    ENS_GRAPHQL_URL[chainId],
     `
       query Registration {
         registration(id: "0x${hash}") {
@@ -39,8 +44,11 @@ async function fetchDomainData(domain: Domain): Promise<Domain> {
   };
 }
 
-export default async function lookupDomains(address: Address): Promise<Address[]> {
-  if (!isAddress(address)) return [];
+export default async function lookupDomains(
+  address: Address,
+  chainId = DEFAULT_CHAIN_ID
+): Promise<Address[]> {
+  if (!isAddress(address) || !ENS_GRAPHQL_URL[chainId]) return [];
 
   try {
     const {
@@ -48,7 +56,7 @@ export default async function lookupDomains(address: Address): Promise<Address[]
         data: { account }
       }
     } = await graphQlCall(
-      ENS_GRAPHQL_URL,
+      ENS_GRAPHQL_URL[chainId],
       `
       query Domain {
         account(id: "${address.toLowerCase()}") {
@@ -75,7 +83,11 @@ export default async function lookupDomains(address: Address): Promise<Address[]
         !domain.name.endsWith('.addr.reverse')
     );
 
-    return (await Promise.all(domains.map(fetchDomainData))).map(domain => domain.name) || [];
+    return (
+      (await Promise.all(domains.map(domain => fetchDomainData(domain, chainId)))).map(
+        domain => domain.name
+      ) || []
+    );
   } catch (e) {
     if (!isSilencedError(e)) {
       capture(e, { input: { address } });

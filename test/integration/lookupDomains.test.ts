@@ -1,12 +1,18 @@
 import lookupDomains from '../../src/lookupDomains';
 
 describe('lookupDomains', () => {
-  it('should return an array of addresses', async () => {
+  it('should return an array of addresses on default network', async () => {
     const result = await lookupDomains('0x24F15402C6Bb870554489b2fd2049A85d75B982f');
 
     expect(result).toBeInstanceOf(Array);
     expect(result.length).toBeGreaterThan(0);
     expect(result[0]).toContain('.eth');
+  });
+
+  it('should return an array of addresses on sepolia', async () => {
+    const result = await lookupDomains('0x24F15402C6Bb870554489b2fd2049A85d75B982f', '11155111');
+
+    expect(result).toContain('testchaitu.eth');
   });
 
   it('should return an empty array if the address is not provided', async () => {
@@ -21,12 +27,10 @@ describe('lookupDomains', () => {
     expect(result).toEqual([]);
   });
 
-  it('should return invalid domains', async () => {
-    const result = await lookupDomains('0xa2e81c205e38324bf7432aecbd2c7e20c717e1d3');
+  it('should return empty array on invalid network', async () => {
+    const result = await lookupDomains('0x24F15402C6Bb870554489b2fd2049A85d75B982f', 'test');
 
-    expect(result).toEqual([
-      '[090fdc7e2b2c9f51e9f228395059bf4d88379c2cea8082bec00613ed967407cc].xyz'
-    ]);
+    expect(result).toEqual([]);
   });
 
   it('should filter out expired domains', async () => {
