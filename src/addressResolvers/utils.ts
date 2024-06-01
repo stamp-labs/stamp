@@ -1,4 +1,3 @@
-import axios from 'axios';
 import snapshot from '@snapshot-labs/snapshot.js';
 import { getAddress } from '@ethersproject/address';
 
@@ -23,20 +22,6 @@ export function provider(network: string) {
 
 export function withoutEmptyValues(obj: Record<string, any>) {
   return Object.fromEntries(Object.entries(obj).filter(([, value]) => value));
-}
-
-export function graphQlCall(url, query: string) {
-  return axios({
-    url: url,
-    method: 'post',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    timeout: 5e3,
-    data: {
-      query
-    }
-  });
 }
 
 export function normalizeAddresses(addresses: Address[]): Address[] {
@@ -69,8 +54,8 @@ export function isSilencedError(error: any): boolean {
 
 export function mapOriginalInput(
   input: string[],
-  results: Record<string, string>
-): Record<string, string> {
+  results: Record<string, string | string[]>
+): Record<string, string | string[]> {
   const inputLc = input.map(i => i?.toLowerCase());
   const resultLc = Object.fromEntries(
     Object.entries(results).map(([key, value]) => [key.toLowerCase(), value])

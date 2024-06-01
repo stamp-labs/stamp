@@ -4,13 +4,13 @@ import { capture } from '@snapshot-labs/snapshot-sentry';
 import { ens_normalize } from '@adraffy/ens-normalize';
 import {
   provider as getProvider,
-  graphQlCall,
   Address,
   Handle,
   isSilencedError,
   FetchError,
   isEvmAddress
 } from './utils';
+import { graphQlCall } from '../helpers/utils';
 
 export const NAME = 'Ens';
 const NETWORK = '1';

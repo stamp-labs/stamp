@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 export function rpcSuccess(res, result, id) {
   res.json({
     jsonrpc: '2.0',
@@ -15,5 +17,19 @@ export function rpcError(res, code, e, id) {
       data: e
     },
     id
+  });
+}
+
+export function graphQlCall(url: string, query: string) {
+  return axios({
+    url: url,
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    timeout: 5e3,
+    data: {
+      query
+    }
   });
 }
