@@ -1,12 +1,6 @@
 import { capture } from '@snapshot-labs/snapshot-sentry';
-import {
-  Address,
-  Handle,
-  withoutEmptyValues,
-  isSilencedError,
-  FetchError,
-  isStarknetAddress
-} from './utils';
+import { withoutEmptyValues, isSilencedError, FetchError, isStarknetAddress } from './utils';
+import { Address, Handle } from '../utils';
 import axios from 'axios';
 
 export const NAME = 'Starknet';

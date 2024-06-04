@@ -1,9 +1,13 @@
-import { createHash } from 'crypto';
+import axios from 'axios';
 import sharp from 'sharp';
+import snapshot from '@snapshot-labs/snapshot.js';
+import { createHash } from 'crypto';
 import { Response } from 'express';
 import { StaticJsonRpcProvider } from '@ethersproject/providers';
-import snapshot from '@snapshot-labs/snapshot.js';
 import constants from './constants.json';
+
+export type Address = string;
+export type Handle = string;
 
 const providers: Record<string, StaticJsonRpcProvider> = {};
 
@@ -141,3 +145,17 @@ export const getBaseAssetIconUrl = (chainId: string) => {
   }
   return 'https://static.cdnlogo.com/logos/e/81/ethereum-eth.svg';
 };
+
+export function graphQlCall(url: string, query: string) {
+  return axios({
+    url: url,
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    timeout: 5e3,
+    data: {
+      query
+    }
+  });
+}
