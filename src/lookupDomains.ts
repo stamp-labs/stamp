@@ -4,7 +4,8 @@ import { Address, graphQlCall } from './utils';
 import { isAddress } from '@ethersproject/address';
 
 const ENS_GRAPHQL_URL = {
-  '1': 'https://api.thegraph.com/subgraphs/name/ensdomains/ens',
+  '1':
+    'https://subgrapher.snapshot.org/subgraph/arbitrum/5XqPmWe6gjyrJtFn9cLy237i4cWw2j9HcUJEXsP5qGtH',
   '11155111': 'https://api.studio.thegraph.com/proxy/49574/enssepolia/version/latest'
 };
 

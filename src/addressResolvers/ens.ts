@@ -66,7 +66,7 @@ export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Ad
         data: { domains: items }
       }
     } = await graphQlCall(
-      'https://api.thegraph.com/subgraphs/name/ensdomains/ens',
+      'https://subgrapher.snapshot.org/subgraph/arbitrum/5XqPmWe6gjyrJtFn9cLy237i4cWw2j9HcUJEXsP5qGtH',
       `query Domains {
         domains(where: {name_in: ["${normalizedHandles.join('","')}"]}) {
           name
