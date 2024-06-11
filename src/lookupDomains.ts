@@ -2,12 +2,7 @@ import { capture } from '@snapshot-labs/snapshot-sentry';
 import { FetchError, isSilencedError } from './addressResolvers/utils';
 import { Address, graphQlCall } from './utils';
 import { isAddress } from '@ethersproject/address';
-
-const ENS_GRAPHQL_URL = {
-  '1':
-    'https://subgrapher.snapshot.org/subgraph/arbitrum/5XqPmWe6gjyrJtFn9cLy237i4cWw2j9HcUJEXsP5qGtH',
-  '11155111': 'https://api.studio.thegraph.com/proxy/49574/enssepolia/version/latest'
-};
+import constants from './constants.json';
 
 const DEFAULT_CHAIN_ID = '1';
 
@@ -25,7 +20,7 @@ async function fetchDomainData(domain: Domain, chainId: string): Promise<Domain>
   const {
     data: { data }
   } = await graphQlCall(
-    ENS_GRAPHQL_URL[chainId],
+    constants.ensSubgraph[chainId],
     `
       query Registration {
         registration(id: "0x${hash}") {
@@ -49,7 +44,7 @@ export default async function lookupDomains(
   address: Address,
   chainId = DEFAULT_CHAIN_ID
 ): Promise<Address[]> {
-  if (!isAddress(address) || !ENS_GRAPHQL_URL[chainId]) return [];
+  if (!isAddress(address) || !constants.ensSubgraph[chainId]) return [];
 
   try {
     const {
@@ -57,7 +52,7 @@ export default async function lookupDomains(
         data: { account }
       }
     } = await graphQlCall(
-      ENS_GRAPHQL_URL[chainId],
+      constants.ensSubgraph[chainId],
       `
       query Domain {
         account(id: "${address.toLowerCase()}") {
