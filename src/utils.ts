@@ -36,7 +36,7 @@ export function sha256(str) {
 export async function resize(input, w, h) {
   return sharp(input)
     .resize(w, h)
-    .webp({ lossless: true })
+    .webp()
     .toBuffer();
 }
 
