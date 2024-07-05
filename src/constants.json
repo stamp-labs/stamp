@@ -1,5 +1,6 @@
 {
   "max": 500,
+  "maxCover": 1500,
   "ttl": 43200,
   "shortTtl": 3600,
   "resolvers": {
