@@ -26,7 +26,7 @@ describe('resolvers', () => {
     }, 15e3);
 
     it('should resolve', async () => {
-      const result = await resolvers['user-cover']('0x91FD2c8d24767db4Ece7069AA27832ffaf8590f3');
+      const result = await resolvers['user-cover']('0xf1f09AdC06aAB740AA16004D62Dbd89484d3Be90');
 
       expect(result).toBeInstanceOf(Buffer);
       expect(result.length).toBeGreaterThan(1000);
