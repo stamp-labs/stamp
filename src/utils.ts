@@ -161,7 +161,3 @@ export function graphQlCall(url: string, query: string) {
     }
   });
 }
-
-export function getChecksummedAddress(address: Address): Address {
-  return isAddress(address) ? getAddress(address) : getChecksumAddress(address);
-}
