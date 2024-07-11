@@ -2312,10 +2312,10 @@
   dependencies:
     "@sentry/node" "^7.81.1"
 
-"@snapshot-labs/snapshot.js@^0.11.38":
-  version "0.11.38"
-  resolved "https://registry.yarnpkg.com/@snapshot-labs/snapshot.js/-/snapshot.js-0.11.38.tgz#bc7e35b6cf5df056ebdb474ef77e851a209b1bab"
-  integrity sha512-Pkiz+7uo5WAGKKJryT1ZyDY5we3QRVGLwQQGV6RDYLto1EmHGu1pEUX2AN/UUXnRzu7b+SPOynjBkAbJLZZq3A==
+"@snapshot-labs/snapshot.js@^0.11.39":
+  version "0.11.39"
+  resolved "https://registry.yarnpkg.com/@snapshot-labs/snapshot.js/-/snapshot.js-0.11.39.tgz#23ed63f17c0eaf79ce99cc9817dfac7c2ad41cfc"
+  integrity sha512-Wy2v75f7g1IOn0d75hBnqRmekUzlWO+6ijGPyLSyQSnlsHlRIaqP+su1C/g9otkjCGq2dEFPp0PvTEGmCcT3kA==
   dependencies:
     "@ensdomains/eth-ens-namehash" "^2.0.15"
     "@ethersproject/abi" "^5.6.4"
@@ -2381,7 +2381,7 @@
   resolved "https://registry.yarnpkg.com/@stablelib/wipe/-/wipe-1.0.1.tgz#d21401f1d59ade56a62e139462a97f104ed19a36"
   integrity sha512-WfqfX/eXGiAd3RJe4VU2snh/ZPwtSjLG4ynQ/vYzvghTh7dHFcI1wl+nrkWG6lGhukOxOsUHfv8dUXr58D0ayg==
 
-"@starknet-io/types-js@^0.7.7", "starknet-types-07@npm:@starknet-io/types-js@^0.7.7":
+"@starknet-io/types-js@^0.7.7":
   version "0.7.7"
   resolved "https://registry.yarnpkg.com/@starknet-io/types-js/-/types-js-0.7.7.tgz#444be5e4e585ec6f599d42d3407280d98b2dfdf8"
   integrity sha512-WLrpK7LIaIb8Ymxu6KF/6JkGW1sso988DweWu7p5QY/3y7waBIiPvzh27D9bX5KIJNRDyOoOVoHVEKYUYWZ/RQ==
@@ -6451,6 +6451,11 @@ stack-utils@^2.0.3:
   integrity sha512-XlkWvfIm6RmsWtNJx+uqtKLS8eqFbxUg0ZzLXqY0caEy9l7hruX8IpiDnjsLavoBgqCCR71TqWO8MaXYheJ3RQ==
   dependencies:
     escape-string-regexp "^2.0.0"
+
+"starknet-types-07@npm:@starknet-io/types-js@^0.7.7":
+  version "0.7.7"
+  resolved "https://registry.yarnpkg.com/@starknet-io/types-js/-/types-js-0.7.7.tgz#444be5e4e585ec6f599d42d3407280d98b2dfdf8"
+  integrity sha512-WLrpK7LIaIb8Ymxu6KF/6JkGW1sso988DweWu7p5QY/3y7waBIiPvzh27D9bX5KIJNRDyOoOVoHVEKYUYWZ/RQ==
 
 starknet@^6.11.0:
   version "6.11.0"
