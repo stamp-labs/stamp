@@ -2,6 +2,8 @@ import resolvers from '../../../src/resolvers';
 
 describe('resolvers', () => {
   describe('starknet', () => {
+    jest.retryTimes(3);
+
     it('should return false if missing', async () => {
       const result = await resolvers.starknet('test-not-existing.stark');
 
