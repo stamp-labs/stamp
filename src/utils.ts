@@ -1,8 +1,6 @@
 import axios from 'axios';
 import sharp from 'sharp';
 import snapshot from '@snapshot-labs/snapshot.js';
-import { getAddress, isAddress } from '@ethersproject/address';
-import { getChecksumAddress } from 'starknet';
 import { createHash } from 'crypto';
 import { Response } from 'express';
 import { StaticJsonRpcProvider } from '@ethersproject/providers';
@@ -160,8 +158,4 @@ export function graphQlCall(url: string, query: string) {
       query
     }
   });
-}
-
-export function getChecksummedAddress(address: Address): Address {
-  return isAddress(address) ? getAddress(address) : getChecksumAddress(address);
 }
