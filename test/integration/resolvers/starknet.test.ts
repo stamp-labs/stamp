@@ -13,11 +13,21 @@ describe('resolvers', () => {
     describe('with a simple image', () => {
       it('should resolve with address', async () => {
         const result = await resolvers.starknet(
-          '0x00C09F8D8CEfb5f094547f0a8B26c88Ca9fD684B4810F3f14C4ef6602FFa7516'
+          '0x0779ba6e4e227947acbbdfb978a292c401339027eeb3d768f5d12cd2e818265a'
         );
 
         expect(result).toBeInstanceOf(Buffer);
         expect(result.length).toBeGreaterThan(1000);
+      });
+    });
+
+    describe('with the default image', () => {
+      it('should return false', async () => {
+        const result = await resolvers.starknet(
+          '0x0047f2e8dbf39f6856fc2437dfc931e3b3a64bfe240218046f2a9fca80e768d4'
+        );
+
+        expect(result).toBe(false);
       });
     });
 
