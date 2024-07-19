@@ -4,6 +4,8 @@ import { getUrl, resize } from '../utils';
 import { max } from '../constants.json';
 import { fetchHttpImage } from './utils';
 
+const DEFAULT_IMG_URL = 'https://starknet.id/api/identicons/0';
+
 const provider = new Provider(
   new RpcProvider({
     nodeUrl: process.env.INFURA_API_KEY
@@ -41,6 +43,8 @@ async function getImage(domainOrAddress: string): Promise<string | null> {
 export default async function resolve(domainOrAddress: string) {
   try {
     let img_url = await getImage(domainOrAddress);
+
+    if (img_url === DEFAULT_IMG_URL) return false;
 
     if (img_url?.startsWith('https://api.starkurabu.com')) {
       const response = await fetch(img_url);
