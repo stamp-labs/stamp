@@ -2,7 +2,6 @@ import axios from 'axios';
 import { getUrl, resize } from '../utils';
 import { max } from '../constants.json';
 import { fetchHttpImage, axiosDefaultParams } from './utils';
-import { getChecksummedAddress } from '../utils';
 
 const HUB_URL = process.env.HUB_URL ?? 'https://hub.snapshot.org';
 
@@ -14,7 +13,7 @@ function createPropertyResolver(property: 'avatar' | 'cover') {
           url: `${HUB_URL}/graphql`,
           method: 'post',
           data: {
-            query: `query { user(id: "${getChecksummedAddress(address)}") { ${property} } }`
+            query: `query { user(id: "${address}") { ${property} } }`
           },
           ...axiosDefaultParams
         })
