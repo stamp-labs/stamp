@@ -1,15 +1,15 @@
 import express from 'express';
 import { capture } from '@snapshot-labs/snapshot-sentry';
-import { parseQuery, resize, setHeader, getCacheKey } from './utils';
+import { parseQuery, resize, setHeader, getCacheKey, ResolverType } from './utils';
 import { set, get, streamToBuffer, clear } from './aws';
 import resolvers from './resolvers';
 import constants from './constants.json';
 import { rpcError, rpcSuccess } from './helpers/utils';
-import { lookupAddresses, resolveNames } from './addressResolvers';
+import { lookupAddresses, resolveNames, clearCache } from './addressResolvers';
 import lookupDomains from './lookupDomains';
 
 const router = express.Router();
-const TYPE_CONSTRAINTS = Object.keys(constants.resolvers).join('|');
+const TYPE_CONSTRAINTS = [...Object.keys(constants.resolvers), 'address', 'name'].join('|');
 
 router.post('/', async (req, res) => {
   const { id = null, method, params } = req.body;
@@ -37,15 +37,22 @@ router.post('/', async (req, res) => {
 });
 
 router.get(`/clear/:type(${TYPE_CONSTRAINTS})/:id`, async (req, res) => {
-  const { type, id } = req.params;
+  const { type, id } = req.params as { type: ResolverType; id: string };
+
   try {
-    const { address, network, w, h, fallback, cb } = await parseQuery(id, type, {
-      s: constants.max,
-      fb: req.query.fb,
-      cb: req.query.cb
-    });
-    const key = getCacheKey({ type, network, address, w, h, fallback, cb });
-    const result = await clear(key);
+    let result = false;
+
+    if (type === 'address' || type === 'name') {
+      result = await clearCache(id);
+    } else {
+      const { address, network, w, h, fallback, cb } = await parseQuery(id, type, {
+        s: constants.max,
+        fb: req.query.fb,
+        cb: req.query.cb
+      });
+      const key = getCacheKey({ type, network, address, w, h, fallback, cb });
+      result = await clear(key);
+    }
     res.status(result ? 200 : 404).json({ status: result ? 'ok' : 'not found' });
   } catch (e) {
     capture(e);
@@ -54,7 +61,7 @@ router.get(`/clear/:type(${TYPE_CONSTRAINTS})/:id`, async (req, res) => {
 });
 
 router.get(`/:type(${TYPE_CONSTRAINTS})/:id`, async (req, res) => {
-  const { type, id } = req.params;
+  const { type, id } = req.params as { type: ResolverType; id: string };
   let address, network, w, h, fallback, cb, resolver;
 
   try {

@@ -3,7 +3,7 @@ import * as lensResolver from './lens';
 import * as unstoppableDomainResolver from './unstoppableDomains';
 import * as starknetResolver from './starknet';
 import * as snapshotResolver from './snapshot';
-import cache from './cache';
+import cache, { clear } from './cache';
 import {
   normalizeAddresses,
   normalizeHandles,
@@ -79,4 +79,8 @@ export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Ad
   );
 
   return mapOriginalInput(handles, result);
+}
+
+export function clearCache(input: string): Promise<boolean> {
+  return clear(normalizeAddresses([input])[0]);
 }

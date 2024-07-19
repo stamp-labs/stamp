@@ -8,6 +8,15 @@ import constants from './constants.json';
 
 export type Address = string;
 export type Handle = string;
+export type ResolverType =
+  | 'avatar'
+  | 'user-cover'
+  | 'token'
+  | 'space'
+  | 'space-sx'
+  | 'space-cover-sx'
+  | 'address'
+  | 'name';
 
 const providers: Record<string, StaticJsonRpcProvider> = {};
 
@@ -48,7 +57,7 @@ export function shortNameToChainId(shortName: string) {
   return null;
 }
 
-export async function parseQuery(id, type, query) {
+export async function parseQuery(id: string, type: ResolverType, query) {
   let address = id;
   let network = '1';
 
@@ -114,7 +123,7 @@ export function getCacheKey({
   fallback,
   cb
 }: {
-  type: string;
+  type: ResolverType;
   network: string;
   address: string;
   w: number;
