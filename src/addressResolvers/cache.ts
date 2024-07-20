@@ -44,3 +44,7 @@ export default async function cache(input: string[], callback) {
 
   return cache;
 }
+
+export async function clear(input: string): Promise<boolean> {
+  return (await redis?.del(`${KEY_PREFIX}:${input}`)) > 0;
+}
