@@ -36,25 +36,25 @@ cdn.stamp.fyi/{type}/{identifier}?{params}
 
 #### Examples
 
-1. Avatar by Ethereum address:
-   ```
-   cdn.stamp.fyi/avatar/0xeF8305E140ac520225DAf050e2f71d5fBcC543e7
-   ```
+Avatar by Ethereum address:
+```
+cdn.stamp.fyi/avatar/0xeF8305E140ac520225DAf050e2f71d5fBcC543e7
+```
 
-2. Token by contract address:
-   ```
-   cdn.stamp.fyi/token/0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e
-   ```
+Token by contract address:
+```
+cdn.stamp.fyi/token/0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e
+```
 
-3. Avatar by ENS name:
-   ```
-   cdn.stamp.fyi/avatar/fabien.eth
-   ```
+Avatar by ENS name:
+```
+cdn.stamp.fyi/avatar/fabien.eth
+```
 
-4. Avatar with custom size:
-   ```
-   cdn.stamp.fyi/avatar/0xeF8305E140ac520225DAf050e2f71d5fBcC543e7?s=160
-   ```
+Avatar with custom size:
+```
+cdn.stamp.fyi/avatar/0xeF8305E140ac520225DAf050e2f71d5fBcC543e7?s=160
+```
 
 ### Supported Identifiers
 
@@ -107,13 +107,11 @@ We welcome new integrations! If you're using Stamp in your project, feel free to
 
 ## Contributing
 
-We welcome contributions to Stamp! If you have ideas for improvements or have found a bug, please open an issue or submit a pull request on our [GitHub repository](https://github.com/snapshot-labs/stamp).
+We welcome contributions to Stamp! If you have ideas for improvements or have found a bug, please open an issue or submit a pull request.
 
-## Local Setup and Development
+## Local Development
 
-To set up Stamp locally for development, follow these steps:
-
-Clone the repository and install dependencies:
+Clone and install the repository:
 
 ```
 git clone https://github.com/snapshot-labs/stamp.git
@@ -122,65 +120,41 @@ yarn install
 ```
 
 > [!WARNING]  
-> If you run into an error like `ERR! install response status 404 Not Found on https://github.com/Automattic/node-canvas ...` you probably need to use node version 21. It has something to do with build targets of a dependency. Will be figured out later.
+> If you encounter `ERR! install response status 404 Not Found on https://github.com/Automattic/node-canvas ...`, try using Node.js version 21. This issue is related to dependency build targets and will be addressed later.
 
-Create a `.env` file in the root directory and add necessary environment variables (refer to `test/.env.test` for required variables).
-
-Start a Redis server:
+Set up the environment by creating a `.env` file in the root directory. Refer to `test/.env.test` for required variables. Then start Redis:
 
 ```
 docker run -d -p 6379:6379 redis
 ```
 
-Of course you can use a different Redis server, without docker, if you already have one running on your machine or elsewhere.
-
-Start the development server:
+Run the development server:
 
 ```
 yarn dev
 ```
 
-This will start the server using nodemon, which will automatically restart the server when you make changes to the code.
+## Building and Production
 
-Build the project (transpile TypeScript to JavaScript):
+To build the project and start the production server:
 
 ```
 yarn build
-```
-
-Start the production server:
-
-```
 yarn start
 ```
 
 ## Testing
 
-Stamp uses Jest for testing. There are several types of tests available:
-
-### Running All Tests
-
-To run all tests:
+Run all tests:
 
 ```
 yarn test
 ```
 
-This command starts a test server on port 3003 and runs all tests.
-
-### Running Integration Tests
-
-To run only integration tests:
+For integration or e2e tests only:
 
 ```
 yarn test:integration
-```
-
-### Running E2E Tests
-
-To run end-to-end tests:
-
-```
 yarn test:e2e
 ```
 
