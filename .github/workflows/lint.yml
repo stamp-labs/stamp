@@ -2,5 +2,5 @@ name: Lint
 on: [push]
 jobs:
   lint:
-    uses: snapshot-labs/actions/.github/workflows/lint.yml@main
+    uses: mktcode/actions/.github/workflows/lint.yml@main
     secrets: inherit

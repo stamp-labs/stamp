@@ -5,7 +5,7 @@ on:
       - 'master'
 jobs:
   create-sentry-release:
-    uses: snapshot-labs/actions/.github/workflows/create-sentry-release.yml@main
+    uses: mktcode/actions/.github/workflows/create-sentry-release.yml@main
     with:
       project: stamp
     secrets: inherit
