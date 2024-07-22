@@ -109,6 +109,79 @@ We welcome new integrations! If you're using Stamp in your project, feel free to
 
 We welcome contributions to Stamp! If you have ideas for improvements or have found a bug, please open an issue or submit a pull request on our [GitHub repository](https://github.com/snapshot-labs/stamp).
 
+## Local Setup and Development
+
+To set up Stamp locally for development, follow these steps:
+
+Clone the repository and install dependencies:
+
+```
+git clone https://github.com/snapshot-labs/stamp.git
+cd stamp
+yarn install
+```
+
+> [!WARNING]  
+> If you run into an error like `ERR! install response status 404 Not Found on https://github.com/Automattic/node-canvas ...` you probably need to use node version 21. It has something to do with build targets of a dependency. Will be figured out later.
+
+Create a `.env` file in the root directory and add necessary environment variables (refer to `test/.env.test` for required variables).
+
+Start a Redis server:
+
+```
+docker run -d -p 6379:6379 redis
+```
+
+Start the development server:
+
+```
+yarn dev
+```
+
+This will start the server using nodemon, which will automatically restart the server when you make changes to the code.
+
+Build the project (transpile TypeScript to JavaScript):
+
+```
+yarn build
+```
+
+Start the production server:
+
+```
+yarn start
+```
+
+## Testing
+
+Stamp uses Jest for testing. There are several types of tests available:
+
+### Running All Tests
+
+To run all tests:
+
+```
+yarn test
+```
+
+This command starts a test server on port 3003 and runs all tests.
+
+### Running Integration Tests
+
+To run only integration tests:
+
+```
+yarn test:integration
+```
+
+### Running E2E Tests
+
+To run end-to-end tests:
+
+```
+yarn test:e2e
+```
+
 ## License
 
 Stamp is released under the [MIT License](LICENSE).
