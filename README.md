@@ -132,6 +132,8 @@ Start a Redis server:
 docker run -d -p 6379:6379 redis
 ```
 
+Of course you can use a different Redis server, without docker, if you already have one running on your machine or elsewhere.
+
 Start the development server:
 
 ```
