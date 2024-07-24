@@ -67,14 +67,13 @@ Stamp supports various identifier types:
 - DIDs (Decentralized Identifiers)
 - Starknet domains
 
-### Parameters
+### Resizing Images
 
 You can customize the returned image using URL parameters:
 
 - `s`: Set both width and height (e.g., `s=160`)
 - `w`: Set width (e.g., `w=160`)
 - `h`: Set height (e.g., `h=240`)
-- `cb`: Cache-busting parameter to force a refresh (e.g., `cb=1`)
 
 ## Resolvers
 
@@ -91,6 +90,26 @@ Stamp uses multiple resolvers to fetch avatar and token images:
 - [Jazzicon (fallback)](/src/resolvers/jazzicon.ts)
 
 For detailed information on each resolver, please check the corresponding files in the `/src/resolvers/` directory.
+
+## Caching
+
+Stamp employs a two-level caching strategy to optimize performance and reduce unnecessary processing. The original image from a resolver is cached, as well as any resized versions requested by clients. This approach ensures that subsequent requests for the same image are served quickly and efficiently.
+
+For an uncached image:
+
+1. Fetch the full-size image from the source
+2. Cache the full-size (base) image
+3. Resize to requested dimensions
+4. Cache the resized version
+5. Serve the resized image
+
+For subsequent requests:
+
+- If the exact size is cached, serve immediately
+- If only the base image is cached, resize and cache the new size before serving
+
+> [!TIP]
+> Use the Cache-buster parameter to bypass the cache and force a refresh: `?cb=1`
 
 ## Integrations
 
