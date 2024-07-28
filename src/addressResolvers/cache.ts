@@ -46,5 +46,7 @@ export default async function cache(input: string[], callback) {
 }
 
 export async function clear(input: string): Promise<boolean> {
+  if (!redis) return false;
+
   return (await redis?.del(`${KEY_PREFIX}:${input}`)) > 0;
 }
