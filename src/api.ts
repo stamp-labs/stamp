@@ -2,7 +2,7 @@ import express from 'express';
 import { capture } from '@snapshot-labs/snapshot-sentry';
 import { parseQuery, resize, setHeader, getCacheKey, ResolverType } from './utils';
 import { set, get, streamToBuffer, clear } from './aws';
-import { resolve } from './resolvers';
+import { resolve, resolverExists } from './resolvers';
 import constants from './constants.json';
 import { rpcError, rpcSuccess } from './helpers/utils';
 import { lookupAddresses, resolveNames, clearCache } from './addressResolvers';
@@ -68,6 +68,10 @@ router.get(`/:type(${TYPE_CONSTRAINTS})/:id`, async (req, res) => {
     ({ address, network, w, h, fallback, cb, resolver } = await parseQuery(id, type, req.query));
   } catch (e) {
     return res.status(500).json({ status: 'error', error: 'failed to load content' });
+  }
+
+  if (resolver && !resolverExists(type, resolver)) {
+    return res.status(400).json({ status: 'error', error: 'invalid resolvers' });
   }
 
   const disableCache = !!resolver;

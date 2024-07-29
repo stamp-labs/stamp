@@ -50,4 +50,8 @@ export function resolve(
   );
 }
 
+export function resolverExists(type: string, resolvers: string): boolean {
+  return constants.resolvers[type]?.includes(resolvers);
+}
+
 export default RESOLVERS;
