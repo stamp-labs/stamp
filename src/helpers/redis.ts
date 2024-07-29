@@ -1,6 +1,6 @@
-import { createClient } from 'redis';
+import { createClient, RedisClientType } from 'redis';
 
-let client;
+let client: RedisClientType | undefined;
 
 (async () => {
   if (!process.env.REDIS_URL) return;
