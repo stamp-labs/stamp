@@ -155,12 +155,19 @@ export const getBaseAssetIconUrl = (chainId: string) => {
   return 'https://static.cdnlogo.com/logos/e/81/ethereum-eth.svg';
 };
 
-export function graphQlCall(url: string, query: string) {
+export function graphQlCall(
+  url: string,
+  query: string,
+  options: any = {
+    headers: {}
+  }
+) {
   return axios({
     url: url,
     method: 'post',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      ...options.headers
     },
     timeout: 5e3,
     data: {
