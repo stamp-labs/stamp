@@ -3,10 +3,12 @@ import { Address, graphQlCall, Handle } from '../utils';
 import { FetchError, isSilencedError } from './utils';
 
 const HUB_URL = process.env.HUB_URL ?? 'https://hub.snapshot.org';
+const HUB_API_KEY = process.env.HUB_API_KEY ?? undefined;
 export const NAME = 'Snapshot';
 
 export async function lookupAddresses(addresses: Address[]): Promise<Record<Address, Handle>> {
   try {
+    const headers: Record<string, string> = HUB_API_KEY ? { 'x-api-key': HUB_API_KEY } : {};
     const {
       data: {
         data: { users }
@@ -20,9 +22,7 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
         }
       }`,
       {
-        header: {
-          'x-api-key': process.env.HUB_API_KEY ?? undefined
-        }
+        headers
       }
     );
     return Object.fromEntries(users.filter(user => user.name).map(user => [user.id, user.name]));

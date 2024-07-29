@@ -4,7 +4,7 @@ import { max } from '../constants.json';
 import { fetchHttpImage, axiosDefaultParams } from './utils';
 
 const HUB_URL = process.env.HUB_URL ?? 'https://hub.snapshot.org';
-const HUB_API_KEY = process.env.HUB_API_KEY ?? '';
+const HUB_API_KEY = process.env.HUB_API_KEY ?? undefined;
 
 function createPropertyResolver(property: 'avatar' | 'cover') {
   return async (address: string) => {
