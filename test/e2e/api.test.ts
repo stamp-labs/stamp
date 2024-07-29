@@ -26,7 +26,8 @@ describe('E2E api', () => {
     });
 
     it('returns a 400 status on invalid resolver', async () => {
-      const makeInvalidRequest = async () => await axios.get(`${HOST}/avatar/0x123=?resolver=invalid`);
+      const makeInvalidRequest = async () =>
+        await axios.get(`${HOST}/avatar/0x123=?resolver=invalid`);
 
       expect(makeInvalidRequest()).rejects.toThrowError(/status code 400/);
     });
