@@ -4,3 +4,5 @@ jobs:
   lint:
     uses: snapshot-labs/actions/.github/workflows/lint.yml@main
     secrets: inherit
+    with:
+      target: '18'

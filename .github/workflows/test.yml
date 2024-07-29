@@ -6,3 +6,4 @@ jobs:
     secrets: inherit
     with:
       redis: true
+      target: '18'
