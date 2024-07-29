@@ -46,5 +46,9 @@ export default async function cache(input: string[], callback) {
 }
 
 export async function clear(input: string): Promise<boolean> {
+  // TODO: When redis is not available, it should probably throw instead of returning false
+  // causing the api the return "failed to clear cache" instead of "not found"
+  if (!redis) return false;
+
   return (await redis?.del(`${KEY_PREFIX}:${input}`)) > 0;
 }
