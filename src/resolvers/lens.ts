@@ -1,22 +1,34 @@
 import axios from 'axios';
 import { getAddress, isAddress } from '@ethersproject/address';
-import { getUrl, resize } from '../utils';
+import { resize } from '../utils';
 import { max } from '../constants.json';
 import { fetchHttpImage, axiosDefaultParams } from './utils';
 
-const API_URL = 'https://api.lens.dev';
+const API_URL = 'https://api-v2.lens.dev';
+const LENS_IPFS_GATEWAY = 'https://gw.ipfs-lens.dev/ipfs/';
+const LENS_EXTENSION = '.lens';
 
-function getDefaultImage(picture) {
-  if (picture?.original) return picture.original.url;
-  if (picture?.uri) return picture.uri;
+function normalizeImageUrl(url: string) {
+  if (!url) return false;
 
-  return null;
+  // Lens IPFS gateway is returning 403 when accessed directly
+  if (url.startsWith(LENS_IPFS_GATEWAY)) {
+    return `https://${process.env.IPFS_GATEWAY || 'cloudflare-ipfs.com'}/ipfs/${
+      url.split(LENS_IPFS_GATEWAY)[1]
+    }`;
+  }
 }
 
-export default async function resolve(address) {
-  const request = isAddress(address)
-    ? `{ ownedBy: "${getAddress(address)}", limit: 1 }`
-    : `{ handles: ["${address}"], limit: 1 }`;
+export default async function resolve(domainOrAddress: string) {
+  let request: string;
+
+  if (isAddress(domainOrAddress)) {
+    request = `{ ownedBy: ["${getAddress(domainOrAddress)}"] }`;
+  } else if (domainOrAddress.endsWith(LENS_EXTENSION)) {
+    request = `{ handles: ["lens/${domainOrAddress.split(LENS_EXTENSION)[0]}"] }`;
+  } else {
+    return false;
+  }
 
   try {
     const { data } = await axios({
@@ -25,20 +37,14 @@ export default async function resolve(address) {
       data: {
         query: `
             query Profile {
-              profiles(request: ${request}) {
+              profiles(request: { where: ${request}, limit: Ten }) {
                 items {
-                  picture {
-                    ... on NftImage {
-                      contractAddress
-                      tokenId
-                      uri
-                      chainId
-                      verified
-                    }
-                    ... on MediaSet {
-                      original {
-                        url
-                        mimeType
+                  metadata {
+                    picture {
+                      ... on ImageSet {
+                        raw {
+                          uri
+                        }
                       }
                     }
                   }
@@ -50,11 +56,10 @@ export default async function resolve(address) {
       ...axiosDefaultParams
     });
 
-    const sourceUrl = getDefaultImage(data.data.profiles.items[0]?.picture);
-    if (!sourceUrl) return false;
+    const img_url = normalizeImageUrl(data.data.profiles.items?.[0]?.metadata?.picture?.raw?.uri);
+    if (!img_url) return false;
 
-    const url = getUrl(sourceUrl);
-    const input = await fetchHttpImage(url);
+    const input = await fetchHttpImage(img_url);
     return await resize(input, max, max);
   } catch (e) {
     return false;

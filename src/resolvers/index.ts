@@ -2,12 +2,14 @@ import blockie from './blockie';
 import jazzicon from './jazzicon';
 import ens from './ens';
 import trustwallet from './trustwallet';
-import snapshot from './snapshot';
+import { resolveAvatar as sResolveAvatar, resolveCover as sResolveCover } from './snapshot';
 import space from './space';
 import { resolveAvatar as sxResolveAvatar, resolveCover as sxResolveCover } from './space-sx';
 import selfid from './selfid';
 import lens from './lens';
 import zapper from './zapper';
+import starknet from './starknet';
+import farcaster from './farcaster';
 import constants from '../constants.json';
 import { timeImageResolverResponse } from '../helpers/metrics';
 
@@ -16,13 +18,16 @@ const RESOLVERS = {
   jazzicon,
   ens,
   trustwallet,
-  snapshot,
+  snapshot: sResolveAvatar,
+  'user-cover': sResolveCover,
   space,
   'space-sx': sxResolveAvatar,
   'space-cover-sx': sxResolveCover,
   selfid,
   lens,
-  zapper
+  zapper,
+  starknet,
+  farcaster
 } as const;
 
 export function resolve(

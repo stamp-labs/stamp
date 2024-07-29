@@ -1,12 +1,18 @@
 {
   "max": 500,
-  "ttl": 86400,
+  "maxCover": 1500,
+  "ttl": 43200,
   "shortTtl": 3600,
   "resolvers": {
-    "avatar": ["lens", "ens", "snapshot"],
+    "avatar": ["snapshot", "ens", "lens", "farcaster", "starknet"],
+    "user-cover": ["user-cover"],
     "token": ["trustwallet", "zapper"],
     "space": ["space"],
     "space-sx": ["space-sx"],
     "space-cover-sx": ["space-cover-sx"]
+  },
+  "ensSubgraph":{
+    "1": "https://subgrapher.snapshot.org/subgraph/arbitrum/5XqPmWe6gjyrJtFn9cLy237i4cWw2j9HcUJEXsP5qGtH",
+    "11155111": "https://api.studio.thegraph.com/proxy/49574/enssepolia/version/latest"
   }
 }

@@ -6,7 +6,7 @@ const bucket = process.env.AWS_BUCKET_NAME;
 const region = process.env.AWS_REGION;
 const endpoint = process.env.AWS_ENDPOINT || undefined;
 if (region) client = new AWS.S3({ region, endpoint });
-const dir = 'stamp-3';
+const dir = 'stamp-5';
 
 export async function streamToBuffer(stream: Readable) {
   return await new Promise((resolve, reject) => {
@@ -18,6 +18,8 @@ export async function streamToBuffer(stream: Readable) {
 }
 
 export async function set(key, value) {
+  if (!client) throw new Error('AWS cache not initialized');
+
   try {
     const command = new AWS.PutObjectCommand({
       Bucket: bucket,
@@ -34,6 +36,8 @@ export async function set(key, value) {
 }
 
 export async function clear(path) {
+  if (!client) throw new Error('AWS cache not initialized');
+
   try {
     const listedObjects = await client.listObjectsV2({
       Bucket: bucket,
