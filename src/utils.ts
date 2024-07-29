@@ -175,3 +175,7 @@ export function graphQlCall(
     }
   });
 }
+
+export function removeFalsyValues(obj: Record<string, any>) {
+  return Object.fromEntries(Object.entries(obj).filter(Boolean));
+}

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getUrl, resize } from '../utils';
+import { getUrl, removeFalsyValues, resize } from '../utils';
 import { max } from '../constants.json';
 import { fetchHttpImage, axiosDefaultParams } from './utils';
 
@@ -15,7 +15,7 @@ export default async function resolve(key) {
         data: {
           query: `query { space(id: "${key}") { avatar } }`
         },
-        headers: Object.fromEntries(Object.entries(headers).filter(Boolean)),
+        headers: removeFalsyValues(headers),
         ...axiosDefaultParams
       })
     ).data.data.space;

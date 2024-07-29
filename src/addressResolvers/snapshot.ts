@@ -1,5 +1,5 @@
 import { capture } from '@snapshot-labs/snapshot-sentry';
-import { Address, graphQlCall, Handle } from '../utils';
+import { Address, graphQlCall, Handle, removeFalsyValues } from '../utils';
 import { FetchError, isSilencedError } from './utils';
 
 const HUB_URL = process.env.HUB_URL ?? 'https://hub.snapshot.org';
@@ -21,7 +21,7 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
         }
       }`,
       {
-        headers: Object.fromEntries(Object.entries(headers).filter(Boolean))
+        headers: removeFalsyValues(headers)
       }
     );
     return Object.fromEntries(users.filter(user => user.name).map(user => [user.id, user.name]));

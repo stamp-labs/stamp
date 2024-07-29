@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getUrl, resize } from '../utils';
+import { getUrl, removeFalsyValues, resize } from '../utils';
 import { max } from '../constants.json';
 import { fetchHttpImage, axiosDefaultParams } from './utils';
 
@@ -16,7 +16,7 @@ function createPropertyResolver(property: 'avatar' | 'cover') {
           data: {
             query: `query { user(id: "${address}") { ${property} } }`
           },
-          headers: Object.fromEntries(Object.entries(headers).filter(Boolean)),
+          headers: removeFalsyValues(headers),
           ...axiosDefaultParams
         })
       ).data.data.user;
