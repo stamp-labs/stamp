@@ -19,8 +19,14 @@ async function purge(): Promise<void> {
 
 describe('E2E api', () => {
   describe('GET type/TYPE/ID', () => {
-    it('returns a 400 status on invalid resolver', async () => {
+    it('returns a 400 status on invalid type', async () => {
       const makeInvalidRequest = async () => await axios.get(`${HOST}/invalid/0x123`);
+
+      expect(makeInvalidRequest()).rejects.toThrowError(/status code 400/);
+    });
+
+    it('returns a 400 status on invalid resolver', async () => {
+      const makeInvalidRequest = async () => await axios.get(`${HOST}/avatar/0x123=?resolver=invalid`);
 
       expect(makeInvalidRequest()).rejects.toThrowError(/status code 400/);
     });
