@@ -3,6 +3,12 @@ import { getCache, setCache } from '../../../src/addressResolvers/cache';
 import redis from '../../../src/helpers/redis';
 import randomAddresses from '../../fixtures/addresses';
 
+function purge() {
+  if (!redis) return;
+
+  return redis.flushDb();
+}
+
 describe('addressResolvers', () => {
   describe('lookupAddresses()', () => {
     describe('when passing more than 50 addresses', () => {
@@ -24,7 +30,7 @@ describe('addressResolvers', () => {
 
     describe('when not cached', () => {
       beforeEach(async () => {
-        await redis.flushDb();
+        await purge();
       });
 
       it('should return the ENS handle first if associated to multiple resolvers', () => {
@@ -63,7 +69,7 @@ describe('addressResolvers', () => {
 
     describe('when cached', () => {
       beforeEach(async () => {
-        await redis.flushDb();
+        await purge();
       });
 
       it('should cache the results', async () => {
@@ -120,7 +126,7 @@ describe('addressResolvers', () => {
 
     describe('when not cached', () => {
       beforeEach(async () => {
-        await redis.flushDb();
+        await purge();
       });
 
       it('should return the address associated to the handle', () => {
@@ -148,7 +154,7 @@ describe('addressResolvers', () => {
 
     describe('when cached', () => {
       beforeEach(async () => {
-        await redis.flushDb();
+        await purge();
       });
 
       it('should cache the results', async () => {
