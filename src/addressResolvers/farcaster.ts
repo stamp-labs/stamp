@@ -1,7 +1,8 @@
 import { capture } from '@snapshot-labs/snapshot-sentry';
-import { Address, Handle, FetchError, isSilencedError, isEvmAddress } from './utils';
+import { FetchError, isSilencedError, isEvmAddress } from './utils';
 import { getAddress } from '@ethersproject/address';
 import fetch from 'node-fetch';
+import { Address, Handle } from '../utils';
 
 export const NAME = 'Farcaster';
 const FNAMES_API_URL = 'https://fnames.farcaster.xyz/transfers?name=';
