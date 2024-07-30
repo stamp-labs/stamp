@@ -29,6 +29,12 @@ interface UserResult {
   pfp_url?: string;
 }
 
+function printInTestEnv(e: Error) {
+  if (process.env.NODE_ENV === 'test') {
+    console.error('Test fail reason:', e);
+  }
+}
+
 async function fetchData<T>(url: string): Promise<T> {
   const headers = {
     Accept: 'application/json',
@@ -39,6 +45,7 @@ async function fetchData<T>(url: string): Promise<T> {
     const e = new FetchError(`Failed to fetch data from the API. Status: ${response.status}`);
     if (!isSilencedError(e)) {
       capture(e, { tags: { issue: 'api_fetch_failure' } });
+      printInTestEnv(e);
     }
     throw e;
   }
@@ -75,6 +82,7 @@ async function getUserDetails(username: Handle): Promise<{ users: UserDetails[] 
 function handleUserDetailsError(e: any, username: Handle): void {
   if (!isSilencedError(e)) {
     capture(e, { input: { username }, tags: { issue: 'fetch_user_details_failure' } });
+    printInTestEnv(e);
   }
   throw new FetchError(`Error fetching user details for ${username}.`);
 }
@@ -112,6 +120,7 @@ function processUserDetails(userDetails: ApiResponse, results: { [key: Handle]: 
 function handleLookupError(e: any, addresses: Address[]): void {
   if (!isSilencedError(e)) {
     capture(e, { input: { addresses }, tags: { issue: 'lookup_addresses_failure' } });
+    printInTestEnv(e);
   }
   throw new FetchError('No user found for this address.');
 }
