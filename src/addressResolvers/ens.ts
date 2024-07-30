@@ -2,15 +2,9 @@ import { getAddress } from '@ethersproject/address';
 import snapshot from '@snapshot-labs/snapshot.js';
 import { capture } from '@snapshot-labs/snapshot-sentry';
 import { ens_normalize } from '@adraffy/ens-normalize';
-import {
-  provider as getProvider,
-  graphQlCall,
-  Address,
-  Handle,
-  isSilencedError,
-  FetchError,
-  isEvmAddress
-} from './utils';
+import { provider as getProvider, isSilencedError, FetchError, isEvmAddress } from './utils';
+import { Address, graphQlCall, Handle } from '../utils';
+import constants from '../constants.json';
 
 export const NAME = 'Ens';
 const NETWORK = '1';
@@ -73,7 +67,7 @@ export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Ad
         data: { domains: items }
       }
     } = await graphQlCall(
-      'https://api.thegraph.com/subgraphs/name/ensdomains/ens',
+      constants.ensSubgraph[NETWORK],
       `query Domains {
         domains(where: {name_in: ["${normalizedHandles.join('","')}"]}) {
           name

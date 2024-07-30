@@ -1,25 +1,31 @@
 import express from 'express';
 import { capture } from '@snapshot-labs/snapshot-sentry';
-import { parseQuery, resize, setHeader, getCacheKey } from './utils';
+import { parseQuery, resize, setHeader, getCacheKey, ResolverType } from './utils';
 import { set, get, streamToBuffer, clear } from './aws';
 import resolvers from './resolvers';
 import constants from './constants.json';
 import { rpcError, rpcSuccess } from './helpers/utils';
-import { lookupAddresses, resolveNames } from './addressResolvers';
+import { lookupAddresses, resolveNames, clearCache } from './addressResolvers';
+import lookupDomains from './lookupDomains';
 
 const router = express.Router();
-const TYPE_CONSTRAINTS = Object.keys(constants.resolvers).join('|');
+const TYPE_CONSTRAINTS = [...Object.keys(constants.resolvers), 'address', 'name'].join('|');
 
 router.post('/', async (req, res) => {
   const { id = null, method, params } = req.body;
   if (!method) return rpcError(res, 400, 'missing method', id);
   try {
     let result: any = {};
-    if (!Array.isArray(params)) return rpcError(res, 400, 'params must be an array of string', id);
 
-    if (method === 'lookup_addresses') result = await lookupAddresses(params);
-    else if (method === 'resolve_names') result = await resolveNames(params);
-    else return rpcError(res, 400, 'invalid method', id);
+    if (method === 'lookup_domains') {
+      result = await lookupDomains(params, req.body.network);
+    } else if (['lookup_addresses', 'resolve_names'].includes(method)) {
+      if (!Array.isArray(params))
+        return rpcError(res, 400, 'params must be an array of string', id);
+
+      if (method === 'lookup_addresses') result = await lookupAddresses(params);
+      else result = await resolveNames(params);
+    } else return rpcError(res, 400, 'invalid method', id);
 
     if (result?.error) return rpcError(res, result.code || 500, result.error, id);
     return rpcSuccess(res, result, id);
@@ -31,15 +37,22 @@ router.post('/', async (req, res) => {
 });
 
 router.get(`/clear/:type(${TYPE_CONSTRAINTS})/:id`, async (req, res) => {
-  const { type, id } = req.params;
+  const { type, id } = req.params as { type: ResolverType; id: string };
+
   try {
-    const { address, network, w, h, fallback, cb } = await parseQuery(id, type, {
-      s: constants.max,
-      fb: req.query.fb,
-      cb: req.query.cb
-    });
-    const key = getCacheKey({ type, network, address, w, h, fallback, cb });
-    const result = await clear(key);
+    let result = false;
+
+    if (type === 'address' || type === 'name') {
+      result = await clearCache(id);
+    } else {
+      const { address, network, w, h, fallback, cb } = await parseQuery(id, type, {
+        s: constants.max,
+        fb: req.query.fb,
+        cb: req.query.cb
+      });
+      const key = getCacheKey({ type, network, address, w, h, fallback, cb });
+      result = await clear(key);
+    }
     res.status(result ? 200 : 404).json({ status: result ? 'ok' : 'not found' });
   } catch (e) {
     capture(e);
@@ -48,14 +61,16 @@ router.get(`/clear/:type(${TYPE_CONSTRAINTS})/:id`, async (req, res) => {
 });
 
 router.get(`/:type(${TYPE_CONSTRAINTS})/:id`, async (req, res) => {
-  const { type, id } = req.params;
-  let address, network, w, h, fallback, cb;
+  const { type, id } = req.params as { type: ResolverType; id: string };
+  let address, network, w, h, fallback, cb, resolver;
 
   try {
-    ({ address, network, w, h, fallback, cb } = await parseQuery(id, type, req.query));
+    ({ address, network, w, h, fallback, cb, resolver } = await parseQuery(id, type, req.query));
   } catch (e) {
     return res.status(500).json({ status: 'error', error: 'failed to load content' });
   }
+
+  const disableCache = !!resolver;
 
   const key1 = getCacheKey({
     type,
@@ -70,7 +85,7 @@ router.get(`/:type(${TYPE_CONSTRAINTS})/:id`, async (req, res) => {
 
   // Check resized cache
   const cache = await get(`${key1}/${key2}`);
-  if (cache) {
+  if (cache && !disableCache) {
     // console.log('Got cache', address);
     setHeader(res);
     return cache.pipe(res);
@@ -90,9 +105,18 @@ router.get(`/:type(${TYPE_CONSTRAINTS})/:id`, async (req, res) => {
     if (type === 'space') currentResolvers = constants.resolvers.space;
     if (type === 'space-sx') currentResolvers = constants.resolvers['space-sx'];
     if (type === 'space-cover-sx') currentResolvers = constants.resolvers['space-cover-sx'];
+    if (type === 'user-cover') currentResolvers = constants.resolvers['user-cover'];
+
+    if (resolver) {
+      if (!currentResolvers.includes(resolver)) {
+        return res.status(500).json({ status: 'error', error: 'invalid resolvers' });
+      }
+
+      currentResolvers = [resolver];
+    }
 
     const files = await Promise.all(currentResolvers.map(r => resolvers[r](address, network)));
-    baseImage = [...files].reverse().find(file => !!file);
+    baseImage = files.find(Boolean);
 
     if (!baseImage) {
       const fallbackImage = await resolvers[fallback](address, network);
@@ -107,6 +131,8 @@ router.get(`/:type(${TYPE_CONSTRAINTS})/:id`, async (req, res) => {
   const resizedImage = await resize(baseImage, w, h);
   setHeader(res);
   res.send(resizedImage);
+
+  if (disableCache) return;
 
   // Store cache
   try {

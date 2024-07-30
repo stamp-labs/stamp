@@ -1,56 +1,62 @@
-import axios from 'axios';
+import fetch from 'node-fetch';
+import { Provider, RpcProvider } from 'starknet';
 import { getUrl, resize } from '../utils';
 import { max } from '../constants.json';
-import { fetchHttpImage, axiosDefaultParams } from './utils';
+import { fetchHttpImage } from './utils';
 
-async function getImageFromDomain(domain: string): Promise<string> {
-  const res = await axios.get(
-    `https://api.starknet.id/domain_to_data?domain=${domain}`,
-    axiosDefaultParams
-  );
-  return res.data.img_url;
-}
+const DEFAULT_IMG_URL = 'https://starknet.id/api/identicons/0';
 
-async function getImageFromAddress(address: string): Promise<string> {
-  const tokenIdRes = await axios.get(
-    `https://api.starknet.id/addr_to_token_id?addr=${address}`,
-    axiosDefaultParams
-  );
-  const tokenId = tokenIdRes.data.token_id;
-
-  if (tokenId) {
-    const res = await axios.get(
-      `https://api.starknet.id/id_to_data?id=${tokenId}`,
-      axiosDefaultParams
-    );
-    return res.data.img_url;
-  }
-
-  throw new Error('No image found for starknet address');
-}
-
-function isStarknetAddress(address: string): boolean {
-  return /^0x[a-f0-9]{64}$/i.test(address);
-}
+const provider = new Provider(
+  new RpcProvider({
+    nodeUrl: process.env.INFURA_API_KEY
+      ? `https://starknet-mainnet.infura.io/v3/${process.env.INFURA_API_KEY}`
+      : 'https://starknet-mainnet.public.blastapi.io'
+  })
+);
 
 function isStarknetDomain(domain: string): boolean {
   return domain.endsWith('.stark');
 }
 
+function normalizeAddress(address: string): string {
+  if (!address.match(/^(0x)?[0-9a-fA-F]{64}$/)) throw new Error('Invalid starknet address');
+
+  return address;
+}
+
+async function getStarknetAddress(domain: string): Promise<string | null> {
+  const address = await provider.getAddressFromStarkName(domain);
+
+  return address === '0x0' ? null : address;
+}
+
+async function getImage(domainOrAddress: string): Promise<string | null> {
+  const address = isStarknetDomain(domainOrAddress)
+    ? await getStarknetAddress(domainOrAddress)
+    : normalizeAddress(domainOrAddress);
+
+  if (!address) return null;
+
+  return (await provider.getStarkProfile(address))?.profilePicture ?? null;
+}
+
 export default async function resolve(domainOrAddress: string) {
   try {
-    let img_url: string | null = null;
-    if (isStarknetDomain(domainOrAddress)) {
-      img_url = await getImageFromDomain(domainOrAddress);
-    } else if (isStarknetAddress(domainOrAddress)) {
-      img_url = await getImageFromAddress(domainOrAddress);
+    let img_url = await getImage(domainOrAddress);
+
+    if (img_url === DEFAULT_IMG_URL) return false;
+
+    if (img_url?.startsWith('https://api.starkurabu.com')) {
+      const response = await fetch(img_url);
+      const data = await response.json();
+
+      img_url = data.image;
     }
 
-    if (!img_url) {
-      throw new Error('No starknet image found');
-    }
+    if (!img_url) return false;
 
     const input = await fetchHttpImage(getUrl(img_url));
+
     return await resize(input, max, max);
   } catch (e) {
     return false;

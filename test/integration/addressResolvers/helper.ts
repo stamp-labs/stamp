@@ -33,27 +33,31 @@ export default function testAddressResolver({
     });
 
     describe('resolveNames()', () => {
-      describe('when the domain is associated to an address', () => {
-        it('returns an address', () => {
-          return expect(resolveNames([validDomain])).resolves.toEqual({
-            [validDomain]: validAddress
-          });
-        }, 10e3);
-      });
+      if (!resolveNames) {
+        it.todo('missing tests for resolveNames()');
+      } else {
+        describe('when the domain is associated to an address', () => {
+          it('returns an address', () => {
+            return expect(resolveNames([validDomain])).resolves.toEqual({
+              [validDomain]: validAddress
+            });
+          }, 10e3);
+        });
 
-      describe('when the domain is not associated to an address', () => {
-        it('returns undefined', () => {
-          return expect(resolveNames(['test.snapshotdomain'])).resolves.toEqual({});
-        }, 10e3);
-      });
+        describe('when the domain is not associated to an address', () => {
+          it('returns undefined', () => {
+            return expect(resolveNames(['test.snapshotdomain'])).resolves.toEqual({});
+          }, 10e3);
+        });
 
-      describe('when mix of domains with and without associated address', () => {
-        it('returns an object with only handles associated to an address', () => {
-          return expect(resolveNames([...invalidDomains, validDomain])).resolves.toEqual({
-            [validDomain]: validAddress
-          });
-        }, 10e3);
-      });
+        describe('when mix of domains with and without associated address', () => {
+          it('returns an object with only handles associated to an address', () => {
+            return expect(resolveNames([...invalidDomains, validDomain])).resolves.toEqual({
+              [validDomain]: validAddress
+            });
+          }, 10e3);
+        });
+      }
     });
   });
 }

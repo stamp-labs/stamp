@@ -3,13 +3,12 @@ import Resolution, { NamingServiceName } from '@unstoppabledomains/resolution';
 import { capture } from '@snapshot-labs/snapshot-sentry';
 import {
   provider as getProvider,
-  Address,
-  Handle,
   withoutEmptyValues,
   isSilencedError,
   FetchError,
   isEvmAddress
 } from './utils';
+import { Address, Handle } from '../utils';
 
 export const NAME = 'Unstoppable Domains';
 const NETWORK = '137';

@@ -3,12 +3,13 @@ import { getCache, setCache } from '../../../src/addressResolvers/cache';
 import redis from '../../../src/helpers/redis';
 import randomAddresses from '../../fixtures/addresses';
 
-describe('addressResolvers', () => {
-  afterAll(async () => {
-    await redis.flushDb();
-    await redis.quit();
-  });
+function purge() {
+  if (!redis) return;
 
+  return redis.flushDb();
+}
+
+describe('addressResolvers', () => {
   describe('lookupAddresses()', () => {
     describe('when passing more than 50 addresses', () => {
       it('rejects with an error', async () => {
@@ -23,20 +24,20 @@ describe('addressResolvers', () => {
       it('should ignore the invalid address', () => {
         expect(
           lookupAddresses(['test', '0xeF8305E140ac520225DAf050e2f71d5fBcC543e7'])
-        ).resolves.toEqual({ '0xeF8305E140ac520225DAf050e2f71d5fBcC543e7': 'fabien.eth' });
+        ).resolves.toEqual({ '0xeF8305E140ac520225DAf050e2f71d5fBcC543e7': 'Fabien' });
       });
     });
 
     describe('when not cached', () => {
       beforeEach(async () => {
-        await redis.flushDb();
+        await purge();
       });
 
       it('should return the ENS handle first if associated to multiple resolvers', () => {
         return expect(
           lookupAddresses(['0xeF8305E140ac520225DAf050e2f71d5fBcC543e7'])
         ).resolves.toEqual({
-          '0xeF8305E140ac520225DAf050e2f71d5fBcC543e7': 'fabien.eth'
+          '0xeF8305E140ac520225DAf050e2f71d5fBcC543e7': 'Fabien'
         });
       }, 10e3);
 
@@ -47,7 +48,7 @@ describe('addressResolvers', () => {
             '0x0C67A201b93cf58D4a5e8D4E970093f0FB4bb0D1'
           ])
         ).resolves.toEqual({
-          '0xeF8305E140ac520225DAf050e2f71d5fBcC543e7': 'fabien.eth'
+          '0xeF8305E140ac520225DAf050e2f71d5fBcC543e7': 'Fabien'
         });
       }, 10e3);
 
@@ -59,16 +60,16 @@ describe('addressResolvers', () => {
             '0xef8305e140ac520225daf050e2f71d5fbcc543e7'
           ])
         ).resolves.toEqual({
-          '0xeF8305E140ac520225DAf050e2f71d5fBcC543e7': 'fabien.eth',
-          '0xEF8305E140AC520225DAF050E2F71D5FBCC543E7': 'fabien.eth',
-          '0xef8305e140ac520225daf050e2f71d5fbcc543e7': 'fabien.eth'
+          '0xeF8305E140ac520225DAf050e2f71d5fBcC543e7': 'Fabien',
+          '0xEF8305E140AC520225DAF050E2F71D5FBCC543E7': 'Fabien',
+          '0xef8305e140ac520225daf050e2f71d5fbcc543e7': 'Fabien'
         });
       }, 10e3);
     });
 
     describe('when cached', () => {
       beforeEach(async () => {
-        await redis.flushDb();
+        await purge();
       });
 
       it('should cache the results', async () => {
@@ -78,7 +79,7 @@ describe('addressResolvers', () => {
             '0x0C67A201b93cf58D4a5e8D4E970093f0FB4bb0D1'
           ])
         ).resolves.toEqual({
-          '0xeF8305E140ac520225DAf050e2f71d5fBcC543e7': 'fabien.eth'
+          '0xeF8305E140ac520225DAf050e2f71d5fBcC543e7': 'Fabien'
         });
 
         return expect(
@@ -87,7 +88,7 @@ describe('addressResolvers', () => {
             '0x0C67A201b93cf58D4a5e8D4E970093f0FB4bb0D1'
           ])
         ).resolves.toEqual({
-          '0xeF8305E140ac520225DAf050e2f71d5fBcC543e7': 'fabien.eth',
+          '0xeF8305E140ac520225DAf050e2f71d5fBcC543e7': 'Fabien',
           '0x0C67A201b93cf58D4a5e8D4E970093f0FB4bb0D1': ''
         });
       });
@@ -125,7 +126,7 @@ describe('addressResolvers', () => {
 
     describe('when not cached', () => {
       beforeEach(async () => {
-        await redis.flushDb();
+        await purge();
       });
 
       it('should return the address associated to the handle', () => {
@@ -153,7 +154,7 @@ describe('addressResolvers', () => {
 
     describe('when cached', () => {
       beforeEach(async () => {
-        await redis.flushDb();
+        await purge();
       });
 
       it('should cache the results', async () => {

@@ -3,18 +3,19 @@ import * as lensResolver from './lens';
 import * as unstoppableDomainResolver from './unstoppableDomains';
 import * as starknetResolver from './starknet';
 import * as farcasterResolver from './farcaster';
-import cache from './cache';
+import * as snapshotResolver from './snapshot';
+import cache, { clear } from './cache';
 import {
-  Address,
-  Handle,
   normalizeAddresses,
   normalizeHandles,
   withoutEmptyValues,
   mapOriginalInput
 } from './utils';
+import { Address, Handle } from '../utils';
 import { timeAddressResolverResponse as timeResponse } from '../helpers/metrics';
 
 const RESOLVERS = [
+  snapshotResolver,
   ensResolver,
   unstoppableDomainResolver,
   lensResolver,
@@ -80,4 +81,8 @@ export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Ad
   );
 
   return mapOriginalInput(handles, result);
+}
+
+export function clearCache(input: string): Promise<boolean> {
+  return clear(normalizeAddresses([input])[0]);
 }

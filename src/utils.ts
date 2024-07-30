@@ -1,9 +1,22 @@
-import { createHash } from 'crypto';
+import axios from 'axios';
 import sharp from 'sharp';
+import snapshot from '@snapshot-labs/snapshot.js';
+import { createHash } from 'crypto';
 import { Response } from 'express';
 import { StaticJsonRpcProvider } from '@ethersproject/providers';
-import snapshot from '@snapshot-labs/snapshot.js';
 import constants from './constants.json';
+
+export type Address = string;
+export type Handle = string;
+export type ResolverType =
+  | 'avatar'
+  | 'user-cover'
+  | 'token'
+  | 'space'
+  | 'space-sx'
+  | 'space-cover-sx'
+  | 'address'
+  | 'name';
 
 const providers: Record<string, StaticJsonRpcProvider> = {};
 
@@ -30,7 +43,7 @@ export function sha256(str) {
 export async function resize(input, w, h) {
   return sharp(input)
     .resize(w, h)
-    .webp({ lossless: true })
+    .webp()
     .toBuffer();
 }
 
@@ -44,7 +57,7 @@ export function shortNameToChainId(shortName: string) {
   return null;
 }
 
-export async function parseQuery(id, type, query) {
+export async function parseQuery(id: string, type: ResolverType, query) {
   let address = id;
   let network = '1';
 
@@ -67,7 +80,7 @@ export async function parseQuery(id, type, query) {
 
   address = address.toLowerCase();
   const size = 64;
-  const maxSize = type === 'space-cover-sx' ? 1500 : 500;
+  const maxSize = type.includes('-cover') ? constants.maxCover : constants.max;
   let s = query.s ? parseInt(query.s) : size;
   if (s < 1 || s > maxSize || isNaN(s)) s = size;
   let w = query.w ? parseInt(query.w) : s;
@@ -81,7 +94,8 @@ export async function parseQuery(id, type, query) {
     w,
     h,
     fallback: query.fb === 'jazzicon' ? 'jazzicon' : 'blockie',
-    cb: query.cb
+    cb: query.cb,
+    resolver: query.resolver
   };
 }
 
@@ -109,7 +123,7 @@ export function getCacheKey({
   fallback,
   cb
 }: {
-  type: string;
+  type: ResolverType;
   network: string;
   address: string;
   w: number;
@@ -140,3 +154,17 @@ export const getBaseAssetIconUrl = (chainId: string) => {
   }
   return 'https://static.cdnlogo.com/logos/e/81/ethereum-eth.svg';
 };
+
+export function graphQlCall(url: string, query: string) {
+  return axios({
+    url: url,
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    timeout: 5e3,
+    data: {
+      query
+    }
+  });
+}
