@@ -20,6 +20,7 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
         }
       }`
     );
+
     return Object.fromEntries(users.filter(user => user.name).map(user => [user.id, user.name]));
   } catch (e) {
     if (!isSilencedError(e)) {
