@@ -13,7 +13,10 @@ function createPropertyResolver(property: 'avatar' | 'cover') {
         }
       } = await graphQlCall(
         `${HUB_URL}/graphql`,
-        `query { user(id: "${address}") { ${property} } }`
+        `query { user(id: "${address}") { ${property} } }`,
+        {
+          headers: { 'x-api-key': process.env.HUB_API_KEY }
+        }
       );
 
       if (!user?.[property]) return false;
