@@ -7,7 +7,6 @@ const HUB_URL = process.env.HUB_URL ?? 'https://hub.snapshot.org';
 function createPropertyResolver(property: 'avatar' | 'cover') {
   return async (address: string) => {
     try {
-      const headers = { 'x-api-key': process.env.HUB_API_KEY };
       const {
         data: {
           data: { user }
@@ -16,7 +15,7 @@ function createPropertyResolver(property: 'avatar' | 'cover') {
         `${HUB_URL}/graphql`,
         `query { user(id: "${address}") { ${property} } }`,
         {
-          headers
+          headers: { 'x-api-key': process.env.HUB_API_KEY }
         }
       );
 

@@ -7,7 +7,6 @@ export const NAME = 'Snapshot';
 
 export async function lookupAddresses(addresses: Address[]): Promise<Record<Address, Handle>> {
   try {
-    const headers = { 'x-api-key': process.env.HUB_API_KEY ?? '' };
     const {
       data: {
         data: { users }
@@ -21,7 +20,7 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
         }
       }`,
       {
-        headers
+        headers: { 'x-api-key': process.env.HUB_API_KEY }
       }
     );
 

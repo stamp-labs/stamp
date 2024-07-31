@@ -6,13 +6,12 @@ const HUB_URL = process.env.HUB_URL || 'https://hub.snapshot.org';
 
 export default async function resolve(key) {
   try {
-    const headers = { 'x-api-key': process.env.HUB_API_KEY ?? undefined };
     const {
       data: {
         data: { space }
       }
     } = await graphQlCall(`${HUB_URL}/graphql`, `query { space(id: "${key}") { avatar } }`, {
-      headers
+      headers: { 'x-api-key': process.env.HUB_API_KEY }
     });
 
     if (!space || !space.avatar) return false;
