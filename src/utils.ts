@@ -167,7 +167,9 @@ export function graphQlCall(
     method: 'post',
     headers: {
       'Content-Type': 'application/json',
-      ...options.headers
+      ...Object.fromEntries(
+        Object.entries(options.headers).filter(([, value]) => value !== undefined && value !== null)
+      )
     },
     timeout: 5e3,
     data: {
