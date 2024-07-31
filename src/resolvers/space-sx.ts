@@ -1,8 +1,7 @@
-import axios from 'axios';
 import { getAddress } from '@ethersproject/address';
-import { getUrl, resize } from '../utils';
+import { getUrl, graphQlCall, resize } from '../utils';
 import { max } from '../constants.json';
-import { fetchHttpImage, axiosDefaultParams } from './utils';
+import { fetchHttpImage } from './utils';
 import { isStarknetAddress } from '../addressResolvers/utils';
 
 const SUBGRAPH_URLS = [
@@ -21,25 +20,22 @@ async function getSpaceProperty(key: string, url: string, property: 'avatar' | '
     ids.push(getAddress(key));
   }
 
-  const data = await axios({
-    url,
-    method: 'POST',
+  const {
     data: {
-      query: `
-        query {
-          spaces(where: { id_in: [${ids.map(item => `"${item}"`).join(', ')}] }) {
-            metadata {
-              ${property}
-            }
-          }
-        }`
-    },
-    ...axiosDefaultParams
-  });
+      data: { spaces }
+    }
+  } = await graphQlCall(
+    url,
+    `query {
+      spaces(where: { id_in: [${ids.map(item => `"${item}"`).join(', ')}] }) {
+        metadata {
+          ${property}
+        }
+      }
+    }`
+  );
 
-  const result = data.data?.data?.spaces
-    ?.map(space => space.metadata?.[property])
-    .filter(Boolean)[0];
+  const result = spaces?.map(space => space.metadata?.[property]).filter(Boolean)[0];
 
   return result || Promise.reject(false);
 }
