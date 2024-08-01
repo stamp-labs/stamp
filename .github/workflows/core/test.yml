@@ -6,7 +6,7 @@ on:
       target:
         required: false
         type: string
-        default: '16'
+        default: '18'
       mysql_database_name:
         required: false
         type: string
