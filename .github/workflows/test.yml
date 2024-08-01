@@ -2,7 +2,7 @@ name: Test
 on: [push]
 jobs:
   test:
-    uses: snapshot-labs/actions/.github/workflows/test.yml@main
+    uses: ./.github/workflows/core/test.yml
     secrets: inherit
     with:
       redis: true
