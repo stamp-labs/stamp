@@ -18,8 +18,12 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
           id
           name
         }
-      }`
+      }`,
+      {
+        headers: { 'x-api-key': process.env.HUB_API_KEY }
+      }
     );
+
     return Object.fromEntries(users.filter(user => user.name).map(user => [user.id, user.name]));
   } catch (e) {
     if (!isSilencedError(e)) {

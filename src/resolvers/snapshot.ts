@@ -1,23 +1,23 @@
-import axios from 'axios';
-import { getUrl, resize } from '../utils';
+import { getUrl, graphQlCall, resize } from '../utils';
 import { max } from '../constants.json';
-import { fetchHttpImage, axiosDefaultParams } from './utils';
+import { fetchHttpImage } from './utils';
 
 const HUB_URL = process.env.HUB_URL ?? 'https://hub.snapshot.org';
 
 function createPropertyResolver(property: 'avatar' | 'cover') {
   return async (address: string) => {
     try {
-      const user = (
-        await axios({
-          url: `${HUB_URL}/graphql`,
-          method: 'post',
-          data: {
-            query: `query { user(id: "${address}") { ${property} } }`
-          },
-          ...axiosDefaultParams
-        })
-      ).data.data.user;
+      const {
+        data: {
+          data: { user }
+        }
+      } = await graphQlCall(
+        `${HUB_URL}/graphql`,
+        `query { user(id: "${address}") { ${property} } }`,
+        {
+          headers: { 'x-api-key': process.env.HUB_API_KEY }
+        }
+      );
 
       if (!user?.[property]) return false;
 
