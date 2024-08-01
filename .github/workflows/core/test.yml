@@ -7,13 +7,6 @@ on:
         required: false
         type: string
         default: '18'
-      mysql_database_name:
-        required: false
-        type: string
-      mysql_schema_path:
-        required: false
-        type: string
-        default: 'src/helpers/schema.sql'
       redis:
         required: false
         type: boolean
@@ -22,9 +15,6 @@ on:
         required: false
         type: string
         default: '7'
-      dotenv_vars:
-        required: false
-        type: string
 
 jobs:
   test:
@@ -39,15 +29,6 @@ jobs:
           node-version: ${{ inputs.target }}
           cache: 'yarn'
 
-      - name: Set up MySQL
-        if: ${{ inputs.mysql_database_name }}
-        run: |
-          sudo /etc/init.d/mysql start
-          mysql -e 'CREATE DATABASE ${{ inputs.mysql_database_name }};' -uroot -proot
-          mysql -uroot -proot ${{ inputs.mysql_database_name }} < ${{ inputs.mysql_schema_path }}
-          mysql -uroot -proot -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'root';"
-          mysql -uroot -proot -e "FLUSH PRIVILEGES;"
-
       - name: Setup Redis
         if: ${{ inputs.redis }}
         uses: supercharge/redis-github-action@1.7.0
@@ -58,8 +39,7 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: Setup test environment variables
-        if: ${{ inputs.dotenv_vars }}
-        run: echo -e "\n${{ inputs.dotenv_vars }}" >> test/.env.test
+        run: echo -e "\nNEYNAR_API_KEY=${{ secrets.NEYNAR_API_KEY }}" >> test/.env.test
 
       - name: Test
         run: yarn test
