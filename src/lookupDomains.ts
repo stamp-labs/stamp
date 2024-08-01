@@ -21,16 +21,14 @@ async function fetchDomainData(domain: Domain, chainId: string): Promise<Domain>
     data: { data }
   } = await graphQlCall(
     constants.ensSubgraph[chainId],
-    `
-      query Registration {
-        registration(id: "0x${hash}") {
-          domain {
-            name
-            labelName
-          }
+    `query Registration {
+      registration(id: "0x${hash}") {
+        domain {
+          name
+          labelName
         }
       }
-    `
+    }`
   );
   const labelName = data?.registration?.domain?.labelName;
 
@@ -53,8 +51,7 @@ export default async function lookupDomains(
       }
     } = await graphQlCall(
       constants.ensSubgraph[chainId],
-      `
-      query Domain {
+      `query Domain {
         account(id: "${address.toLowerCase()}") {
           domains {
             name
@@ -65,8 +62,7 @@ export default async function lookupDomains(
             expiryDate
           }
         }
-      }
-     `
+      }`
     );
 
     const now = (Date.now() / 1000).toFixed(0);

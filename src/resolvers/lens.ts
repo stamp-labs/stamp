@@ -1,8 +1,7 @@
-import axios from 'axios';
 import { getAddress, isAddress } from '@ethersproject/address';
-import { resize } from '../utils';
+import { graphQlCall, resize } from '../utils';
 import { max } from '../constants.json';
-import { fetchHttpImage, axiosDefaultParams } from './utils';
+import { fetchHttpImage } from './utils';
 
 const API_URL = 'https://api-v2.lens.dev';
 const LENS_IPFS_GATEWAY = 'https://gw.ipfs-lens.dev/ipfs/';
@@ -31,32 +30,32 @@ export default async function resolve(domainOrAddress: string) {
   }
 
   try {
-    const { data } = await axios({
-      url: `${API_URL}/graphql`,
-      method: 'post',
+    const {
       data: {
-        query: `
-            query Profile {
-              profiles(request: { where: ${request}, limit: Ten }) {
-                items {
-                  metadata {
-                    picture {
-                      ... on ImageSet {
-                        raw {
-                          uri
-                        }
-                      }
-                    }
+        data: {
+          profiles: { items }
+        }
+      }
+    } = await graphQlCall(
+      `${API_URL}/graphql`,
+      `query Profile {
+        profiles(request: { where: ${request}, limit: Ten }) {
+          items {
+            metadata {
+              picture {
+                ... on ImageSet {
+                  raw {
+                    uri
                   }
                 }
               }
             }
-          `
-      },
-      ...axiosDefaultParams
-    });
+          }
+        }
+      }`
+    );
 
-    const img_url = normalizeImageUrl(data.data.profiles.items?.[0]?.metadata?.picture?.raw?.uri);
+    const img_url = normalizeImageUrl(items?.[0]?.metadata?.picture?.raw?.uri);
     if (!img_url) return false;
 
     const input = await fetchHttpImage(img_url);
