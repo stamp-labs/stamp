@@ -8,7 +8,7 @@ assignees:
 body:
 
   - type: textarea
-    id: product-input
+    id: product-impact
     attributes:
       label: Product Impact
       description: How does this affect the product? Why is this important?
@@ -30,5 +30,5 @@ body:
   - type: markdown
     attributes:
       value: |
-      - [ ] What is the maximum time we want to spend on this?
-      - [ ] Is the scope clearly defined and aligned with that? Any tradeoffs?
+        - [ ] What is the maximum time we want to spend on this?
+        - [ ] Is the scope clearly defined and aligned with that? Any tradeoffs?
