@@ -22,16 +22,30 @@ body:
       label: Category
       description: What kind of changes are needed?
       options:
+        - label: Hotfix
         - label: Refactoring
         - label: Implementation
-        - label: Chores
+        - label: Infrastructure
+        - label: Chores/Documentation
+
+  - type: textarea
+    id: advance-information
+    attributes:
+      label: Advance Information
+      description: What do we know or need to, before starting the implementation?
+      placeholder: \"I did some research on...\" or \"I already did some prototyping on...\" or \"See \#1234\"
+    validations:
+      required: true
 
   - type: markdown
     attributes:
       value: |
         # Checklist
 
-        All these questions should have been answered, before moving to implementation:
-        
+        All these questions should be answered before moving to implementation. We don’t need a scientific thesis, but ensure that you have considered these questions thoroughly.
+
         - [ ] What is the maximum time we want to spend on this?
-        - [ ] Is the scope clearly defined and aligned with that? Any tradeoffs?
+        - [ ] Did we do some prototyping or browsing through the code to getting an idea of what expects?
+        - [ ] Is the scope clearly defined and aligned with that? What tradeoffs have been made?
+        - [ ] Do we have clear success/done criteria and have tests been discussed/drafted?
+        - [ ] Have all emerging subtasks been identified and clearly shaped as well?
