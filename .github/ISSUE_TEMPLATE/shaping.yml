@@ -33,7 +33,7 @@ body:
     attributes:
       label: Advance Information
       description: What do we know or need to, before starting the implementation?
-      placeholder: "See issue #123"
+      placeholder: "e.g.: See issue #123"
     validations:
       required: true
 
