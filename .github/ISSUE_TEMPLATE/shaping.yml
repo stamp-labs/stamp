@@ -11,7 +11,7 @@ body:
     id: product-impact
     attributes:
       label: Product Impact
-      description: "Very briefly: How does this affect the product? Why is this important?"
+      description: "Very briefly: How does this affect the product? Why is this important? Go to the Kanban board and look at the product column, if you aren't sure."
       placeholder: Better performance!
     validations:
       required: true
@@ -33,7 +33,7 @@ body:
     attributes:
       label: Advance Information
       description: What do we know or need to, before starting the implementation?
-      placeholder: \"I did some research on...\" or \"I already did some prototyping on...\" or \"See \#1234\"
+      placeholder: "See issue #123"
     validations:
       required: true
 
