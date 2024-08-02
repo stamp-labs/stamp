@@ -29,5 +29,9 @@ body:
   - type: markdown
     attributes:
       value: |
+        # Checklist
+
+        All these questions should have been answered, before moving to implementation:
+        
         - [ ] What is the maximum time we want to spend on this?
         - [ ] Is the scope clearly defined and aligned with that? Any tradeoffs?
