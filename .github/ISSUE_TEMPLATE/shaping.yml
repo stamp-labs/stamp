@@ -16,18 +16,18 @@ body:
     validations:
       required: true
 
-  - type: checkboxes
-    attributes:
-      label: Category
-      description: What kind of changes are needed?
-      options:
-        - label: Refactoring
-        - label: Implementation
-        - label: Chores
+  # - type: checkboxes
+  #   attributes:
+  #     label: Category
+  #     description: What kind of changes are needed?
+  #     options:
+  #       - label: Refactoring
+  #       - label: Implementation
+  #       - label: Chores
         
-  - type: markdown
-    label: Checklist
-    attributes:
-      value: |
-        - [ ] What is the maximum time we want to spend on this?
-        - [ ] Is the scope clearly defined and aligned with that? Any tradeoffs?
+  # - type: markdown
+  #   label: Checklist
+  #   attributes:
+  #     value: |
+  #       - [ ] What is the maximum time we want to spend on this?
+  #       - [ ] Is the scope clearly defined and aligned with that? Any tradeoffs?
