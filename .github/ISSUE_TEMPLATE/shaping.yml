@@ -12,7 +12,7 @@ body:
     attributes:
       label: Product Impact
       description: "Very briefly: How does this affect the product? Why is this important? Go to the Kanban board and look at the product column, if you aren't sure."
-      placeholder: Better performance!
+      placeholder: "e.g.: Better performance!"
     validations:
       required: true
 
@@ -29,10 +29,10 @@ body:
         - label: Chores/Documentation
 
   - type: textarea
-    id: advance-information
+    id: relevant-information
     attributes:
-      label: Advance Information
-      description: What do we know or need to, before starting the implementation?
+      label: Relevant Information
+      description: What do we know or need to, before starting the implementation? Share links, screenshots, or any other relevant resources.
       placeholder: "e.g.: See issue #123"
     validations:
       required: true
