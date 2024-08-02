@@ -11,7 +11,7 @@ body:
     id: product-impact
     attributes:
       label: Product Impact
-      description: How does this affect the product? Why is this important?
+      description: "Very briefly: How does this affect the product? Why is this important?"
       placeholder: Better performance!
     validations:
       required: true
