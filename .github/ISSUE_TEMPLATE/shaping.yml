@@ -1,0 +1,32 @@
+name: Feature Shaping
+description: Use this template to discuss implementation.
+title: "shape: "
+labels: ["shaping"]
+projects: ["mktcode/4"]
+assignees:
+  - mkcode
+body:
+
+  - type: markdown
+    attributes:
+      label: Product Impact
+      description: How does this affect the product? Why is this important?
+      placeholder: Better performance!
+    validations:
+      required: true
+
+  - type: checkboxes
+    attributes:
+      label: Category
+      description: What kind of changes are needed?
+      options:
+        - label: Refactoring
+        - label: Implementation
+        - label: Chores
+        
+  - type: markdown
+    attributes:
+      label: Checklist
+      value: |
+        - [ ] What is the maximum time we want to spend on this?
+        - [ ] Is the scope clearly defined and aligned with that? Any tradeoffs?
