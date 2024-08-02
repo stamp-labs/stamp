@@ -27,7 +27,7 @@ body:
         - label: Implementation
         - label: Chores
 
-- type: markdown
+  - type: markdown
     attributes:
       value: |
       - [ ] What is the maximum time we want to spend on this?
