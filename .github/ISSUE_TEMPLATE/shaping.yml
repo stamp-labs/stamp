@@ -42,7 +42,7 @@ body:
       value: |
         # Checklist
 
-        All these questions should be answered before moving to implementation. We don’t need a scientific thesis, but ensure that you have considered these questions thoroughly.
+        All these questions should be answered before moving on to implementation. We don’t need a scientific thesis, but ensure that you have considered these questions thoroughly.
 
         - [ ] What is the maximum time we want to spend on this?
         - [ ] Did we do some prototyping or browsing through the code to getting an idea of what expects?
