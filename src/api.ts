@@ -1,33 +1,23 @@
 import express from 'express';
 import { capture } from '@snapshot-labs/snapshot-sentry';
 import { parseQuery, resize, setHeader, getCacheKey, ResolverType } from './utils';
-import { set, get, streamToBuffer, clear } from './aws';
+import { set, get, streamToBuffer } from './aws';
 import resolvers from './resolvers';
 import constants from './constants.json';
 import { rpcError, rpcSuccess } from './helpers/utils';
-import { lookupAddresses, resolveNames, clearCache } from './addressResolvers';
+import { lookupAddresses, resolveNames } from './addressResolvers';
 import lookupDomains from './lookupDomains';
 
 const router = express.Router();
-const TYPE_CONSTRAINTS = [...Object.keys(constants.resolvers), 'address', 'name'].join('|');
+const RESOLVER_TYPE_CONSTRAINT = Object.keys(constants.resolvers).join('|');
 
-router.post('/', async (req, res) => {
-  const { id = null, method, params } = req.body;
-  if (!method) return rpcError(res, 400, 'missing method', id);
+router.post('/v2/lookup/domains', async (req, res) => {
+  const { id = null, address, network } = req.body;
+
+  if (!address || !network) return rpcError(res, 400, 'address and network are required', id);
+
   try {
-    let result: any = {};
-
-    if (method === 'lookup_domains') {
-      result = await lookupDomains(params, req.body.network);
-    } else if (['lookup_addresses', 'resolve_names'].includes(method)) {
-      if (!Array.isArray(params))
-        return rpcError(res, 400, 'params must be an array of string', id);
-
-      if (method === 'lookup_addresses') result = await lookupAddresses(params);
-      else result = await resolveNames(params);
-    } else return rpcError(res, 400, 'invalid method', id);
-
-    if (result?.error) return rpcError(res, result.code || 500, result.error, id);
+    const result = await lookupDomains(address, network);
     return rpcSuccess(res, result, id);
   } catch (e) {
     const err = e as any;
@@ -36,31 +26,37 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.get(`/clear/:type(${TYPE_CONSTRAINTS})/:id`, async (req, res) => {
-  const { type, id } = req.params as { type: ResolverType; id: string };
+router.post('/v2/lookup/addresses', async (req, res) => {
+  const { id = null, params } = req.body;
+
+  if (!Array.isArray(params)) return rpcError(res, 400, 'params must be an array of string', id);
 
   try {
-    let result = false;
-
-    if (type === 'address' || type === 'name') {
-      result = await clearCache(id);
-    } else {
-      const { address, network, w, h, fallback, cb } = await parseQuery(id, type, {
-        s: constants.max,
-        fb: req.query.fb,
-        cb: req.query.cb
-      });
-      const key = getCacheKey({ type, network, address, w, h, fallback, cb });
-      result = await clear(key);
-    }
-    res.status(result ? 200 : 404).json({ status: result ? 'ok' : 'not found' });
+    const result = await lookupAddresses(params);
+    return rpcSuccess(res, result, id);
   } catch (e) {
-    capture(e);
-    res.status(500).json({ status: 'error', error: 'failed to clear cache' });
+    const err = e as any;
+    capture(err.error ? new Error(err.error) : err);
+    return rpcError(res, 500, e, id);
   }
 });
 
-router.get(`/:type(${TYPE_CONSTRAINTS})/:id`, async (req, res) => {
+router.post('/v2/resolve/names', async (req, res) => {
+  const { id = null, params } = req.body;
+
+  if (!Array.isArray(params)) return rpcError(res, 400, 'params must be an array of string', id);
+
+  try {
+    const result = await resolveNames(params);
+    return rpcSuccess(res, result, id);
+  } catch (e) {
+    const err = e as any;
+    capture(err.error ? new Error(err.error) : err);
+    return rpcError(res, 500, e, id);
+  }
+});
+
+router.get(`/:type(${RESOLVER_TYPE_CONSTRAINT})/:id`, async (req, res) => {
   const { type, id } = req.params as { type: ResolverType; id: string };
   let address, network, w, h, fallback, cb, resolver;
 
