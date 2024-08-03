@@ -18,7 +18,7 @@ describe('resolving images', () => {
     expect(makeInvalidRequest()).rejects.toThrowError(/status code 400/);
   });
 
-  describe.each([['avatar'], ['token']])('returns %i image', type => {
+  describe.each([['avatar'], ['token']])('returns %s image', type => {
     describe('with headers', () => {
       describe('indicating a fallback was used because', () => {
         it('it was the first request ever for this identifier', async () => {

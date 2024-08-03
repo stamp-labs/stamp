@@ -43,5 +43,5 @@ export function expectHeader(response: AxiosResponse, key: string, value: string
 }
 
 export function getImageResponse(type: string, identifier: string) {
-  return axios.get(`${HOST}/${type}${identifier}`, { responseType: 'arraybuffer' });
+  return axios.get(`${HOST}/${type}/${identifier}`, { responseType: 'arraybuffer' });
 }
