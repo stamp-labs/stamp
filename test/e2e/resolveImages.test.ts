@@ -11,6 +11,49 @@ import {
   expectHeader
 } from './helpers';
 
+const typeTests = [
+  {
+    type: 'avatar',
+    fallbackCases: [
+      {
+        title: 'it was the first request ever for this identifier',
+        identifier: RANDOM_ETH_ADDRESS,
+        fallbackReason: FALLBACK_REASONS.notCached
+      },
+      {
+        title: 'the identifier format is unknown',
+        identifier: UNKNOWN_ID_FORMAT,
+        fallbackReason: FALLBACK_REASONS.unknownIdentifierFormat
+      },
+      {
+        title: 'no image was found for the identifier',
+        identifier: RANDOM_ETH_ADDRESS,
+        fallbackReason: FALLBACK_REASONS.noImageFound
+      }
+    ]
+  },
+  {
+    type: 'token',
+    fallbackCases: [
+      {
+        title: 'it was the first request ever for this identifier',
+        identifier: RANDOM_ETH_ADDRESS,
+        fallbackReason: FALLBACK_REASONS.notCached
+      },
+      {
+        title: 'the identifier format is unknown',
+        identifier: UNKNOWN_ID_FORMAT,
+        fallbackReason: FALLBACK_REASONS.unknownIdentifierFormat
+      },
+      {
+        title: 'no image was found for the identifier',
+        identifier: RANDOM_ETH_ADDRESS,
+        fallbackReason: FALLBACK_REASONS.noImageFound
+      }
+    ]
+  }
+];
+
 describe('resolving images', () => {
   it('returns a Bad Request response for an invalid type', async () => {
     const makeInvalidRequest = async () => await axios.get(`${HOST}/invalid_type/0x123`);
@@ -18,9 +61,9 @@ describe('resolving images', () => {
     expect(makeInvalidRequest()).rejects.toThrowError(/status code 400/);
   });
 
-  describe.each([['avatar'], ['token']])('returns %s image', type => {
+  describe.each(typeTests)('returns %s image', ({ type, fallbackCases }) => {
     it('of default size', async () => {
-      const response = await getImageResponse(type, `${RANDOM_ETH_ADDRESS}`);
+      const response = await getImageResponse(type, RANDOM_ETH_ADDRESS);
 
       await expectImageResponse(response, DEFAULT_SIZE);
     });
@@ -37,26 +80,10 @@ describe('resolving images', () => {
         expectHeader(response, `x-${type}-source-url`, 'https://api.ens.domains/0x123.png');
       });
       describe('indicating a fallback was used because', () => {
-        it('it was the first request ever for this identifier', async () => {
-          const response = await getImageResponse(type, RANDOM_ETH_ADDRESS);
+        it.each(fallbackCases)('%s', async ({ identifier, fallbackReason }) => {
+          const response = await getImageResponse(type, identifier);
 
-          expectHeader(response, `x-${type}-fallback-reason`, FALLBACK_REASONS.notCached);
-        });
-
-        it('the identifier format is unknown', async () => {
-          const response = await getImageResponse(type, UNKNOWN_ID_FORMAT);
-
-          expectHeader(
-            response,
-            `x-${type}-fallback-reason`,
-            FALLBACK_REASONS.unknownIdentifierFormat
-          );
-        });
-        it('no image was found for the identifier', async () => {
-          const response = await getImageResponse(type, RANDOM_ETH_ADDRESS);
-
-          await expectImageResponse(response, DEFAULT_SIZE);
-          expectHeader(response, `x-${type}-fallback-reason`, FALLBACK_REASONS.noImageFound);
+          expectHeader(response, `x-${type}-fallback-reason`, fallbackReason);
         });
       });
       it('containing timestamp and ttl of the image', async () => {
