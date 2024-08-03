@@ -1,20 +1,14 @@
 import axios from 'axios';
 import {
   HOST,
-  UNKNOWN_AVATAR_ID_FORMAT,
+  UNKNOWN_ID_FORMAT,
   DEFAULT_SIZE,
-  DEFAULT_AVATAR_FALLBACK_TYPE,
-  DEFAULT_TOKEN_FALLBACK_TYPE,
   FALLBACK_REASONS,
   RANDOM_ETH_ADDRESS,
-  AVATAR_ID,
   RESIZE_SIZE,
-  TOKEN_ID,
-  expectHeaders,
   expectImageResponse,
-  getAvatarResponse,
-  getTokenResponse,
-  UNKNOWN_TOKEN_ID_FORMAT
+  getImageResponse,
+  expectHeader
 } from './helpers';
 
 describe('resolving images', () => {
@@ -24,63 +18,47 @@ describe('resolving images', () => {
     expect(makeInvalidRequest()).rejects.toThrowError(/status code 400/);
   });
 
-  describe('returns an avatar image', () => {
+  describe.each([['avatar'], ['token']])('returns %i image', type => {
     describe('with headers', () => {
-      describe('indicating a fallback was used ', () => {
-        it('because of an unknown identifier format', async () => {
-          const response = await getAvatarResponse(UNKNOWN_AVATAR_ID_FORMAT);
+      describe('indicating a fallback was used because', () => {
+        it('it was the first request ever for this identifier', async () => {
+          const response = await getImageResponse(type, RANDOM_ETH_ADDRESS);
 
           await expectImageResponse(response, DEFAULT_SIZE);
-          expectHeaders(response, {
-            'x-avatar-fallback-type': DEFAULT_AVATAR_FALLBACK_TYPE,
-            'x-avatar-fallback-reason': FALLBACK_REASONS.unknownIdentifierFormat
-          });
+          expectHeader(response, `x-${type}-fallback-reason`, FALLBACK_REASONS.notCached);
         });
-        it('because no image was found', async () => {
-          const response = await getAvatarResponse(RANDOM_ETH_ADDRESS);
+
+        it('the identifier format is unknown', async () => {
+          const response = await getImageResponse(type, UNKNOWN_ID_FORMAT);
 
           await expectImageResponse(response, DEFAULT_SIZE);
-          expectHeaders(response, {
-            'x-avatar-fallback-type': DEFAULT_AVATAR_FALLBACK_TYPE,
-            'x-avatar-fallback-reason': FALLBACK_REASONS.noImageFound
-          });
+          expectHeader(
+            response,
+            `x-${type}-fallback-reason`,
+            FALLBACK_REASONS.unknownIdentifierFormat
+          );
+        });
+        it('no image was found for the identifier', async () => {
+          const response = await getImageResponse(type, RANDOM_ETH_ADDRESS);
+
+          await expectImageResponse(response, DEFAULT_SIZE);
+          expectHeader(response, `x-${type}-fallback-reason`, FALLBACK_REASONS.noImageFound);
         });
       });
-      it.todo('containing timestamp and ttl of the avatar');
-    });
-    it('of custom size', async () => {
-      const response = await getAvatarResponse(`${AVATAR_ID}?s=${RESIZE_SIZE}`);
+      it('containing timestamp and ttl of the image', async () => {
+        const response = await getImageResponse(type, RANDOM_ETH_ADDRESS);
 
-      await expectImageResponse(response, RESIZE_SIZE);
-    });
-  });
+        const timestampStr = response.headers[`x-${type}-timestamp`];
+        const ttlStr = response.headers[`x-${type}-ttl`];
+        const timestamp = parseInt(timestampStr);
+        const ttl = parseInt(ttlStr);
 
-  describe('returns a token image', () => {
-    describe('with headers', () => {
-      describe('indicating a fallback was used ', () => {
-        it('because of an unknown identifier format', async () => {
-          const response = await getTokenResponse(UNKNOWN_TOKEN_ID_FORMAT);
-
-          await expectImageResponse(response, DEFAULT_SIZE);
-          expectHeaders(response, {
-            'x-token-fallback-type': DEFAULT_TOKEN_FALLBACK_TYPE,
-            'x-token-fallback-reason': FALLBACK_REASONS.unknownIdentifierFormat
-          });
-        });
-        it('because no image was found', async () => {
-          const response = await getTokenResponse(RANDOM_ETH_ADDRESS);
-
-          await expectImageResponse(response, DEFAULT_SIZE);
-          expectHeaders(response, {
-            'x-token-fallback-type': DEFAULT_TOKEN_FALLBACK_TYPE,
-            'x-token-fallback-reason': FALLBACK_REASONS.noImageFound
-          });
-        });
+        expect(timestamp).toBeGreaterThan(0);
+        expect(ttl).toBeGreaterThan(new Date().getTime());
       });
-      it.todo('containing timestamp and ttl of the token image');
     });
     it('of custom size', async () => {
-      const response = await getTokenResponse(`${TOKEN_ID}?s=${RESIZE_SIZE}`);
+      const response = await getImageResponse(type, `${RANDOM_ETH_ADDRESS}?s=${RESIZE_SIZE}`);
 
       await expectImageResponse(response, RESIZE_SIZE);
     });
