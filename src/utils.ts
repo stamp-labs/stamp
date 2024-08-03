@@ -57,28 +57,30 @@ export function shortNameToChainId(shortName: string) {
   return null;
 }
 
-export async function parseQuery(id: string, type: ResolverType, query) {
-  let address = id;
+function parseIdentifier(identifier: string) {
+  const chunks = identifier.split(':');
+  let address = chunks[0];
   let network = '1';
 
-  // Resolve format
-  // let format;
-  const chunks = id.split(':');
   if (chunks.length === 2) {
-    // format = 'eip3770';
+    // eip3770
     address = chunks[1];
     network = shortNameToChainId(chunks[0]) || '1';
   } else if (chunks.length === 3) {
-    // format = 'caip10';
+    // caip10
     address = chunks[2];
     network = chunks[1];
-  } else if (id.startsWith('did:')) {
-    // format = 'did';
-    address = id.slice(4);
+  } else if (chunks[0] === 'did') {
+    // did
+    address = identifier.slice(4);
   }
-  // console.log('Format', format);
 
   address = address.toLowerCase();
+
+  return { address, network };
+}
+
+function parseRequestedSize(query: any, type: ResolverType) {
   const size = 64;
   const maxSize = type.includes('-cover') ? constants.maxCover : constants.max;
   let s = query.s ? parseInt(query.s) : size;
@@ -88,14 +90,23 @@ export async function parseQuery(id: string, type: ResolverType, query) {
   let h = query.h ? parseInt(query.h) : s;
   if (h < 1 || h > maxSize || isNaN(h)) h = size;
 
+  return { w, h };
+}
+
+export async function parseQuery(identifier: string, type: ResolverType, query: any) {
+  const { address, network } = parseIdentifier(identifier);
+  const { w, h } = parseRequestedSize(query, type);
+  const fallback = query.fb === 'jazzicon' ? 'jazzicon' : 'blockie';
+  const { cb, resolver } = query;
+
   return {
     address,
     network,
     w,
     h,
-    fallback: query.fb === 'jazzicon' ? 'jazzicon' : 'blockie',
-    cb: query.cb,
-    resolver: query.resolver
+    fallback,
+    cb,
+    resolver
   };
 }
 
