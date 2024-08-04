@@ -1,10 +1,12 @@
 # Continuous Integration Guide
 
-(PREVIEW: FULL OF CRAP STILL!)
+In order to prevent the review process from unnecessarily blocking progress, anyone with write access is allowed to merge their own pull requests. Tests and other CI jobs are of course still in place and will be improved, so they will allow to merge changes fully automatically with more confidence. Requesting a code review and waiting for approval is an optional step. **That does not mean we do less review!** It means we put more of the responsibility into the developers own hands and “shift left” on quality, meaning **more focus on the beginning of the process instead of the end**. Pull requests will often be more like reports and (human) review has already happened. This is an optimistic approach and optimistic doesn’t mean naive. People using oSnap are well aware of that. It’s the algorithm that ensures correctness to the highest degree possible, not a single pair of eyes.
 
-In order to prevent the review process from unnecessarily blocking progress, anyone with write access is allowed to merge their own pull requests. Tests and other CI jobs are of course still in place and will be improved, so they will allow to merge changes fully automatically. Requesting a code review and waiting for approval is an optional step. **That does not mean we do less review!** It means we put more of the responsibility into the developers own hands and “shift left” on quality, meaning **more focus on the beginning of the process instead of the end**. Pull requests will often be more like reports and (human) review has already happened.
+When I’m trying to go really hardcore on continuous integration, it’s difficult to implement that in a team that works with a much slower and often just broken process. It’s difficult to explain the benefits of continuous integration, if you start with trunk-based development and throw everyone in the cold water, committing broken code and creating a mess in their local history and branches.
 
-This has a lot to do with culture and mindset and also the right tools, which is what I want to discuss here.
+To move fast without breaking anything, there simply are some prerequisites and accompanying techniques and it’s much easier to implement them without even talking about continuous integration, let alone trunk-based development.
+
+These techniques can be applied gradually by any project and help improve quality of change management in a codebase. It has a lot to do with culture and mindset, which I also want to discuss here.
 
 # Commits
 
@@ -20,27 +22,31 @@ One game changer for me was, when I realized I can even add individual lines to 
 
 So even though I have tons of local changes all the time, often completely unrelated stuff, I stay confident about what I commit and line by line all my changes become the actual truth and the diff between local and remote shrinks again.
 
+In a team scenario the problem occurs when this remote branch isn’t everyone’s branch a.k.a. feature branching. Then this approach is simply not possible because after making a correct, working and helpful change, you still have to wait for approval by a reviewer to allow the team to get in sync with you. If this reviewer has too many additional responsibilities, this can slow down a project dramatically. It is crucial to understand, that dogmatic use of PRs in combination with non-automated approval **enforces larger change sets, that are harder to review!** It forces necessary refactoring and code maintenance tasks to be hidden in feature development or omitted entirely.
+
+Code review is absolutely important. But there simply are some common mistakes that lead to worse not better code quality (and delivery) and endless bouncing back and forth, trying to answer questions that should have been answered long before or trying to resolve conflicts, that could have been addressed a lot earlier in the process or avoided entirely. And no, it is not always faster to resolve a conflict than to prevent it. Sometimes you are just stuck with a huge pile of incompatibility, making the fact even more obvious, that the integration should have happened way earlier.
+
 # Feature Branches
 
-If you want to double down on Continuous Integration, then you would go with trunk-based development. No branches, no PRs, everyone just has a local copy of master and pushes changes directly. This would introduce quite a drastic change and requires a very robust setup of tools and production pipelines and changes in the ways new features get implemented. The push-back is often intense. "But what if someone pushes broken code to master?" "How will we do code reviews?" "Won't this cause chaos?"
+As mentioned, everyone with write access can merge their own pull requests into master, which allows us to merge more often but other feature branches will get out of sync more frequently. That’s intentional. Other branches must know as soon as possible when they are causing a conflict with another one. Merging more frequently into master helps to address these conflicts earlier but it requires you to update your own feature branches more often as well. Luckily we can automate that with git hooks.
 
-I want to suggest a more soft version of it, that would still allow us to move faster while easing these concerns a little bit. As mentioned, everyone with write access can merge their own pull requests into master, which allows us to merge more often and your feature branches will get out of sync quicker. The main purpose of trunk-based development, is to avoid isolation and accumulating conflicts but that can also be achieve with a simple pre-commit hook.
+To ensure your branches never diverge from master too much, it will get fetched and brutally merged into the current branch you are on, after every push you make. Other local changes will be stashed and reapplied after master has been merged. If conflicts arise, you’ll be the first to know.
 
-To ensure your branches never diverge from master, a git hook will fetch and merge it into your current branch, before every commit you try to make locally. If conflicts arise, you’ll be the first to know and think “Thank god!” every single time.
-
-This makes sure our pull requests will never have conflicts with master. But it still doesn’t solve the isolation and potential conflicts between two feature branches that have not yet been merged back into master. Even though they are both fully compatible with master, they still can conflict with each other. That’s why allowing (not enforcing!) to self-approve your own PRs and merging them quickly is important, to reduce this risk. Ideally PRs simply get merged when tests pass but that requires a more complete coverage of critical features.
+This makes sure our pull requests will never have conflicts with master. But it still doesn’t solve the isolation and potential conflicts between two feature branches that have not yet been merged. Even though they are both fully compatible with master, they still can conflict with each other. That’s why allowing (not enforcing!) to self-approve your own PRs and merging them quickly is important, to reduce this risk. Ideally PRs simply get merged when tests pass but that requires a more complete coverage of critical features.
 
 # Feature Flags
 
-What about really large changes? Architectural design? Drastic refactoring? Replacing entire modules? Some things just can’t be committed in steps, right? Well, yes and no.
+What about really large changes? Architectural design? Drastic refactoring? Replacing entire modules? Some things just can’t be committed and deployed in small steps, right? Well, yes and no.
 
-The goal is too allow code to be tested in real environments before being deployed to production Yes, that’s possible with branching and many projects do it like that. But when you test a branch, containing a new feature and you are happy it works, all tests and checks are green, even your human test team has checked all the boxes and approves everything to be released. Now what? You still need to merge it into the master branch? And that might have changed, right? So what did you really test?
+The goal is too allow code to be tested in real environments before being deployed to production That’s possible with branching and many projects do it like that. But when you test a branch, containing a new feature (like when submitting a PR and a test workflow runs on it) and you are happy it works, all tests and checks are green, even your human test team has checked all the boxes with the help of a test deployment and approves everything to be released. Now what? You still need to merge it into the master branch. And that might have changed, right? Maybe by that same process, two days earlier and three weeks after work on this feature had started. So what did you really test?
 
-Your tests should run against something that is as close as possible to the real production environment. With feature flags you always test exactly what will be rolled out to customers and doing that is a matter of updating an environment variable or a config value in a database or whatever. Generally speaking: By moving deployment more into your codebase, you don’t give up control, you increase it.
+Your tests should run against something that is as close as possible to production.
+
+Feature flags give you a way to roll out software to the actual production environment, without immediately activating it. This way a roll back in case something goes wrong is often just the act of deactivating it again. Your test deployment can be identical to production, despite some config options or the request headers you send to it. Features can be enabled for your favorite customers only or you can do slow and careful canary releases more easily. You get tools to test in production more carefully. Generally speaking: By moving deployment more into your codebase, you don’t give up control, you increase it.
 
 https://github.com/Unleash/unleash
 
-There are sophisticated solutions out there but I would say this is first of all a switch in mindset and overall approach to organizing feature development in a software project. Implementation details are secondary.
+There are sophisticated solutions out there but I would say this is first of all a switch in mindset and overall approach to organizing feature development in a software project. Implementation details are secondary. But if implemented appropriately, it’s also a big win for developer confidence and the overall development workflow.
 
 # Test Driven Development
 
@@ -48,11 +54,15 @@ Don’t worry. This will also be a very soft approach. I’m trying to take from
 
 The first step is often to build as much confidence as possible, that what you plan to implement or change is actually the right thing. I see TDD as a tool to help with that.
 
-There are two aspects of testing something in general. A test ensures something works, but thinking about that test is also a great practice to refine the test subject itself. Open a new file and pretend your software already exists. Try to use it. How would you test it, if you had to? What would that look like? This simple act can conjure up scenarios and edge cases you might have missed otherwise and that would then come up during the review process.
+There are two aspects of testing something in general. A test ensures something works, but thinking about that test is also a great practice to refine the test subject itself. Open a new file and pretend your software already exists. Try to use it. How would you make sure it works? What would that look like? This simple act can conjure up scenarios and edge cases you might have missed otherwise and that would then come up during implementation or even worse… the review process.
 
-If you do this exercise in a way that is actually executable, you get the added benefit of protection against regression, which is great for merging with confidence. If you follow a clear structure and conventions and use terms that have been defined and understood by everyone, including management, and you focus more on behaviors than implementation details, it becomes a valuable tool for everyone involved. If you make it a habit, you get high test coverage “for free” which again increases confidence and reduces review burden.
+If you do this exercise in a way that is executable, you get the added benefit of protection later on, against unintentionally changing the behavior of your software, which is great for merging with confidence. And behavior is what you care about. That’s why the practice of *Behavior Driven Design* is closely related to TDD and was largely motivated by the misinterpretation of that term.
 
-But all that doesn’t necessarily mean you need to learn an established testing library. As long as it can be executed and helps to build confidence that everything works as expected, good. If it doesn’t serve that purpose (anymore), consider deleting it, instead of wasting time on maintaining it. Because I actually think, even though being confident doesn’t mean nothing will ever go wrong, it just allows you mentally to move faster and not get blocked by your own doubt. And IF something goes wrong, you at least know you did a lot of things to prevent it and you don’t need to question yourself so much. Shit happens. Even with TDD. Just a little bit less, hopefully. Also, whenever something still goes wrong, despite all the carefulness, you’ll probably actually learn something very valuable about how to make your tests even more robust from now on.
+If you follow a clear structure and conventions and use terms that have been defined and understood by everyone, including management, and you focus more on behaviors than implementation details, it becomes a valuable tool for everyone involved.
+
+If you do follow TDD dogmatically, you will get 100% test coverage, at all times “for free”. Whatever that means, but it stops becoming “extra work”, when it stats to become an essential part of how you plan to build your software. BUT there are situations you can’t “plan” with a test. You need to prototype. It’s just not a contradiction. It’s complementary and sometimes one is more helpful than the other. Like I said, just open a new file and start to think a little bit more from the other end of the process.
+
+It doesn’t mean you need to master an established testing library. As long as what ever you do, helps you and everyone else in becoming more confident about making changes that work and are well aligned with the goals of the project, for me that counts!
 
 # Deployment
 
@@ -96,31 +106,14 @@ This column simply contains all merged changes since the last deployment. The co
 
 The essence of a Kanban board is to channel and reflect utilization of resources, so the number of items that are allowed in a column, is based on the available resources. If there are only two developers, it doesn’t make sense to have 20 items in a column. Usually there’s one “row” per “processing unit” (developer). It’s not just lists of tasks, changing their state from open to closed.
 
-# Plan more and review with more confidence!
+# Plan more and reviews with more confidence!
 
 ## Arguments Against Feature Branching and Pull Requests
 
-(Redundant AI generated shit!)
+- **Integration and Merge Challenges**: Feature branches often lead to complex integration issues, including accumulating conflicts and difficult merges due to their prolonged isolation from the main codebase. Delays in merging can result in unforeseen integration problems and additional work. **Instead:** Merge often! Integrate continuously.
+- **Development Bottlenecks**: The process of waiting for code reviews and approvals can slow down development. This introduces potential delays and inefficiencies. Especially if feedback is not timely or thorough enough, it leads to endless back and forth communication, blocking real progress. **Instead:** Plan ahead! Use templates and checklists to guide thought processes and ensure relevant questions have been addressed upfront.
+- **Quality Assurance Concerns**: Reliance on pull requests and code reviews for quality assurance can create a false sense of security. This may lead developers to neglect their own code quality, assuming that reviews will catch issues. Also pull requests often run tests on the feature branch, which is completely irrelevant in many scenarios. Imagine dependencies have been updated in master but not in the feature branch. **Instead:** Empower developers, create guidelines and build strong pipelines. “Shift left” on quality. Test production, not feature branches.
+- **Reduced Collaboration and Visibility**: Feature branches can cause developers to work in isolation, reducing collaboration and visibility into ongoing work. This unnecessarily hides valuable changes and improvements, not only from the team but from the product. When team members leave or features get canceled, this value is often lost. **Instead:** Share independent work separately and get it merged quickly.
+- **Increased Cognitive Load**: Managing multiple feature branches while being prevented from sharing smaller changes promptly, adds cognitive load and often ends in many things started but nothing getting done. **Instead:** Avoid context switching. Ensure resources are allocated conservatively and developers can work uninterrupted until completion.
 
-1. **Isolation and Accumulating Conflicts**: Feature branches create isolation, leading to accumulating conflicts over time. This makes integration more difficult and time-consuming.
-2. **Delayed Integration**: Features developed in isolation may not integrate well with other changes, leading to surprises and additional work when merging back to the main branch.
-3. **False Sense of Security**: Pull requests and code reviews can create a false sense of security, potentially leading to less careful development practices.
-4. **Bottlenecks in Development Flow**: Waiting for code reviews and approvals can create bottlenecks, slowing down the development process.
-5. **Reduced Responsibility**: Relying on others to catch issues through code reviews may reduce developers' sense of responsibility for their own code quality.
-6. **Inefficient Use of Time**: Code reviews often happen after significant work has been done, making it less efficient to address fundamental issues.
-7. **Lack of Focus in Reviews**: Uncoordinated and random code reviews without clear focus can lead to superficial feedback and missed critical issues.
-8. **Delayed Feedback**: Feature branches delay feedback on how code integrates with the main codebase and other ongoing changes.
-9. **Hiding Valuable Changes**: Useful refactoring or improvements might be hidden in feature branches, depriving the team of immediate benefits.
-10. **Risk of Feature Cancellation**: If a feature is canceled, valuable changes within the branch might be lost or overlooked.
-11. **Difficulty in Testing**: Testing feature branches in isolation doesn't guarantee they'll work when integrated into the main codebase.
-12. **Reduced Collaboration**: Feature branches can lead to reduced collaboration as developers work in silos.
-13. **Increased Cognitive Load**: Managing multiple branches and their states adds complexity to the development process.
-14. **Decreased Visibility**: Long-lived feature branches decrease visibility into ongoing work for the rest of the team.
-15. **Potential for "Big Bang" Integrations**: Large feature branches can lead to challenging and risky "big bang" integrations.
-16. **Reduced Frequency of Integration**: Feature branching can lead to less frequent integration, going against continuous integration principles.
-17. **Difficulty in Keeping Branches Up-to-Date**: Constantly rebasing or merging from the main branch into feature branches can be time-consuming and error-prone.
-18. **Increased Merge Conflicts**: The longer a branch lives, the higher the likelihood of merge conflicts when integrating back to the main branch.
-19. **Delayed Deployment**: Feature branches can delay deployment of completed work, as the entire feature needs to be finished before merging.
-20. **Less Emphasis on Incremental Development**: Feature branches may encourage larger, less incremental changes, which are riskier and harder to review effectively.
-
-In conclusion, while feature branching and pull requests have their place, they can introduce significant challenges to the development process. A more continuous integration approach, with emphasis on smaller, more frequent commits to the main branch and a shift towards "left" quality practices, may lead to more efficient and effective development workflows.
+In conclusion, while feature branching and pull requests have their place, they can introduce significant challenges to the development process for smaller teams of trusted core developers. A more continuous integration approach, with emphasis on smaller, more frequent commits to the main branch, e.g. by fostering confidence in developers, to merge their own work, and a shift towards "left" quality practices, may lead to more efficient and effective development workflows, without losing anything on the security and robustness front. You might even see improvements there too.
