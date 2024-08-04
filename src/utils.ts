@@ -8,15 +8,16 @@ import constants from './constants.json';
 
 export type Address = string;
 export type Handle = string;
-export type ResolverType =
-  | 'avatar'
-  | 'user-cover'
-  | 'token'
-  | 'space'
-  | 'space-sx'
-  | 'space-cover-sx'
-  | 'address'
-  | 'name';
+
+export const resolverTypes = [
+  'avatar',
+  'user-cover',
+  'token',
+  'space',
+  'space-sx',
+  'space-cover-sx'
+] as const;
+export type ResolverType = typeof resolverTypes[number];
 
 const providers: Record<string, StaticJsonRpcProvider> = {};
 
@@ -57,7 +58,7 @@ export function shortNameToChainId(shortName: string) {
   return null;
 }
 
-function parseIdentifier(identifier: string) {
+export function parseIdentifier(identifier: string) {
   const chunks = identifier.split(':');
   let address = chunks[0];
   let network = '1';
@@ -80,7 +81,7 @@ function parseIdentifier(identifier: string) {
   return { address, network };
 }
 
-function parseRequestedSize(query: any, type: ResolverType) {
+export function parseRequestedSize(query: any, type: ResolverType) {
   const size = 64;
   const maxSize = type.includes('-cover') ? constants.maxCover : constants.max;
   let s = query.s ? parseInt(query.s) : size;
@@ -90,20 +91,14 @@ function parseRequestedSize(query: any, type: ResolverType) {
   let h = query.h ? parseInt(query.h) : s;
   if (h < 1 || h > maxSize || isNaN(h)) h = size;
 
-  return { w, h };
+  return { w, h, maxSize };
 }
 
-export async function parseQuery(identifier: string, type: ResolverType, query: any) {
-  const { address, network } = parseIdentifier(identifier);
-  const { w, h } = parseRequestedSize(query, type);
+export function parseFallback(query: any) {
   const fallback = query.fb === 'jazzicon' ? 'jazzicon' : 'blockie';
   const { cb, resolver } = query;
 
   return {
-    address,
-    network,
-    w,
-    h,
     fallback,
     cb,
     resolver
@@ -125,27 +120,14 @@ export function getUrl(url) {
   return snapshot.utils.getUrl(url, gateway);
 }
 
-export function getCacheKey({
-  type,
-  network,
-  address,
-  w,
-  h,
-  fallback,
-  cb
-}: {
+export function getCacheKey(data: {
   type: ResolverType;
   network: string;
   address: string;
+  fallback: string;
   w: number;
   h: number;
-  fallback: string;
-  cb?: string;
 }) {
-  const data = { type, network, address, w, h };
-  if (fallback !== 'blockie') data['fallback'] = fallback;
-  if (cb) data['cb'] = cb;
-
   return sha256(JSON.stringify(data));
 }
 

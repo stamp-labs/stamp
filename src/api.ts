@@ -1,15 +1,22 @@
-import express from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import { capture } from '@snapshot-labs/snapshot-sentry';
-import { parseQuery, resize, setHeader, getCacheKey, ResolverType } from './utils';
+import {
+  parseFallback,
+  resize,
+  setHeader,
+  getCacheKey,
+  parseRequestedSize,
+  parseIdentifier
+} from './utils';
 import { set, get, streamToBuffer } from './aws';
 import resolvers from './resolvers';
 import constants from './constants.json';
 import { rpcError, rpcSuccess } from './helpers/utils';
 import { lookupAddresses, resolveNames } from './addressResolvers';
 import lookupDomains from './lookupDomains';
+import { z } from 'zod';
 
 const router = express.Router();
-const RESOLVER_TYPE_CONSTRAINT = Object.keys(constants.resolvers).join('|');
 
 router.post('/v2/lookup/domains', async (req, res) => {
   const { id = null, address, network } = req.body;
@@ -56,92 +63,88 @@ router.post('/v2/resolve/names', async (req, res) => {
   }
 });
 
-router.get(`/:type(${RESOLVER_TYPE_CONSTRAINT})/:id`, async (req, res) => {
-  const { type, id } = req.params as { type: ResolverType; id: string };
-  let address, network, w, h, fallback, cb, resolver;
+const paramsSchema = z.object({
+  identifier: z.string()
+});
 
+const querySchema = z.object({
+  s: z.string().optional(),
+  w: z.string().optional(),
+  h: z.string().optional(),
+  fallback: z.string().optional()
+});
+
+type Params = z.infer<typeof paramsSchema>;
+type Query = z.infer<typeof querySchema>;
+type AvatarRequest = Request<Params, any, any, Query>;
+
+function validateRequest(req: AvatarRequest, res: Response, next: NextFunction) {
   try {
-    ({ address, network, w, h, fallback, cb, resolver } = await parseQuery(id, type, req.query));
+    paramsSchema.parse(req.params);
+    querySchema.parse(req.query);
+    next();
   } catch (e) {
-    return res.status(500).json({ status: 'error', error: 'failed to load content' });
+    res.status(400).json({ status: 'error', error: 'bad request' });
+  }
+}
+
+async function processRequest(req: AvatarRequest, res: Response) {
+  const type = 'avatar';
+  const { identifier } = req.params;
+
+  const { address, network } = parseIdentifier(identifier);
+  const { w, h, maxSize } = parseRequestedSize(req.query, type);
+  const { fallback } = parseFallback(req.query);
+
+  const requestedImageCacheKey = getCacheKey({ type, network, address, fallback, w, h });
+
+  const cachedRequestedImage = await get(requestedImageCacheKey);
+  if (cachedRequestedImage) {
+    setHeader(res);
+    return cachedRequestedImage.pipe(res);
   }
 
-  const disableCache = !!resolver;
-
-  const key1 = getCacheKey({
+  const baseImageCacheKey = getCacheKey({
     type,
     network,
     address,
-    w: constants.max,
-    h: constants.max,
     fallback,
-    cb
+    w: maxSize,
+    h: maxSize
   });
-  const key2 = getCacheKey({ type, network, address, w, h, fallback, cb });
 
-  // Check resized cache
-  const cache = await get(`${key1}/${key2}`);
-  if (cache && !disableCache) {
-    // console.log('Got cache', address);
+  const cachedBasedImage = await get(baseImageCacheKey);
+  if (cachedBasedImage) {
+    const baseImageBuffer = await streamToBuffer(cachedBasedImage);
+    const resizedImage = await resize(baseImageBuffer, w, h);
+    await set(requestedImageCacheKey, resizedImage);
+
     setHeader(res);
-    return cache.pipe(res);
+    return resizedImage.pipe(res);
   }
 
-  // Check base cache
-  const base = await get(`${key1}/${key1}`);
-  let baseImage;
-  if (base) {
-    baseImage = await streamToBuffer(base);
-    // console.log('Got base cache');
-  } else {
-    // console.log('No cache for', key1, base);
+  const resolvedImages = await Promise.all(
+    constants.resolvers.avatar.map(r => resolvers[r](address, network))
+  );
+  const newBaseImage = resolvedImages.find(Boolean);
+  if (newBaseImage) {
+    const resizedImage = await resize(newBaseImage, w, h);
+    await set(baseImageCacheKey, newBaseImage);
+    await set(requestedImageCacheKey, resizedImage);
 
-    let currentResolvers: string[] = constants.resolvers.avatar;
-    if (type === 'token') currentResolvers = constants.resolvers.token;
-    if (type === 'space') currentResolvers = constants.resolvers.space;
-    if (type === 'space-sx') currentResolvers = constants.resolvers['space-sx'];
-    if (type === 'space-cover-sx') currentResolvers = constants.resolvers['space-cover-sx'];
-    if (type === 'user-cover') currentResolvers = constants.resolvers['user-cover'];
-
-    if (resolver) {
-      if (!currentResolvers.includes(resolver)) {
-        return res.status(500).json({ status: 'error', error: 'invalid resolvers' });
-      }
-
-      currentResolvers = [resolver];
-    }
-
-    const files = await Promise.all(currentResolvers.map(r => resolvers[r](address, network)));
-    baseImage = files.find(Boolean);
-
-    if (!baseImage) {
-      const fallbackImage = await resolvers[fallback](address, network);
-      const resizedImage = await resize(fallbackImage, w, h);
-
-      setHeader(res, 'SHORT_CACHE');
-      return res.send(resizedImage);
-    }
+    setHeader(res);
+    return resizedImage.pipe(res);
   }
 
-  // Resize and return image
-  const resizedImage = await resize(baseImage, w, h);
-  setHeader(res);
-  res.send(resizedImage);
+  const fallbackImage = await resolvers[fallback](address, network);
+  const resizedFallbackImage = await resize(fallbackImage, w, h);
 
-  if (disableCache) return;
+  await set(requestedImageCacheKey, resizedFallbackImage);
 
-  // Store cache
-  try {
-    if (!base) {
-      await set(`${key1}/${key1}`, baseImage);
-      console.log('Stored base cache', key1);
-    }
-    await set(`${key1}/${key2}`, resizedImage);
-    console.log('Stored cache', address);
-  } catch (e) {
-    capture(e);
-    console.log('Store cache failed', address, e);
-  }
-});
+  setHeader(res, 'SHORT_CACHE');
+  return res.send(resizedFallbackImage);
+}
+
+router.get(`/avatar/:identifier`, validateRequest, processRequest);
 
 export default router;
