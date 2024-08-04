@@ -1,0 +1,46 @@
+name: Check Pull Request Conflicts
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  check_conflicts:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout the repository
+      uses: actions/checkout@v3
+
+    - name: Set up Git
+      run: git config user.name "github-actions" && git config user.email "github-actions@github.com"
+
+    - name: Fetch all pull requests
+      run: |
+        git fetch origin '+refs/pull/*/head:refs/remotes/origin/pr/*'
+
+    - name: Check for conflicts with other pull requests
+      run: |
+        # Get the current PR number and branch
+        PR_NUMBER=$(jq --raw-output .number "$GITHUB_EVENT_PATH")
+        CURRENT_PR_BRANCH="refs/remotes/origin/pr/$PR_NUMBER"
+        
+        # List all PR branches
+        PR_BRANCHES=$(git branch -r | grep 'origin/pr/' | grep -v "$CURRENT_PR_BRANCH")
+        echo "PR_BRANCHES: $PR_BRANCHES"
+        
+        # Function to check conflicts
+        check_conflict() {
+          LOCAL_BRANCH=$1
+          echo "Checking conflicts with $LOCAL_BRANCH"
+          git fetch origin
+          git checkout -b "temp-branch" "$LOCAL_BRANCH"
+          git checkout "$CURRENT_PR_BRANCH"
+          git merge --no-commit --no-ff "temp-branch" || echo "Conflict detected with $LOCAL_BRANCH"
+          git checkout -f "$CURRENT_PR_BRANCH"
+          git branch -D "temp-branch"
+        }
+        
+        # Check conflicts
+        for BRANCH in $PR_BRANCHES; do
+          check_conflict "$BRANCH"
+        done
