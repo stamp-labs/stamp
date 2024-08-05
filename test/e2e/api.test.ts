@@ -16,8 +16,8 @@ async function purge(): Promise<void> {
   transaction.exec();
 }
 
-async function getFallbackImageData(type: 'avatar' | 'token', fallback: string | null = null) {
-  const url = `${HOST}/${type}/${RANDOM_ETH_ADDRESS}?${fallback ? `&fb=${fallback}` : ''}`;
+async function getFallbackImageData(type: 'avatar' | 'token', fallback: string) {
+  const url = `${HOST}/${type}/${RANDOM_ETH_ADDRESS}?fb=${fallback}`;
   const response = await axios.get(url, { responseType: 'arraybuffer' });
   const metadata = await sharp(response.data).metadata();
   return { data: response.data, metadata };
