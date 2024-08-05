@@ -151,13 +151,15 @@ export function setHeader(
     Expires: new Date(Date.now() + ttl * 1e3).toUTCString()
   };
 
-  Object.entries(extraHeaders).forEach(([key, value]) => {
-    if (typeof value === 'string') {
-      headers[key] = value;
-    } else {
-      console.warn('Invalid header value passed to setHeader:', key, value);
-    }
-  });
+  if (typeof extraHeaders === 'object' && extraHeaders !== null) {
+    Object.entries(extraHeaders).forEach(([key, value]) => {
+      if (typeof value === 'string') {
+        headers[key] = value;
+      } else {
+        console.warn('Invalid header value passed to setHeader:', key, value);
+      }
+    });
+  }
 
   res.set(headers);
 }
