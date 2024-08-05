@@ -122,7 +122,9 @@ router.get(`/:type(${TYPE_CONSTRAINTS})/:id`, async (req, res) => {
       const fallbackImage = await resolvers[fallback](address, network);
       const resizedImage = await resize(fallbackImage, w, h);
 
-      setHeader(res, 'SHORT_CACHE');
+      setHeader(res, 'SHORT_CACHE', {
+        [`x-stamp-${type}-fallback`]: fallback
+      });
       return res.send(resizedImage);
     }
   }

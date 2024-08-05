@@ -138,14 +138,20 @@ export function getCacheKey({
   return sha256(JSON.stringify(data));
 }
 
-export function setHeader(res: Response, cacheType: 'SHORT_CACHE' | 'LONG_CACHE' = 'LONG_CACHE') {
+export function setHeader(
+  res: Response,
+  cacheType: 'SHORT_CACHE' | 'LONG_CACHE' = 'LONG_CACHE',
+  extraHeaders: Record<string, string> = {}
+) {
   const ttl = cacheType === 'SHORT_CACHE' ? constants.shortTtl : constants.ttl;
 
-  res.set({
+  const headers = {
     'Content-Type': 'image/webp',
     'Cache-Control': `public, max-age=${ttl}`,
     Expires: new Date(Date.now() + ttl * 1e3).toUTCString()
-  });
+  };
+
+  res.set({ ...headers, ...extraHeaders });
 }
 
 export const getBaseAssetIconUrl = (chainId: string) => {
