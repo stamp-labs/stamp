@@ -3,7 +3,7 @@ import redis from '../../src/helpers/redis';
 import { KEY_PREFIX } from '../../src/addressResolvers/cache';
 
 const HOST = `http://localhost:${process.env.PORT || 3003}`;
-const TOKEN_ADDRESS = '0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e';
+const cUSDC_TOKEN_ADDRESS_ON_MAIN = '0x39AA39c021dfbaE8faC545936693aC917d5E7563';
 
 async function purge(): Promise<void> {
   if (!redis) return;
@@ -18,7 +18,9 @@ async function purge(): Promise<void> {
 describe('E2E api', () => {
   describe('GET type/TYPE/ID', () => {
     it('returns an image for tokenlists resolver', async () => {
-      const response = await axios.get(`${HOST}/token/${TOKEN_ADDRESS}?resolver=tokenlists`);
+      const response = await axios.get(
+        `${HOST}/token/${cUSDC_TOKEN_ADDRESS_ON_MAIN}?resolver=tokenlists`
+      );
       expect(response.status).toBe(200);
       expect(response.headers['content-type']).toBe('image/webp');
       expect(response.headers['x-stamp-token-resolver']).toBe('tokenlists');

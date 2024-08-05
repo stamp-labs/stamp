@@ -6,6 +6,7 @@ import { initLogger, fallbackLogger } from '@snapshot-labs/snapshot-sentry';
 import initMetrics from './helpers/metrics';
 import api from './api';
 import { name, version } from '../package.json';
+import { initAggregatedTokenList } from './helpers/tokenlists';
 
 const app = express();
 const PORT = process.env.PORT || 3008;
@@ -20,7 +21,7 @@ app.use(cors({ maxAge: 86400 }));
 app.use(compression());
 app.use('/', api);
 
-app.get('/', (req, res) => {
+app.get('/', (_req, res) => {
   const commit = process.env.COMMIT_HASH ?? undefined;
   res.json({ name, version, commit });
 });
@@ -31,4 +32,8 @@ app.use((_, res) => {
   res.status(400).json({ message: 'Not found' });
 });
 
-app.listen(PORT, () => console.log(`Listening at http://localhost:${PORT}`));
+async function boot() {
+  await initAggregatedTokenList();
+}
+
+boot().then(() => app.listen(PORT, () => console.log(`Listening at http://localhost:${PORT}`)));
