@@ -131,7 +131,9 @@ router.get(`/:type(${TYPE_CONSTRAINTS})/:id`, async (req, res) => {
 
   // Resize and return image
   const resizedImage = await resize(baseImage, w, h);
-  setHeader(res);
+  const extraHeaders = {};
+  if (resolver) extraHeaders[`x-stamp-${type}-resolver`] = resolver;
+  setHeader(res, 'LONG_CACHE', extraHeaders);
   res.send(resizedImage);
 
   if (disableCache) return;
