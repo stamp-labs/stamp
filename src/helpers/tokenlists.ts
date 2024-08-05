@@ -1,20 +1,15 @@
 // (draft from top of my head)
-export type TokenLists = {
-  [network: string]: {
-    name: string;
-    logoURI: string;
-    tokens: {
-      address: string;
-      chainId: number;
-      name: string;
-      symbol: string;
-      decimals: number;
-    }[];
-  }[];
-};
+export type AggregatedTokenList = {
+  chainId: number;
+  address: string;
+  symbol: string;
+  name: string;
+  logoURI: string;
+  decimals: number;
+}[];
 
-const tokenlists: TokenLists = {};
+const aggregatedTokenList: AggregatedTokenList = [];
 
 // TODO: process static tokenlists from remote sources
 
-export default tokenlists;
+export default aggregatedTokenList;

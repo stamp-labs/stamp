@@ -1,26 +1,27 @@
 import { getAddress } from '@ethersproject/address';
-import { resize, chainIdToName } from '../utils';
+import { resize } from '../utils';
 import { max } from '../constants.json';
 import { fetchHttpImage } from './utils';
-import tokenlists from '../helpers/tokenlists';
+import aggregatedTokenList from '../helpers/tokenlists';
 
-function searchTokenlists(address: string, chainId: string) {
+function findImageUrl(address: string, chainId: string) {
   const checksum = getAddress(address);
-  const networkName = chainIdToName(chainId) || 'ethereum';
 
-  const url = tokenlists[networkName]?.find(list =>
-    list.tokens.find(token => getAddress(token.address) === checksum)
-  )?.logoURI;
+  const token = aggregatedTokenList.find(token => {
+    return token.chainId === parseInt(chainId) && getAddress(token.address) === checksum;
+  });
+  if (!token) throw new Error('Token not found');
 
-  return url;
+  return token.logoURI;
 }
 
 export default async function resolve(address: string, chainId: string) {
-  const url = searchTokenlists(address, chainId);
-  if (!url) return false;
+  try {
+    const url = findImageUrl(address, chainId);
+    const image = await fetchHttpImage(url);
 
-  const image = await fetchHttpImage(url);
-  if (!image) return false;
-
-  return await resize(image, max, max);
+    return await resize(image, max, max);
+  } catch (e) {
+    return false;
+  }
 }
