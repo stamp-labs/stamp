@@ -1,8 +1,10 @@
 import axios from 'axios';
+import sharp from 'sharp';
 import redis from '../../src/helpers/redis';
 import { KEY_PREFIX } from '../../src/addressResolvers/cache';
 
 const HOST = `http://localhost:${process.env.PORT || 3003}`;
+const RANDOM_ETH_ADDRESS = '0xcB716479cA40c9916e1E92E83Cfc87F074FA5A34';
 
 async function purge(): Promise<void> {
   if (!redis) return;
@@ -14,8 +16,39 @@ async function purge(): Promise<void> {
   transaction.exec();
 }
 
+async function getFallbackImageData(type: 'avatar' | 'token', fallback: string | null = null) {
+  const url = `${HOST}/${type}/${RANDOM_ETH_ADDRESS}?${fallback ? `&fb=${fallback}` : ''}`;
+  const response = await axios.get(url, { responseType: 'arraybuffer' });
+  const metadata = await sharp(response.data).metadata();
+  return { data: response.data, metadata };
+}
+
+function expectDifferentImages(image1: Buffer, image2: Buffer) {
+  expect(image1).not.toEqual(image2);
+}
+
 describe('E2E api', () => {
   describe('GET type/TYPE/ID', () => {
+    // In the future we could return more informative headers in the responses
+    // to make these tests more robust and the API more transparent for users.
+    describe('avatars', () => {
+      it('returns different images for different fallback resolvers', async () => {
+        const blockieImage = await getFallbackImageData('avatar', 'blockie');
+        const jazziconImage = await getFallbackImageData('avatar', 'jazzicon');
+
+        expectDifferentImages(blockieImage.data, jazziconImage.data);
+      });
+    });
+
+    describe('tokens', () => {
+      it('returns different images for different fallback resolvers', async () => {
+        const blockieImage = await getFallbackImageData('token', 'blockies');
+        const jazziconImage = await getFallbackImageData('token', 'jazzicon');
+
+        expectDifferentImages(blockieImage.data, jazziconImage.data);
+      });
+    });
+
     it.todo('returns a 500 status on invalid query');
 
     describe('when the image is not cached', () => {
