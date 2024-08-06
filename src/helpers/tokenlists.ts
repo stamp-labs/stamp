@@ -9,22 +9,36 @@ export type AggregatedTokenList = {
 
 const aggregatedTokenList: AggregatedTokenList = [];
 
+function normalizeTokenListUri(tokenListUri: string) {
+  if (!tokenListUri.startsWith('http') && tokenListUri.endsWith('.eth')) {
+    tokenListUri = `https://${tokenListUri}.limo`;
+  }
+  return tokenListUri;
+}
+
 export async function initAggregatedTokenList() {
-  // let's start with a single one (refactor in next commits)
-  const response = await fetch(
-    'https://raw.githubusercontent.com/compound-finance/token-list/master/compound.tokenlist.json'
+  console.info('Initializing aggregated token list from tokenlists.org');
+
+  const tokenListsResponse = await fetch(
+    'https://raw.githubusercontent.com/Uniswap/tokenlists-org/master/src/token-lists.json'
   );
-  const tokens = await response.json();
-  aggregatedTokenList.push(
-    ...tokens.tokens.map((token: any) => ({
-      chainId: 1,
-      address: token.address,
-      symbol: token.symbol,
-      name: token.name,
-      logoURI: token.logoURI,
-      decimals: token.decimals
-    }))
-  );
+  const tokenLists = await tokenListsResponse.json();
+  const uris = Object.keys(tokenLists);
+
+  // TODO: parallelize
+  for (let tokenListUri of uris) {
+    tokenListUri = normalizeTokenListUri(tokenListUri);
+    console.info(`Fetching list from ${tokenListUri}`);
+
+    try {
+      const response = await fetch(tokenListUri);
+      const tokens = await response.json();
+      // TODO: validate response, use zod
+      aggregatedTokenList.push(...tokens.tokens.filter((token: any) => token.logoURI));
+    } catch (e) {
+      console.warn(`Failed to fetch token list from ${tokenListUri}`);
+    }
+  }
 }
 
 export default aggregatedTokenList;

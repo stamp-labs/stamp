@@ -6,7 +6,7 @@ import { initLogger, fallbackLogger } from '@snapshot-labs/snapshot-sentry';
 import initMetrics from './helpers/metrics';
 import api from './api';
 import { name, version } from '../package.json';
-import { initAggregatedTokenList } from './helpers/tokenlists';
+import aggregatedTokenList, { initAggregatedTokenList } from './helpers/tokenlists';
 
 const app = express();
 const PORT = process.env.PORT || 3008;
@@ -36,4 +36,7 @@ async function boot() {
   await initAggregatedTokenList();
 }
 
-boot().then(() => app.listen(PORT, () => console.log(`Listening at http://localhost:${PORT}`)));
+boot().then(() => {
+  console.info('Aggregated token list initialized', aggregatedTokenList.length);
+  app.listen(PORT, () => console.log(`Listening at http://localhost:${PORT}`));
+});
