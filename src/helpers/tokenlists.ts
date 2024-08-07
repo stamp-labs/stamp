@@ -79,9 +79,7 @@ export async function initAggregatedTokenList() {
     })
   );
 
-  const listWithReplacedSizes = replaceSizePartsInImageUrls(list);
-
-  aggregatedTokenList = listWithReplacedSizes;
+  aggregatedTokenList = replaceSizePartsInImageUrls(list);
 
   console.info(`Aggregated token list initialized with ${aggregatedTokenList.length} tokens`);
   lastUpdateTimestamp = Date.now();
