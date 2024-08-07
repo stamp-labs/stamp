@@ -27,8 +27,6 @@ describe('E2E api', () => {
       );
       expect(response.status).toBe(200);
       expect(response.headers['content-type']).toBe('image/webp');
-      expect(response.headers['x-stamp-token-resolver']).toBe('tokenlists');
-      expect(response.headers['x-stamp-token-fallback']).toBe(undefined);
     });
 
     it.todo('returns a 500 status on invalid query');

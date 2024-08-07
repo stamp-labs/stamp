@@ -122,18 +122,14 @@ router.get(`/:type(${TYPE_CONSTRAINTS})/:id`, async (req, res) => {
       const fallbackImage = await resolvers[fallback](address, network);
       const resizedImage = await resize(fallbackImage, w, h);
 
-      setHeader(res, 'SHORT_CACHE', {
-        [`x-stamp-${type}-fallback`]: fallback
-      });
+      setHeader(res, 'SHORT_CACHE');
       return res.send(resizedImage);
     }
   }
 
   // Resize and return image
   const resizedImage = await resize(baseImage, w, h);
-  const extraHeaders = {};
-  if (resolver) extraHeaders[`x-stamp-${type}-resolver`] = resolver;
-  setHeader(res, 'LONG_CACHE', extraHeaders);
+  setHeader(res);
   res.send(resizedImage);
 
   if (disableCache) return;
