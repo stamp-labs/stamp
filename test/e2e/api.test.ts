@@ -15,8 +15,8 @@ async function purge(): Promise<void> {
   transaction.exec();
 }
 
-// for token resolver, which currently takes very long
-// not sure this is the best way to handle this
+// for token resolver, which needs a moment on first run
+// I think the tests need to return promises.
 jest.setTimeout(30_000);
 
 describe('E2E api', () => {
