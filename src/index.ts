@@ -33,6 +33,7 @@ app.use((_, res) => {
 });
 
 async function boot() {
+  // TODO: init other stuff here too (redis) and remove if !redis return elsewhere
   await initAggregatedTokenList();
 }
 
