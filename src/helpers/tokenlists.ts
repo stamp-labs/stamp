@@ -7,6 +7,10 @@ export type AggregatedTokenList = {
   decimals: number;
 }[];
 
+const TTL = 1000 * 60 * 60 * 24;
+let aggregatedTokenList: AggregatedTokenList | undefined;
+let lastUpdateTimestamp: number | undefined;
+
 function normalizeTokenListUri(tokenListUri: string) {
   if (!tokenListUri.startsWith('http') && tokenListUri.endsWith('.eth')) {
     tokenListUri = `https://${tokenListUri}.limo`;
@@ -41,20 +45,28 @@ async function fetchTokens(tokenListUri: string) {
 }
 
 export async function initAggregatedTokenList() {
+  if (aggregatedTokenList && lastUpdateTimestamp && lastUpdateTimestamp > Date.now() - TTL) {
+    console.info('Using in-memory aggregated token list');
+    return aggregatedTokenList;
+  }
+
   console.info('Initializing aggregated token list from tokenlists.org');
 
-  const aggregatedTokenList: AggregatedTokenList = [];
+  const list: AggregatedTokenList = [];
 
   const uris = await fetchList();
 
   await Promise.all(
     uris.map(async tokenListUri => {
       const tokens = await fetchTokens(tokenListUri);
-      aggregatedTokenList.push(...tokens);
+      list.push(...tokens);
     })
   );
 
+  aggregatedTokenList = list;
+
   console.info(`Aggregated token list initialized with ${aggregatedTokenList.length} tokens`);
+  lastUpdateTimestamp = Date.now();
 
   return aggregatedTokenList;
 }
