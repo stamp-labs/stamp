@@ -14,31 +14,45 @@ function normalizeTokenListUri(tokenListUri: string) {
   return tokenListUri;
 }
 
+const TOKENLISTS_URL =
+  'https://raw.githubusercontent.com/Uniswap/tokenlists-org/master/src/token-lists.json';
+
+async function fetchList() {
+  const response = await fetch(TOKENLISTS_URL);
+  const tokenLists = await response.json();
+  const uris = Object.keys(tokenLists);
+
+  return uris;
+}
+
+async function fetchTokens(tokenListUri: string) {
+  tokenListUri = normalizeTokenListUri(tokenListUri);
+  console.info(`Fetching list from ${tokenListUri}`);
+
+  try {
+    const response = await fetch(tokenListUri);
+    const tokens = await response.json();
+    // TODO: validate response, use zod
+    return tokens.tokens.filter((token: any) => token.logoURI);
+  } catch (e) {
+    console.warn(`Failed to fetch token list from ${tokenListUri}`);
+    return [];
+  }
+}
+
 export async function initAggregatedTokenList() {
   console.info('Initializing aggregated token list from tokenlists.org');
 
   const aggregatedTokenList: AggregatedTokenList = [];
 
-  const tokenListsResponse = await fetch(
-    'https://raw.githubusercontent.com/Uniswap/tokenlists-org/master/src/token-lists.json'
+  const uris = await fetchList();
+
+  await Promise.all(
+    uris.map(async tokenListUri => {
+      const tokens = await fetchTokens(tokenListUri);
+      aggregatedTokenList.push(...tokens);
+    })
   );
-  const tokenLists = await tokenListsResponse.json();
-  const uris = Object.keys(tokenLists);
-
-  // TODO: parallelize
-  for (let tokenListUri of uris) {
-    tokenListUri = normalizeTokenListUri(tokenListUri);
-    console.info(`Fetching list from ${tokenListUri}`);
-
-    try {
-      const response = await fetch(tokenListUri);
-      const tokens = await response.json();
-      // TODO: validate response, use zod
-      aggregatedTokenList.push(...tokens.tokens.filter((token: any) => token.logoURI));
-    } catch (e) {
-      console.warn(`Failed to fetch token list from ${tokenListUri}`);
-    }
-  }
 
   console.info(`Aggregated token list initialized with ${aggregatedTokenList.length} tokens`);
 
