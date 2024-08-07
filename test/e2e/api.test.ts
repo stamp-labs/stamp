@@ -17,7 +17,7 @@ async function purge(): Promise<void> {
 
 // for token resolver, which currently takes very long
 // not sure this is the best way to handle this
-jest.setTimeout(120_000);
+jest.setTimeout(30_000);
 
 describe('E2E api', () => {
   describe('GET type/TYPE/ID', () => {
