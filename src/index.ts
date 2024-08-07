@@ -6,7 +6,6 @@ import { initLogger, fallbackLogger } from '@snapshot-labs/snapshot-sentry';
 import initMetrics from './helpers/metrics';
 import api from './api';
 import { name, version } from '../package.json';
-import aggregatedTokenList, { initAggregatedTokenList } from './helpers/tokenlists';
 
 const app = express();
 const PORT = process.env.PORT || 3008;
@@ -32,12 +31,4 @@ app.use((_, res) => {
   res.status(400).json({ message: 'Not found' });
 });
 
-async function boot() {
-  // TODO: init other stuff here too (redis) and remove if !redis return elsewhere
-  await initAggregatedTokenList();
-}
-
-boot().then(() => {
-  console.info('Aggregated token list initialized', aggregatedTokenList.length);
-  app.listen(PORT, () => console.log(`Listening at http://localhost:${PORT}`));
-});
+app.listen(PORT, () => console.log(`Listening at http://localhost:${PORT}`));

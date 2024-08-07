@@ -7,8 +7,6 @@ export type AggregatedTokenList = {
   decimals: number;
 }[];
 
-const aggregatedTokenList: AggregatedTokenList = [];
-
 function normalizeTokenListUri(tokenListUri: string) {
   if (!tokenListUri.startsWith('http') && tokenListUri.endsWith('.eth')) {
     tokenListUri = `https://${tokenListUri}.limo`;
@@ -18,6 +16,8 @@ function normalizeTokenListUri(tokenListUri: string) {
 
 export async function initAggregatedTokenList() {
   console.info('Initializing aggregated token list from tokenlists.org');
+
+  const aggregatedTokenList: AggregatedTokenList = [];
 
   const tokenListsResponse = await fetch(
     'https://raw.githubusercontent.com/Uniswap/tokenlists-org/master/src/token-lists.json'
@@ -39,6 +39,8 @@ export async function initAggregatedTokenList() {
       console.warn(`Failed to fetch token list from ${tokenListUri}`);
     }
   }
-}
 
-export default aggregatedTokenList;
+  console.info(`Aggregated token list initialized with ${aggregatedTokenList.length} tokens`);
+
+  return aggregatedTokenList;
+}

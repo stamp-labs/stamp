@@ -15,6 +15,8 @@ async function purge(): Promise<void> {
   transaction.exec();
 }
 
+jest.setTimeout(120_000); // for token resolver
+
 describe('E2E api', () => {
   describe('GET type/TYPE/ID', () => {
     it('returns an image for tokenlists resolver', async () => {
