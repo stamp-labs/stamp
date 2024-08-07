@@ -44,6 +44,22 @@ async function fetchTokens(tokenListUri: string) {
   }
 }
 
+const REPLACE_SIZE_REGEX: { pattern: RegExp; replacement: string }[] = [
+  {
+    pattern: /assets.coingecko.com\/coins\/images\/\d+\/thumb/,
+    replacement: 'assets.coingecko.com/coins/images/$1/large'
+  }
+];
+
+function replaceSizePartsInImageUrls(list: AggregatedTokenList) {
+  return list.map(token => {
+    token.logoURI = REPLACE_SIZE_REGEX.reduce((acc, { pattern, replacement }) => {
+      return acc.replace(pattern, replacement);
+    }, token.logoURI);
+    return token;
+  });
+}
+
 export async function initAggregatedTokenList() {
   if (aggregatedTokenList && lastUpdateTimestamp && lastUpdateTimestamp > Date.now() - TTL) {
     console.info('Using in-memory aggregated token list');
@@ -63,7 +79,9 @@ export async function initAggregatedTokenList() {
     })
   );
 
-  aggregatedTokenList = list;
+  const listWithReplacedSizes = replaceSizePartsInImageUrls(list);
+
+  aggregatedTokenList = listWithReplacedSizes;
 
   console.info(`Aggregated token list initialized with ${aggregatedTokenList.length} tokens`);
   lastUpdateTimestamp = Date.now();
