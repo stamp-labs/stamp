@@ -10,7 +10,9 @@ export default async function resolve(key) {
       data: {
         data: { space }
       }
-    } = await graphQlCall(`${HUB_URL}/graphql`, `query { space(id: "${key}") { avatar } }`);
+    } = await graphQlCall(`${HUB_URL}/graphql`, `query { space(id: "${key}") { avatar } }`, {
+      headers: { 'x-api-key': process.env.HUB_API_KEY }
+    });
 
     if (!space || !space.avatar) return false;
 
