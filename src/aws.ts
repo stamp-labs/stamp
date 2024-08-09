@@ -6,7 +6,7 @@ const bucket = process.env.AWS_BUCKET_NAME;
 const region = process.env.AWS_REGION;
 const endpoint = process.env.AWS_ENDPOINT || undefined;
 if (region) client = new AWS.S3({ region, endpoint });
-const dir = 'stamp-5';
+const dir = 'stamp-6';
 
 export async function streamToBuffer(stream: Readable) {
   return await new Promise((resolve, reject) => {
