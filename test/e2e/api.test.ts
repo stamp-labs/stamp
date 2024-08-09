@@ -17,7 +17,7 @@ async function purge(): Promise<void> {
 
 // for token resolver, which needs a moment on first run
 // I think the tests need to return promises.
-jest.setTimeout(30_000);
+jest.setTimeout(60_000);
 
 describe('E2E api', () => {
   describe('GET type/TYPE/ID', () => {
