@@ -1,11 +1,15 @@
-export type AggregatedTokenList = {
+import { getAddress } from '@ethersproject/address';
+
+type TokenlistToken = {
   chainId: number;
   address: string;
   symbol: string;
   name: string;
   logoURI: string;
   decimals: number;
-}[];
+};
+
+type AggregatedTokenList = TokenlistToken[];
 
 const TTL = 1000 * 60 * 60 * 24;
 let aggregatedTokenList: AggregatedTokenList | undefined;
@@ -21,7 +25,7 @@ function normalizeTokenListUri(tokenListUri: string) {
 const TOKENLISTS_URL =
   'https://raw.githubusercontent.com/Uniswap/tokenlists-org/master/src/token-lists.json';
 
-async function fetchList() {
+async function fetchListUris() {
   const response = await fetch(TOKENLISTS_URL);
   const tokenLists = await response.json();
   const uris = Object.keys(tokenLists);
@@ -63,17 +67,10 @@ function replaceSizePartsInImageUrls(list: AggregatedTokenList) {
   });
 }
 
-export async function initAggregatedTokenList() {
-  if (aggregatedTokenList && lastUpdateTimestamp && lastUpdateTimestamp > Date.now() - TTL) {
-    console.info('Using in-memory aggregated token list');
-    return aggregatedTokenList;
-  }
-
-  console.info('Initializing aggregated token list from tokenlists.org');
-
+async function updateAggregatedTokenList() {
   const list: AggregatedTokenList = [];
 
-  const uris = await fetchList();
+  const uris = await fetchListUris();
 
   await Promise.all(
     uris.map(async tokenListUri => {
@@ -83,9 +80,32 @@ export async function initAggregatedTokenList() {
   );
 
   aggregatedTokenList = replaceSizePartsInImageUrls(list);
-
-  console.info(`Aggregated token list initialized with ${aggregatedTokenList.length} tokens`);
   lastUpdateTimestamp = Date.now();
+}
 
-  return aggregatedTokenList;
+export async function initTokenLists() {
+  await updateAggregatedTokenList();
+
+  setInterval(() => {
+    if (lastUpdateTimestamp && Date.now() - lastUpdateTimestamp > TTL) {
+      updateAggregatedTokenList();
+    }
+  }, TTL);
+
+  return true;
+}
+
+export async function findImageUrl(address: string, chainId: string) {
+  const checksum = getAddress(address);
+
+  if (!aggregatedTokenList) {
+    throw new Error('Tokenlists not initialized');
+  }
+
+  const token = aggregatedTokenList.find(token => {
+    return token.chainId === parseInt(chainId) && getAddress(token.address) === checksum;
+  });
+  if (!token) throw new Error('Token not found');
+
+  return token.logoURI;
 }
