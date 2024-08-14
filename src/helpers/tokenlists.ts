@@ -53,7 +53,7 @@ async function fetchTokens(tokenListUri: string) {
 
 const REPLACE_SIZE_REGEX: { pattern: RegExp; replacement: string }[] = [
   {
-    pattern: /assets.coingecko.com\/coins\/images\/\d+\/thumb/,
+    pattern: /assets.coingecko.com\/coins\/images\/(\d+)\/thumb/,
     replacement: 'assets.coingecko.com/coins/images/$1/large'
   }
 ];
@@ -66,6 +66,19 @@ function replaceSizePartsInImageUrls(list: AggregatedTokenList) {
     return token;
   });
 }
+
+console.log(
+  replaceSizePartsInImageUrls([
+    {
+      address: '0x6b175474e89094c44da98b954eedeac495271d0f',
+      chainId: 1,
+      decimals: 18,
+      logoURI: 'https://assets.coingecko.com/coins/images/1645646/thumb/dai.png',
+      name: 'Dai Stablecoin',
+      symbol: 'DAI'
+    }
+  ])
+);
 
 async function updateAggregatedTokenList() {
   const list: AggregatedTokenList = [];
