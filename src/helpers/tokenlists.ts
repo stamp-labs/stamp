@@ -22,6 +22,13 @@ function normalizeTokenListUri(tokenListUri: string) {
   return tokenListUri;
 }
 
+function normalizeTokenLogoUri(logoUri: string) {
+  if (logoUri.startsWith('ipfs://')) {
+    logoUri = `https://ipfs.io/ipfs/${logoUri.slice(7)}`;
+  }
+  return logoUri;
+}
+
 const TOKENLISTS_URL =
   'https://raw.githubusercontent.com/Uniswap/tokenlists-org/master/src/token-lists.json';
 
@@ -44,7 +51,7 @@ async function fetchTokens(tokenListUri: string) {
       throw new Error('Invalid token list');
     }
 
-    return tokens.tokens.filter((token: any) => token.logoURI);
+    return tokens.tokens.filter((token: any) => normalizeTokenLogoUri(token.logoURI));
   } catch (e) {
     console.warn(`Failed to fetch token list from ${tokenListUri}`);
     return [];
