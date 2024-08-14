@@ -36,7 +36,10 @@ async function fetchTokens(tokenListUri: string) {
   try {
     const response = await fetch(tokenListUri);
     const tokens = await response.json();
-    // TODO: validate response, use zod
+    if (!tokens.tokens || !Array.isArray(tokens.tokens)) {
+      throw new Error('Invalid token list');
+    }
+
     return tokens.tokens.filter((token: any) => token.logoURI);
   } catch (e) {
     console.warn(`Failed to fetch token list from ${tokenListUri}`);
