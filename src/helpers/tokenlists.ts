@@ -60,12 +60,12 @@ async function fetchTokens(tokenListUri: string) {
 
 const REPLACE_SIZE_REGEX: { pattern: RegExp; replacement: string }[] = [
   {
-    pattern: /assets.coingecko.com\/coins\/images\/(\d+)\/thumb/,
+    pattern: /assets.coingecko.com\/coins\/images\/(\d+)\/(thumb|small)/,
     replacement: 'assets.coingecko.com/coins/images/$1/large'
   }
 ];
 
-function replaceSizePartsInImageUrls(list: AggregatedTokenList) {
+export function replaceSizePartsInImageUrls(list: AggregatedTokenList) {
   return list.map(token => {
     token.logoURI = REPLACE_SIZE_REGEX.reduce((acc, { pattern, replacement }) => {
       return acc.replace(pattern, replacement);
