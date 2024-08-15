@@ -12,8 +12,12 @@ type TokenlistToken = {
 type AggregatedTokenList = TokenlistToken[];
 
 const TTL = 1000 * 60 * 60 * 24;
-let aggregatedTokenList: AggregatedTokenList | undefined;
+let aggregatedTokenList: AggregatedTokenList = [];
 let lastUpdateTimestamp: number | undefined;
+
+function isExpired() {
+  return !lastUpdateTimestamp || Date.now() - lastUpdateTimestamp > TTL;
+}
 
 function normalizeTokenListUri(tokenListUri: string) {
   if (!tokenListUri.startsWith('http') && tokenListUri.endsWith('.eth')) {
@@ -42,7 +46,6 @@ async function fetchListUris() {
 
 async function fetchTokens(tokenListUri: string) {
   tokenListUri = normalizeTokenListUri(tokenListUri);
-  console.info(`Fetching list from ${tokenListUri}`);
 
   try {
     const response = await fetch(tokenListUri);
@@ -74,7 +77,11 @@ export function replaceSizePartsInImageUrls(list: AggregatedTokenList) {
   });
 }
 
-async function updateAggregatedTokenList() {
+export async function updateExpiredAggregatedTokenList() {
+  if (!isExpired()) {
+    return;
+  }
+
   const list: AggregatedTokenList = [];
 
   const uris = await fetchListUris();
@@ -90,29 +97,16 @@ async function updateAggregatedTokenList() {
   lastUpdateTimestamp = Date.now();
 }
 
-export async function initTokenLists() {
-  await updateAggregatedTokenList();
-
-  setInterval(() => {
-    if (lastUpdateTimestamp && Date.now() - lastUpdateTimestamp > TTL) {
-      updateAggregatedTokenList();
-    }
-  }, TTL);
-
-  return true;
-}
-
-export async function findImageUrl(address: string, chainId: string) {
+export function findImageUrl(address: string, chainId: string) {
   const checksum = getAddress(address);
-
-  if (!aggregatedTokenList) {
-    throw new Error('Tokenlists not initialized');
-  }
 
   const token = aggregatedTokenList.find(token => {
     return token.chainId === parseInt(chainId) && getAddress(token.address) === checksum;
   });
-  if (!token) throw new Error('Token not found');
+
+  if (!token) {
+    throw new Error('Token not found');
+  }
 
   return token.logoURI;
 }
