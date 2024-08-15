@@ -11,6 +11,9 @@ type TokenlistToken = {
 
 type AggregatedTokenList = TokenlistToken[];
 
+const TOKENLISTS_URL =
+  'https://raw.githubusercontent.com/Uniswap/tokenlists-org/master/src/token-lists.json';
+const REQUEST_TIMEOUT = 2500;
 const TTL = 1000 * 60 * 60 * 24;
 let aggregatedTokenList: AggregatedTokenList = [];
 let lastUpdateTimestamp: number | undefined;
@@ -33,11 +36,10 @@ function normalizeTokenLogoUri(logoUri: string) {
   return logoUri;
 }
 
-const TOKENLISTS_URL =
-  'https://raw.githubusercontent.com/Uniswap/tokenlists-org/master/src/token-lists.json';
-
 async function fetchListUris() {
-  const response = await fetch(TOKENLISTS_URL);
+  const response = await fetch(TOKENLISTS_URL, {
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT)
+  });
   const tokenLists = await response.json();
   const uris = Object.keys(tokenLists);
 
@@ -48,7 +50,9 @@ async function fetchTokens(tokenListUri: string) {
   tokenListUri = normalizeTokenListUri(tokenListUri);
 
   try {
-    const response = await fetch(tokenListUri);
+    const response = await fetch(tokenListUri, {
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT)
+    });
     const tokens = await response.json();
     if (!tokens.tokens || !Array.isArray(tokens.tokens)) {
       throw new Error('Invalid token list');
