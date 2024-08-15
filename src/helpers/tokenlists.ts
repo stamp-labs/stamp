@@ -54,7 +54,14 @@ async function fetchTokens(tokenListUri: string) {
       throw new Error('Invalid token list');
     }
 
-    return tokens.tokens.filter((token: any) => normalizeTokenLogoUri(token.logoURI));
+    const tokensWithLogoUri = tokens.tokens.filter((token: any) => token.logoURI);
+
+    return tokensWithLogoUri.map((token: any) => {
+      return {
+        ...token,
+        logoURI: normalizeTokenLogoUri(token.logoURI)
+      };
+    });
   } catch (e) {
     console.warn(`Failed to fetch token list from ${tokenListUri}`);
     return [];
