@@ -1,5 +1,12 @@
 import { getAddress } from '@ethersproject/address';
 
+const TOKENLISTS_URL =
+  'https://raw.githubusercontent.com/Uniswap/tokenlists-org/master/src/token-lists.json';
+const REQUEST_TIMEOUT = 5000;
+const TTL = 1000 * 60 * 60 * 24;
+let aggregatedTokenList: AggregatedTokenList = [];
+let lastUpdateTimestamp: number | undefined;
+
 type TokenlistToken = {
   chainId: number;
   address: string;
@@ -9,83 +16,86 @@ type TokenlistToken = {
   decimals: number;
 };
 
-type AggregatedTokenList = TokenlistToken[];
+type AggregatedTokenListToken = Omit<TokenlistToken, 'logoURI'> & {
+  logoURIs: string[];
+};
 
-const TOKENLISTS_URL =
-  'https://raw.githubusercontent.com/Uniswap/tokenlists-org/master/src/token-lists.json';
-const REQUEST_TIMEOUT = 2500;
-const TTL = 1000 * 60 * 60 * 24;
-let aggregatedTokenList: AggregatedTokenList = [];
-let lastUpdateTimestamp: number | undefined;
+type AggregatedTokenList = AggregatedTokenListToken[];
+
+function isTokenlistToken(token: unknown): token is TokenlistToken {
+  if (typeof token !== 'object' || token === null) {
+    return false;
+  }
+
+  const { chainId, address, symbol, name, logoURI, decimals } = token as TokenlistToken;
+
+  return (
+    typeof chainId === 'number' &&
+    typeof address === 'string' &&
+    typeof symbol === 'string' &&
+    typeof name === 'string' &&
+    typeof logoURI === 'string' &&
+    typeof decimals === 'number'
+  );
+}
 
 function isExpired() {
   return !lastUpdateTimestamp || Date.now() - lastUpdateTimestamp > TTL;
 }
 
-function normalizeTokenListUri(tokenListUri: string) {
-  if (!tokenListUri.startsWith('http') && tokenListUri.endsWith('.eth')) {
-    tokenListUri = `https://${tokenListUri}.limo`;
+function normalizeUri(uri: string) {
+  if (!uri.startsWith('http') && uri.endsWith('.eth')) {
+    uri = `https://${uri}.limo`;
   }
-  return tokenListUri;
+  if (uri.startsWith('ipfs://')) {
+    uri = `https://ipfs.io/ipfs/${uri.slice(7)}`;
+  }
+  return uri;
 }
 
-function normalizeTokenLogoUri(logoUri: string) {
-  if (logoUri.startsWith('ipfs://')) {
-    logoUri = `https://ipfs.io/ipfs/${logoUri.slice(7)}`;
-  }
-  return logoUri;
+async function fetchUri(uri: string) {
+  return await fetch(normalizeUri(uri), { signal: AbortSignal.timeout(REQUEST_TIMEOUT) });
 }
 
 async function fetchListUris() {
-  const response = await fetch(TOKENLISTS_URL, {
-    signal: AbortSignal.timeout(REQUEST_TIMEOUT)
-  });
-  const tokenLists = await response.json();
-  const uris = Object.keys(tokenLists);
-
-  return uris;
-}
-
-async function fetchTokens(tokenListUri: string) {
-  tokenListUri = normalizeTokenListUri(tokenListUri);
-
   try {
-    const response = await fetch(tokenListUri, {
-      signal: AbortSignal.timeout(REQUEST_TIMEOUT)
-    });
-    const tokens = await response.json();
-    if (!tokens.tokens || !Array.isArray(tokens.tokens)) {
-      throw new Error('Invalid token list');
-    }
+    const response = await fetchUri(TOKENLISTS_URL);
+    const tokenLists = await response.json();
+    const uris = Object.keys(tokenLists);
 
-    const tokensWithLogoUri = tokens.tokens.filter((token: any) => token.logoURI);
+    uris.sort();
 
-    return tokensWithLogoUri.map((token: any) => {
-      return {
-        ...token,
-        logoURI: normalizeTokenLogoUri(token.logoURI)
-      };
-    });
+    return uris;
   } catch (e) {
-    console.warn(`Failed to fetch token list from ${tokenListUri}`);
     return [];
   }
 }
 
-const REPLACE_SIZE_REGEX: { pattern: RegExp; replacement: string }[] = [
+export async function fetchTokens(listUri: string) {
+  try {
+    const response = await fetchUri(listUri);
+    const { tokens } = await response.json();
+    if (!tokens || !Array.isArray(tokens)) {
+      throw new Error('Invalid token list');
+    }
+    return tokens.filter(isTokenlistToken);
+  } catch (e) {
+    return [];
+  }
+}
+
+const REPLACE_SIZE_REGEXES: { pattern: RegExp; replacement: string }[] = [
   {
     pattern: /assets.coingecko.com\/coins\/images\/(\d+)\/(thumb|small)/,
     replacement: 'assets.coingecko.com/coins/images/$1/large'
   }
 ];
 
-export function replaceSizePartsInImageUrls(list: AggregatedTokenList) {
-  return list.map(token => {
-    token.logoURI = REPLACE_SIZE_REGEX.reduce((acc, { pattern, replacement }) => {
-      return acc.replace(pattern, replacement);
-    }, token.logoURI);
-    return token;
-  });
+export function replaceURIPatterns(uri: string) {
+  for (const { pattern, replacement } of REPLACE_SIZE_REGEXES) {
+    uri = uri.replace(pattern, replacement);
+  }
+  return uri;
 }
 
 export async function updateExpiredAggregatedTokenList() {
@@ -93,18 +103,38 @@ export async function updateExpiredAggregatedTokenList() {
     return;
   }
 
-  const list: AggregatedTokenList = [];
+  const updatedAggregatedList: AggregatedTokenList = [];
+  const tokenMap = new Map<string, AggregatedTokenListToken>();
 
-  const uris = await fetchListUris();
+  const tokenListUris = await fetchListUris();
+  const tokenLists = await Promise.all(tokenListUris.map(fetchTokens));
 
-  await Promise.all(
-    uris.map(async tokenListUri => {
-      const tokens = await fetchTokens(tokenListUri);
-      list.push(...tokens);
-    })
-  );
+  for (const tokens of tokenLists) {
+    for (const token of tokens) {
+      const logoURI = normalizeUri(replaceURIPatterns(token.logoURI));
+      const tokenKey = `${token.chainId}-${getAddress(token.address)}`;
 
-  aggregatedTokenList = replaceSizePartsInImageUrls(list);
+      const existingToken = tokenMap.get(tokenKey);
+      if (existingToken) {
+        existingToken.logoURIs.push(logoURI);
+      } else {
+        const newToken: AggregatedTokenListToken = {
+          chainId: token.chainId,
+          address: token.address,
+          symbol: token.symbol,
+          name: token.name,
+          decimals: token.decimals,
+          logoURIs: [logoURI]
+        };
+        tokenMap.set(tokenKey, newToken);
+        updatedAggregatedList.push(newToken);
+      }
+    }
+  }
+
+  updatedAggregatedList.forEach(token => token.logoURIs.sort());
+
+  aggregatedTokenList = updatedAggregatedList;
   lastUpdateTimestamp = Date.now();
 }
 
@@ -119,5 +149,5 @@ export function findImageUrl(address: string, chainId: string) {
     throw new Error('Token not found');
   }
 
-  return token.logoURI;
+  return token.logoURIs[0];
 }
