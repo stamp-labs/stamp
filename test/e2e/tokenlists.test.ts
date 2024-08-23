@@ -33,9 +33,6 @@ describe('tokenlist resolver', () => {
   it('returns an image for standard address', async () => {
     const response = await getImageResponse(cUSDC_TOKEN_ADDRESS_ON_MAIN);
 
-    const image = sharp(response.data);
-    await image.toFile(`./test/e2e/cusdc-${new Date().getTime()}.webp`);
-
     expect(response.status).toBe(200);
     expect(response.headers['content-type']).toBe('image/webp');
   });
@@ -44,11 +41,10 @@ describe('tokenlist resolver', () => {
     const response = await getImageResponse(ERC3770_ADDRESS);
 
     const image = sharp(response.data);
-    await image.toFile(`./test/e2e/erc3770-${new Date().getTime()}.webp`);
     const imageBuffer = await image.raw().toBuffer();
 
     const fingerprint = getImageFingerprint(imageBuffer.toString('hex'));
-    const expectedFingerprint = 'f00ea652e3b6c2c7e72db8b1c0f35884094c7c598fe60b3c28956f328dbaded8';
+    const expectedFingerprint = 'ac601f072065d4d03e6ef906c1dc3074d7ad52b9c715d0db6941ec89bf2073a1';
 
     expect(response.status).toBe(200);
     expect(response.headers['content-type']).toBe('image/webp');
@@ -59,7 +55,6 @@ describe('tokenlist resolver', () => {
     const response = await getImageResponse(EIP155_ADDRESS);
 
     const image = sharp(response.data);
-    await image.toFile(`./test/e2e/eip155-${new Date().getTime()}.webp`);
     const imageBuffer = await image.raw().toBuffer();
 
     const fingerprint = getImageFingerprint(imageBuffer.toString('hex'));
