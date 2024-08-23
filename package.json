@@ -13,6 +13,7 @@
     "test": "PORT=3003 start-server-and-test 'yarn start:test' http://localhost:3003 'dotenv -e test/.env.test yarn jest'",
     "test:integration": "dotenv -e test/.env.test yarn jest --runInBand --collectCoverage=false test/integration",
     "test:e2e": "PORT=3003 start-server-and-test 'yarn start:test' http://localhost:3003 'dotenv -e test/.env.test jest --runInBand --collectCoverage=false test/e2e/'",
+    "test:e2e:tokenlists": "PORT=3003 start-server-and-test 'yarn start:test' http://localhost:3003 'dotenv -e test/.env.test jest --runInBand --collectCoverage=false test/e2e/tokenlists.test.ts'",
     "test:unit": "yarn jest --runInBand --collectCoverage=false test/unit"
   },
   "dependencies": {
