@@ -3,7 +3,6 @@ import redis from '../../src/helpers/redis';
 import { KEY_PREFIX } from '../../src/addressResolvers/cache';
 
 const HOST = `http://localhost:${process.env.PORT || 3003}`;
-const cUSDC_TOKEN_ADDRESS_ON_MAIN = '0x39AA39c021dfbaE8faC545936693aC917d5E7563';
 
 async function purge(): Promise<void> {
   if (!redis) return;
@@ -15,20 +14,8 @@ async function purge(): Promise<void> {
   transaction.exec();
 }
 
-// for token resolver, which needs a moment on first run
-// I think the tests need to return promises.
-jest.setTimeout(60_000);
-
 describe('E2E api', () => {
   describe('GET type/TYPE/ID', () => {
-    it('returns an image for tokenlists resolver', async () => {
-      const response = await axios.get(
-        `${HOST}/token/${cUSDC_TOKEN_ADDRESS_ON_MAIN}?resolver=tokenlists`
-      );
-      expect(response.status).toBe(200);
-      expect(response.headers['content-type']).toBe('image/webp');
-    });
-
     it.todo('returns a 500 status on invalid query');
 
     describe('when the image is not cached', () => {

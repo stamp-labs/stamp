@@ -1,45 +1,21 @@
-import { replaceSizePartsInImageUrls } from '../../src/helpers/tokenlists';
+import { replaceURIPatterns } from '../../src/helpers/tokenlists';
 
-test('replaceSizePartsInImageUrls should replace image size parts in URLs', () => {
-  const tokenList = [
-    {
-      chainId: 1,
-      address: '0x1234567890abcdef',
-      symbol: 'ABC',
-      name: 'Token ABC',
-      logoURI: 'https://assets.coingecko.com/coins/images/123/thumb',
-      decimals: 18
-    },
-    {
-      chainId: 1,
-      address: '0xabcdef1234567890',
-      symbol: 'DEF',
-      name: 'Token DEF',
-      logoURI: 'https://assets.coingecko.com/coins/images/456/small',
-      decimals: 18
-    }
-  ];
+jest.setTimeout(60_000);
 
-  const expectedTokenList = [
-    {
-      chainId: 1,
-      address: '0x1234567890abcdef',
-      symbol: 'ABC',
-      name: 'Token ABC',
-      logoURI: 'https://assets.coingecko.com/coins/images/123/large',
-      decimals: 18
-    },
-    {
-      chainId: 1,
-      address: '0xabcdef1234567890',
-      symbol: 'DEF',
-      name: 'Token DEF',
-      logoURI: 'https://assets.coingecko.com/coins/images/456/large',
-      decimals: 18
-    }
-  ];
+describe('tokenlists helper', () => {
+  it('replaceURIPatterns should replace image size parts in URLs', () => {
+    const uris = [
+      'https://assets.coingecko.com/coins/images/123/thumb',
+      'https://assets.coingecko.com/coins/images/456/small'
+    ];
 
-  const result = replaceSizePartsInImageUrls(tokenList);
+    const expectedUris = [
+      'https://assets.coingecko.com/coins/images/123/large',
+      'https://assets.coingecko.com/coins/images/456/large'
+    ];
 
-  expect(result).toEqual(expectedTokenList);
+    uris.forEach((uri, i) => {
+      expect(replaceURIPatterns(uri)).toBe(expectedUris[i]);
+    });
+  });
 });
