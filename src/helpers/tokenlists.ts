@@ -14,6 +14,7 @@ const REQUEST_TIMEOUT = 5000;
 const TTL = 1000 * 60 * 60 * 24;
 let aggregatedTokenList: AggregatedTokenList = new Map();
 let lastUpdateTimestamp: number | undefined;
+let isUpdating = false;
 
 function isTokenlistToken(token: unknown): token is TokenlistToken {
   if (typeof token !== 'object' || token === null) {
@@ -132,9 +133,11 @@ function getTokenKey(address: string, chainId: string) {
 }
 
 export async function updateExpiredAggregatedTokenList() {
-  if (!isExpired()) {
+  if (!isExpired() || isUpdating) {
     return;
   }
+
+  isUpdating = true;
 
   const newTokenMap = new Map<string, string[]>();
 
@@ -159,6 +162,7 @@ export async function updateExpiredAggregatedTokenList() {
 
   aggregatedTokenList = newTokenMap;
   lastUpdateTimestamp = Date.now();
+  isUpdating = false;
 }
 
 export function findImageUrl(address: string, chainId: string) {
