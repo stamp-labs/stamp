@@ -75,6 +75,8 @@ const REPLACE_SIZE_REGEXES: { pattern: RegExp; replacement: string }[] = [
   }
 ];
 
+// TODO: Since we do the sorting by keyword match, we should probably not change the URLs in place but add the "large" version to the list of URIs.
+// Might be better for fallback mechanisms, instead of overwriting the version that was fetched.
 export function replaceURIPatterns(uri: string) {
   for (const { pattern, replacement } of REPLACE_SIZE_REGEXES) {
     uri = uri.replace(pattern, replacement);
