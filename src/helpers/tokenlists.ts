@@ -3,10 +3,7 @@ import { getAddress } from '@ethersproject/address';
 type TokenlistToken = {
   chainId: number;
   address: string;
-  symbol: string;
-  name: string;
   logoURI: string;
-  decimals: number;
 };
 
 type AggregatedTokenListToken = Omit<TokenlistToken, 'logoURI'> & {
@@ -27,16 +24,9 @@ function isTokenlistToken(token: unknown): token is TokenlistToken {
     return false;
   }
 
-  const { chainId, address, symbol, name, logoURI, decimals } = token as TokenlistToken;
+  const { chainId, address, logoURI } = token as TokenlistToken;
 
-  return (
-    typeof chainId === 'number' &&
-    typeof address === 'string' &&
-    typeof symbol === 'string' &&
-    typeof name === 'string' &&
-    typeof logoURI === 'string' &&
-    typeof decimals === 'number'
-  );
+  return typeof chainId === 'number' && typeof address === 'string' && typeof logoURI === 'string';
 }
 
 function isExpired() {
@@ -165,9 +155,6 @@ export async function updateExpiredAggregatedTokenList() {
         const newToken: AggregatedTokenListToken = {
           chainId: token.chainId,
           address: token.address,
-          symbol: token.symbol,
-          name: token.name,
-          decimals: token.decimals,
           logoURIs: [logoURI]
         };
         newTokenMap.set(tokenKey, newToken);
