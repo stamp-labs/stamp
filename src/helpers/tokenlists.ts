@@ -1,12 +1,5 @@
 import { getAddress } from '@ethersproject/address';
 
-const TOKENLISTS_URL =
-  'https://raw.githubusercontent.com/Uniswap/tokenlists-org/master/src/token-lists.json';
-const REQUEST_TIMEOUT = 5000;
-const TTL = 1000 * 60 * 60 * 24;
-let aggregatedTokenList: AggregatedTokenList = [];
-let lastUpdateTimestamp: number | undefined;
-
 type TokenlistToken = {
   chainId: number;
   address: string;
@@ -20,7 +13,14 @@ type AggregatedTokenListToken = Omit<TokenlistToken, 'logoURI'> & {
   logoURIs: string[];
 };
 
-type AggregatedTokenList = AggregatedTokenListToken[];
+type AggregatedTokenList = Map<string, AggregatedTokenListToken>;
+
+const TOKENLISTS_URL =
+  'https://raw.githubusercontent.com/Uniswap/tokenlists-org/master/src/token-lists.json';
+const REQUEST_TIMEOUT = 5000;
+const TTL = 1000 * 60 * 60 * 24;
+let aggregatedTokenList: AggregatedTokenList = new Map();
+let lastUpdateTimestamp: number | undefined;
 
 function isTokenlistToken(token: unknown): token is TokenlistToken {
   if (typeof token !== 'object' || token === null) {
@@ -139,13 +139,16 @@ export function sortByKeywordMatch(a: string, b: string) {
   }
 }
 
+function getTokenKey(address: string, chainId: string) {
+  return `${chainId}-${getAddress(address)}`;
+}
+
 export async function updateExpiredAggregatedTokenList() {
   if (!isExpired()) {
     return;
   }
 
-  const updatedAggregatedList: AggregatedTokenList = [];
-  const tokenMap = new Map<string, AggregatedTokenListToken>();
+  const newTokenMap = new Map<string, AggregatedTokenListToken>();
 
   const tokenListUris = await fetchListUris();
   const tokenLists = await Promise.all(tokenListUris.map(fetchTokens));
@@ -153,9 +156,9 @@ export async function updateExpiredAggregatedTokenList() {
   for (const tokens of tokenLists) {
     for (const token of tokens) {
       const logoURI = normalizeUri(replaceURIPatterns(token.logoURI));
-      const tokenKey = `${token.chainId}-${getAddress(token.address)}`;
+      const tokenKey = getTokenKey(token.address, token.chainId.toString());
 
-      const existingToken = tokenMap.get(tokenKey);
+      const existingToken = newTokenMap.get(tokenKey);
       if (existingToken) {
         existingToken.logoURIs.push(logoURI);
       } else {
@@ -167,27 +170,23 @@ export async function updateExpiredAggregatedTokenList() {
           decimals: token.decimals,
           logoURIs: [logoURI]
         };
-        tokenMap.set(tokenKey, newToken);
-        updatedAggregatedList.push(newToken);
+        newTokenMap.set(tokenKey, newToken);
       }
     }
   }
 
-  updatedAggregatedList.forEach(token => token.logoURIs.sort(sortByKeywordMatch));
+  newTokenMap.forEach(token => token.logoURIs.sort(sortByKeywordMatch));
 
-  aggregatedTokenList = updatedAggregatedList;
+  aggregatedTokenList = newTokenMap;
   lastUpdateTimestamp = Date.now();
 }
 
 export function findImageUrl(address: string, chainId: string) {
-  const checksum = getAddress(address);
-
-  const token = aggregatedTokenList.find(token => {
-    return token.chainId === parseInt(chainId) && getAddress(token.address) === checksum;
-  });
+  const tokenKey = getTokenKey(address, chainId);
+  const token = aggregatedTokenList.get(tokenKey);
 
   if (!token) {
-    throw new Error('Token not found');
+    throw new Error('Token not found in aggregated tokenlist');
   }
 
   return token.logoURIs[0];
