@@ -63,8 +63,6 @@ async function fetchListUris() {
     const tokenLists = await response.json();
     const uris = Object.keys(tokenLists);
 
-    uris.sort();
-
     return uris;
   } catch (e) {
     return [];
