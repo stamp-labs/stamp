@@ -6,11 +6,7 @@ type TokenlistToken = {
   logoURI: string;
 };
 
-type AggregatedTokenListToken = Omit<TokenlistToken, 'logoURI'> & {
-  logoURIs: string[];
-};
-
-type AggregatedTokenList = Map<string, AggregatedTokenListToken>;
+type AggregatedTokenList = Map<string, string[]>;
 
 const TOKENLISTS_URL =
   'https://raw.githubusercontent.com/Uniswap/tokenlists-org/master/src/token-lists.json';
@@ -138,7 +134,7 @@ export async function updateExpiredAggregatedTokenList() {
     return;
   }
 
-  const newTokenMap = new Map<string, AggregatedTokenListToken>();
+  const newTokenMap = new Map<string, string[]>();
 
   const tokenListUris = await fetchListUris();
   const tokenLists = await Promise.all(tokenListUris.map(fetchTokens));
@@ -150,19 +146,14 @@ export async function updateExpiredAggregatedTokenList() {
 
       const existingToken = newTokenMap.get(tokenKey);
       if (existingToken) {
-        existingToken.logoURIs.push(logoURI);
+        existingToken.push(logoURI);
       } else {
-        const newToken: AggregatedTokenListToken = {
-          chainId: token.chainId,
-          address: token.address,
-          logoURIs: [logoURI]
-        };
-        newTokenMap.set(tokenKey, newToken);
+        newTokenMap.set(tokenKey, [logoURI]);
       }
     }
   }
 
-  newTokenMap.forEach(token => token.logoURIs.sort(sortByKeywordMatch));
+  newTokenMap.forEach(token => token.sort(sortByKeywordMatch));
 
   aggregatedTokenList = newTokenMap;
   lastUpdateTimestamp = Date.now();
@@ -176,5 +167,5 @@ export function findImageUrl(address: string, chainId: string) {
     throw new Error('Token not found in aggregated tokenlist');
   }
 
-  return token.logoURIs[0];
+  return token[0];
 }
