@@ -96,6 +96,49 @@ export function replaceURIPatterns(uri: string) {
   return uri;
 }
 
+const sizeKeywords = [
+  'xxl',
+  'xl',
+  'large',
+  'lg',
+  'big',
+  'medium',
+  'md',
+  'small',
+  'sm',
+  'thumb',
+  'icon',
+  'xs',
+  'xxs'
+];
+
+/**
+ * Sorts URIs by the size keyword in the URI. The order in the array above is the order of the sort.
+ */
+export function sortByKeywordMatch(a: string, b: string) {
+  try {
+    const aPath = new URL(a).pathname;
+    const bPath = new URL(b).pathname;
+
+    const keywordRegex = new RegExp(`\\b(${sizeKeywords.join('|')})\\b`);
+
+    const aMatch = aPath.match(keywordRegex);
+    const bMatch = bPath.match(keywordRegex);
+
+    if (aMatch && bMatch) {
+      return sizeKeywords.indexOf(aMatch[1]) - sizeKeywords.indexOf(bMatch[1]);
+    } else if (aMatch) {
+      return -1;
+    } else if (bMatch) {
+      return 1;
+    } else {
+      return a.localeCompare(b);
+    }
+  } catch (e) {
+    return 0;
+  }
+}
+
 export async function updateExpiredAggregatedTokenList() {
   if (!isExpired()) {
     return;
@@ -130,7 +173,7 @@ export async function updateExpiredAggregatedTokenList() {
     }
   }
 
-  updatedAggregatedList.forEach(token => token.logoURIs.sort());
+  updatedAggregatedList.forEach(token => token.logoURIs.sort(sortByKeywordMatch));
 
   aggregatedTokenList = updatedAggregatedList;
   lastUpdateTimestamp = Date.now();
