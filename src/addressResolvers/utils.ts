@@ -2,7 +2,7 @@ import snapshot from '@snapshot-labs/snapshot.js';
 import { getAddress } from '@ethersproject/address';
 import { Address, Handle } from '../utils';
 
-const broviderUrl = process.env.BROVIDER_URL || 'https://rpc.brovider.xyz';
+const broviderUrl = process.env.BROVIDER_URL || 'https://rpc.snapshot.org';
 
 export class FetchError extends Error {}
 
