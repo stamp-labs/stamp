@@ -13,6 +13,7 @@ export type ResolverType =
   | 'user-cover'
   | 'token'
   | 'space'
+  | 'space-cover'
   | 'space-sx'
   | 'space-cover-sx'
   | 'address'
