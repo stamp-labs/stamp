@@ -4,24 +4,24 @@ import { fetchHttpImage } from './utils';
 
 const HUB_URL = process.env.HUB_URL ?? 'https://hub.snapshot.org';
 
-function createPropertyResolver(property: 'avatar' | 'cover') {
+function createPropertyResolver(entity: 'user' | 'space', property: 'avatar' | 'cover') {
   return async (address: string) => {
     try {
       const {
         data: {
-          data: { user }
+          data: { entry }
         }
       } = await graphQlCall(
         `${HUB_URL}/graphql`,
-        `query { user(id: "${address}") { ${property} } }`,
+        `query { entry: ${entity}(id: "${address}") { ${property} } }`,
         {
           headers: { 'x-api-key': process.env.HUB_API_KEY }
         }
       );
 
-      if (!user?.[property]) return false;
+      if (!entry?.[property]) return false;
 
-      const url = getUrl(user[property]);
+      const url = getUrl(entry[property]);
       const input = await fetchHttpImage(url);
 
       if (property === 'cover') return input;
@@ -33,5 +33,7 @@ function createPropertyResolver(property: 'avatar' | 'cover') {
   };
 }
 
-export const resolveAvatar = createPropertyResolver('avatar');
-export const resolveCover = createPropertyResolver('cover');
+export const resolveUserAvatar = createPropertyResolver('user', 'avatar');
+export const resolveUserCover = createPropertyResolver('user', 'cover');
+export const resolveSpaceAvatar = createPropertyResolver('space', 'avatar');
+export const resolveSpaceCover = createPropertyResolver('space', 'cover');
