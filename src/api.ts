@@ -103,6 +103,7 @@ router.get(`/:type(${TYPE_CONSTRAINTS})/:id`, async (req, res) => {
     let currentResolvers: string[] = constants.resolvers.avatar;
     if (type === 'token') currentResolvers = constants.resolvers.token;
     if (type === 'space') currentResolvers = constants.resolvers.space;
+    if (type === 'space-cover') currentResolvers = constants.resolvers['space-cover'];
     if (type === 'space-sx') currentResolvers = constants.resolvers['space-sx'];
     if (type === 'space-cover-sx') currentResolvers = constants.resolvers['space-cover-sx'];
     if (type === 'user-cover') currentResolvers = constants.resolvers['user-cover'];

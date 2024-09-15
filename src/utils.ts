@@ -13,6 +13,7 @@ export type ResolverType =
   | 'user-cover'
   | 'token'
   | 'space'
+  | 'space-cover'
   | 'space-sx'
   | 'space-cover-sx'
   | 'address'
@@ -24,7 +25,7 @@ export function getProvider(network: number): StaticJsonRpcProvider {
   if (!providers[`_${network}`])
     providers[`_${network}`] = new StaticJsonRpcProvider(
       {
-        url: `https://rpc.brovider.xyz/${network}`,
+        url: `https://rpc.snapshot.org/${network}`,
         timeout: 20e3,
         allowGzip: true
       },

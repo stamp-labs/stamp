@@ -2,8 +2,12 @@ import blockie from './blockie';
 import jazzicon from './jazzicon';
 import ens from './ens';
 import trustwallet from './trustwallet';
-import { resolveAvatar as sResolveAvatar, resolveCover as sResolveCover } from './snapshot';
-import space from './space';
+import {
+  resolveUserAvatar as sResolveUserAvatar,
+  resolveUserCover as sResolveUserCover,
+  resolveSpaceAvatar as sResolveSpaceAvatar,
+  resolveSpaceCover as sResolveSpaceCover
+} from './snapshot';
 import { resolveAvatar as sxResolveAvatar, resolveCover as sxResolveCover } from './space-sx';
 import selfid from './selfid';
 import lens from './lens';
@@ -17,9 +21,10 @@ export default {
   jazzicon,
   ens,
   trustwallet,
-  snapshot: sResolveAvatar,
-  'user-cover': sResolveCover,
-  space,
+  snapshot: sResolveUserAvatar,
+  'user-cover': sResolveUserCover,
+  space: sResolveSpaceAvatar,
+  'space-cover': sResolveSpaceCover,
   'space-sx': sxResolveAvatar,
   'space-cover-sx': sxResolveCover,
   selfid,
