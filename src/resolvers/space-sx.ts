@@ -10,8 +10,8 @@ const SUBGRAPH_URLS = [
   'https://api.studio.thegraph.com/query/23545/sx-polygon/version/latest',
   'https://api.studio.thegraph.com/query/23545/sx-arbitrum/version/latest',
   'https://api.studio.thegraph.com/query/23545/sx-optimism/version/latest',
-  'https://api-1.snapshot.box',
-  'https://testnet-api-1.snapshot.box'
+  'https://api.snapshot.box',
+  'https://testnet-api.snapshot.box'
 ];
 
 async function getSpaceProperty(key: string, url: string, property: 'avatar' | 'cover') {
