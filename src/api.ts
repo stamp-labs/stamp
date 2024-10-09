@@ -45,12 +45,13 @@ router.get(`/clear/:type(${TYPE_CONSTRAINTS})/:id`, async (req, res) => {
     if (type === 'address' || type === 'name') {
       result = await clearCache(id);
     } else {
-      const { address, network, w, h, fallback, cb } = await parseQuery(id, type, {
+      const { address, networkId, w, h, fallback, cb } = await parseQuery(id, type, {
         s: constants.max,
         fb: req.query.fb,
         cb: req.query.cb
       });
-      const key = getCacheKey({ type, network, address, w, h, fallback, cb });
+      const normalizedNetworkId = networkId || constants.defaultOffchainNetwork;
+      const key = getCacheKey({ type, network: normalizedNetworkId, address, w, h, fallback, cb });
       result = await clear(key);
     }
     res.status(result ? 200 : 404).json({ status: result ? 'ok' : 'not found' });
@@ -62,26 +63,31 @@ router.get(`/clear/:type(${TYPE_CONSTRAINTS})/:id`, async (req, res) => {
 
 router.get(`/:type(${TYPE_CONSTRAINTS})/:id`, async (req, res) => {
   const { type, id } = req.params as { type: ResolverType; id: string };
-  let address, network, w, h, fallback, cb, resolver;
+  let address, network, networkId, w, h, fallback, cb, resolver;
 
   try {
-    ({ address, network, w, h, fallback, cb, resolver } = await parseQuery(id, type, req.query));
+    ({ address, network, networkId, w, h, fallback, cb, resolver } = await parseQuery(
+      id,
+      type,
+      req.query
+    ));
   } catch (e) {
     return res.status(500).json({ status: 'error', error: 'failed to load content' });
   }
 
   const disableCache = !!resolver;
+  const normalizedNetworkId = networkId || constants.defaultOffchainNetwork;
 
   const key1 = getCacheKey({
     type,
-    network,
+    network: normalizedNetworkId,
     address,
     w: constants.max,
     h: constants.max,
     fallback,
     cb
   });
-  const key2 = getCacheKey({ type, network, address, w, h, fallback, cb });
+  const key2 = getCacheKey({ type, network: normalizedNetworkId, address, w, h, fallback, cb });
 
   // Check resized cache
   const cache = await get(`${key1}/${key2}`);
@@ -116,11 +122,13 @@ router.get(`/:type(${TYPE_CONSTRAINTS})/:id`, async (req, res) => {
       currentResolvers = [resolver];
     }
 
-    const files = await Promise.all(currentResolvers.map(r => resolvers[r](address, network)));
+    const files = await Promise.all(
+      currentResolvers.map(r => resolvers[r](address, network, networkId))
+    );
     baseImage = files.find(Boolean);
 
     if (!baseImage) {
-      const fallbackImage = await resolvers[fallback](address, network);
+      const fallbackImage = await resolvers[fallback](address, network, networkId);
       const resizedImage = await resize(fallbackImage, w, h);
 
       setHeader(res, 'SHORT_CACHE');

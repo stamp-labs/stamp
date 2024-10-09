@@ -54,14 +54,14 @@ export function shortNameToChainId(shortName: string) {
   if (shortName === 'ftm') return '250';
   if (shortName === 'matic') return '137';
   if (shortName === 'arb1') return '42161';
-  if (constants.offchainNetworks.includes(shortName)) return shortName;
 
   return null;
 }
 
 export async function parseQuery(id: string, type: ResolverType, query) {
   let address = id;
-  let network = type.startsWith('space-') ? constants.defaultOffchainNetwork : '1';
+  let network = '1';
+  let networkId: string | null = null;
 
   // Resolve format
   // let format;
@@ -70,6 +70,7 @@ export async function parseQuery(id: string, type: ResolverType, query) {
     // format = 'eip3770';
     address = chunks[1];
     network = shortNameToChainId(chunks[0]) || '1';
+    networkId = chunks[0] || constants.defaultOffchainNetwork;
   } else if (chunks.length === 3) {
     // format = 'caip10';
     address = chunks[2];
@@ -93,6 +94,7 @@ export async function parseQuery(id: string, type: ResolverType, query) {
   return {
     address,
     network,
+    networkId,
     w,
     h,
     fallback: query.fb === 'jazzicon' ? 'jazzicon' : 'blockie',
