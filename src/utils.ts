@@ -54,13 +54,14 @@ export function shortNameToChainId(shortName: string) {
   if (shortName === 'ftm') return '250';
   if (shortName === 'matic') return '137';
   if (shortName === 'arb1') return '42161';
+  if (constants.offchainNetworks.includes(shortName)) return shortName;
 
   return null;
 }
 
 export async function parseQuery(id: string, type: ResolverType, query) {
   let address = id;
-  let network = '1';
+  let network = type.startsWith('space-') ? constants.defaultOffchainNetwork : '1';
 
   // Resolve format
   // let format;
