@@ -70,13 +70,14 @@ async function getOnchainProperty(
 }
 
 function createPropertyResolver(entity: Entity, property: Property) {
-  return async (address: string, chainId = '1', networkId = defaultOffchainNetwork) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  return async (address: string, chainId = 1, networkId = defaultOffchainNetwork) => {
     let value = null;
 
     if (!Object.keys(API_URLS).includes(networkId)) return false;
 
     try {
-      if (offchainNetworks.includes(networkId)) {
+      if (offchainNetworks.includes(networkId) || entity === 'user') {
         value = await getOffchainProperty(networkId, address, entity, property);
       } else {
         value = await getOnchainProperty(networkId, address, entity, property);
