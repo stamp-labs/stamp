@@ -9,14 +9,15 @@ describe('resolvers', () => {
         expect(result).toBe(false);
       });
 
-      it('should return false on unsupported network', async () => {
+      it('should resolve regardless of network', async () => {
         const result = await resolvers.snapshot(
           '0xeF8305E140ac520225DAf050e2f71d5fBcC543e7',
           1,
           'eth'
         );
 
-        expect(result).toBe(false);
+        expect(result).toBeInstanceOf(Buffer);
+        expect(result.length).toBeGreaterThan(1000);
       });
 
       it('should resolve', async () => {
@@ -35,14 +36,15 @@ describe('resolvers', () => {
       expect(result).toBe(false);
     });
 
-    it('should return false on unsupported network', async () => {
+    it('should resolve regardless of network', async () => {
       const result = await resolvers.snapshot(
         '0xf1f09AdC06aAB740AA16004D62Dbd89484d3Be90',
         1,
         'eth'
       );
 
-      expect(result).toBe(false);
+      expect(result).toBeInstanceOf(Buffer);
+      expect(result.length).toBeGreaterThan(1000);
     });
 
     it('should resolve', async () => {

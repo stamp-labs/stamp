@@ -78,7 +78,12 @@ function createPropertyResolver(entity: Entity, property: Property) {
 
     try {
       if (offchainNetworks.includes(networkId) || entity === 'user') {
-        value = await getOffchainProperty(networkId, address, entity, property);
+        value = await getOffchainProperty(
+          offchainNetworks.includes(networkId) ? networkId : defaultOffchainNetwork,
+          address,
+          entity,
+          property
+        );
       } else {
         value = await getOnchainProperty(networkId, address, entity, property);
       }
