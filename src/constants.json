@@ -14,7 +14,7 @@
   },
   "ensSubgraph": {
     "1": "https://subgrapher.snapshot.org/subgraph/arbitrum/5XqPmWe6gjyrJtFn9cLy237i4cWw2j9HcUJEXsP5qGtH",
-    "11155111": "https://api.studio.thegraph.com/proxy/49574/enssepolia/version/latest"
+    "11155111": "https://subgrapher.snapshot.org/subgraph/arbitrum/DmMXLtMZnGbQXASJ7p1jfzLUbBYnYUD9zNBTxpkjHYXV"
   },
   "defaultOffchainNetwork" : "s",
   "offchainNetworks": ["s", "s-tn"]
