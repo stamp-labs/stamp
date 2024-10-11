@@ -81,6 +81,7 @@ export default async function lookupDomains(
       ) || []
     );
   } catch (e) {
+    console.log(e);
     if (!isSilencedError(e)) {
       capture(e, { input: { address } });
     }
