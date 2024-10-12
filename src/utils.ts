@@ -61,7 +61,7 @@ export function shortNameToChainId(shortName: string) {
 export async function parseQuery(id: string, type: ResolverType, query) {
   let address = id;
   let network = '1';
-  let networkId: string | null = null;
+  let networkId: string | undefined = undefined;
 
   // Resolve format
   // let format;
