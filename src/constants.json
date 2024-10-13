@@ -6,7 +6,7 @@
   "resolvers": {
     "avatar": ["snapshot", "ens", "lens", "farcaster", "starknet"],
     "user-cover": ["user-cover"],
-    "token": ["trustwallet", "zapper"],
+    "token": ["trustwallet", "zapper", "tokenlists"],
     "space": ["space"],
     "space-cover": ["space-cover"],
     "space-sx": ["space-sx"],
