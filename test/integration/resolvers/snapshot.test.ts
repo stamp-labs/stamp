@@ -74,6 +74,15 @@ describe('resolvers', () => {
       expect(result).toBeInstanceOf(Buffer);
       expect(result.length).toBeGreaterThan(1000);
     });
+
+    it('should return same result for both legacy and non-legacy format', async () => {
+      const resultA = await resolvers.space('ens.eth');
+      const resultB = await resolvers.space('ens.eth', 1, 's');
+
+      expect(resultA).toBeInstanceOf(Buffer);
+      expect(resultA.length).toBeGreaterThan(1000);
+      expect(resultA).toEqual(resultB);
+    });
   });
 
   describe('on space cover', () => {
@@ -94,6 +103,15 @@ describe('resolvers', () => {
 
       expect(result).toBeInstanceOf(Buffer);
       expect(result.length).toBeGreaterThan(1000);
+    });
+
+    it('should return same result for both legacy and non-legacy format', async () => {
+      const resultA = await resolvers['space-cover']('test.wa0x6e.eth');
+      const resultB = await resolvers['space-cover']('test.wa0x6e.eth', 1, 's');
+
+      expect(resultA).toBeInstanceOf(Buffer);
+      expect(resultA.length).toBeGreaterThan(1000);
+      expect(resultA).toEqual(resultB);
     });
   });
 });

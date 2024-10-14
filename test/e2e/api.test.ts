@@ -1,4 +1,5 @@
 import axios from 'axios';
+import fetch from 'node-fetch';
 import redis from '../../src/helpers/redis';
 import { KEY_PREFIX } from '../../src/addressResolvers/cache';
 
@@ -14,6 +15,13 @@ async function purge(): Promise<void> {
   transaction.exec();
 }
 
+async function imageToBase64(url: string) {
+  const response = await fetch(url);
+  const buffer = await response.buffer();
+
+  return buffer.toString('base64');
+}
+
 describe('E2E api', () => {
   describe('GET type/TYPE/ID', () => {
     it.todo('returns a 500 status on invalid query');
@@ -22,6 +30,48 @@ describe('E2E api', () => {
       it.todo('returns the image');
       it.todo('caches the base image');
       it.todo('caches the resized image');
+
+      it('returns same space avatar for snapshot legacy and non-legacy format', async () => {
+        expect(await imageToBase64(`${HOST}/space/ens.eth`)).toEqual(
+          await imageToBase64(`${HOST}/space/s:ens.eth`)
+        );
+        expect(
+          await imageToBase64(
+            `${HOST}/space/sn:0x07c251045154318a2376a3bb65be47d3c90df1740d8e35c9b9d943aa3f240e50`
+          )
+        ).toEqual(
+          await imageToBase64(
+            `${HOST}/space-sx/0x07c251045154318a2376a3bb65be47d3c90df1740d8e35c9b9d943aa3f240e50`
+          )
+        );
+      });
+
+      it('returns different space avatar for different network', async () => {
+        expect(await imageToBase64(`${HOST}/space/s:ens.eth`)).not.toEqual(
+          await imageToBase64(`${HOST}/space/s-tn:ens.eth`)
+        );
+      });
+
+      it('returns same space cover for snapshot legacy and non-legacy format', async () => {
+        expect(await imageToBase64(`${HOST}/space-cover/test.wa0x6e.eth`)).toEqual(
+          await imageToBase64(`${HOST}/space-cover/s:test.wa0x6e.eth`)
+        );
+        expect(
+          await imageToBase64(
+            `${HOST}/space-cover/sn:0x07c251045154318a2376a3bb65be47d3c90df1740d8e35c9b9d943aa3f240e50`
+          )
+        ).toEqual(
+          await imageToBase64(
+            `${HOST}/space-cover-sx/0x07c251045154318a2376a3bb65be47d3c90df1740d8e35c9b9d943aa3f240e50`
+          )
+        );
+      });
+
+      it('returns different space cover for different network', async () => {
+        expect(await imageToBase64(`${HOST}/space-cover/s:test.wa0x6e.eth`)).not.toEqual(
+          await imageToBase64(`${HOST}/space-cover/s-tn:test.wa0x6e.eth`)
+        );
+      });
     });
 
     describe('when the base image is cached, but not the requested size', () => {
