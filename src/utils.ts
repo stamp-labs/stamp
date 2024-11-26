@@ -61,6 +61,7 @@ export function shortNameToChainId(shortName: string) {
 export async function parseQuery(id: string, type: ResolverType, query) {
   let address = id;
   let network = '1';
+  let networkId: string | undefined = undefined;
 
   // Resolve format
   // let format;
@@ -69,6 +70,7 @@ export async function parseQuery(id: string, type: ResolverType, query) {
     // format = 'eip3770';
     address = chunks[1];
     network = shortNameToChainId(chunks[0]) || '1';
+    networkId = chunks[0] || constants.defaultOffchainNetwork;
   } else if (chunks.length === 3) {
     // format = 'caip10';
     address = chunks[2];
@@ -92,6 +94,7 @@ export async function parseQuery(id: string, type: ResolverType, query) {
   return {
     address,
     network,
+    networkId,
     w,
     h,
     fallback: query.fb === 'jazzicon' ? 'jazzicon' : 'blockie',
