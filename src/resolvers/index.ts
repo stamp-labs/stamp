@@ -14,6 +14,7 @@ import lens from './lens';
 import zapper from './zapper';
 import starknet from './starknet';
 import farcaster from './farcaster';
+import tokenlists from './tokenlists';
 
 export default {
   blockie,
@@ -30,5 +31,6 @@ export default {
   lens,
   zapper,
   starknet,
-  farcaster
+  farcaster,
+  tokenlists
 };

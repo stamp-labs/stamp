@@ -20,7 +20,7 @@ app.use(cors({ maxAge: 86400 }));
 app.use(compression());
 app.use('/', api);
 
-app.get('/', (req, res) => {
+app.get('/', (_req, res) => {
   const commit = process.env.COMMIT_HASH ?? undefined;
   res.json({ name, version, commit });
 });
