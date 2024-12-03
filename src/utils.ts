@@ -4,6 +4,7 @@ import snapshot from '@snapshot-labs/snapshot.js';
 import { createHash } from 'crypto';
 import { Response } from 'express';
 import { StaticJsonRpcProvider } from '@ethersproject/providers';
+import chains from './chains.json';
 import constants from './constants.json';
 
 export type Address = string;
@@ -48,12 +49,20 @@ export async function resize(input, w, h) {
     .toBuffer();
 }
 
-export function shortNameToChainId(shortName: string) {
-  if (shortName === 'eth') return '1';
-  if (shortName === 'bsc') return '56';
-  if (shortName === 'ftm') return '250';
-  if (shortName === 'matic') return '137';
-  if (shortName === 'arb1') return '42161';
+export function shortNameToChainId(shortName: string): string | null {
+  return shortName in chains.SHORTNAME_TO_CHAIN_ID ? chains.SHORTNAME_TO_CHAIN_ID[shortName] : null;
+}
+
+export function chainIdToShortName(chainId: string): string | null {
+  return chainId in chains.CHAIN_ID_TO_SHORTNAME ? chains.CHAIN_ID_TO_SHORTNAME[chainId] : null;
+}
+
+export function chainIdToName(chainId: string): string | null {
+  if (chainId === '1') return 'ethereum';
+  if (chainId === '56') return 'binance';
+  if (chainId === '250') return 'fantom';
+  if (chainId === '137') return 'polygon';
+  if (chainId === '42161') return 'arbitrum';
 
   return null;
 }
@@ -69,12 +78,13 @@ export async function parseQuery(id: string, type: ResolverType, query) {
   if (chunks.length === 2) {
     // format = 'eip3770';
     address = chunks[1];
-    network = shortNameToChainId(chunks[0]) || '1';
-    networkId = chunks[0] || constants.defaultOffchainNetwork;
+    networkId = chunks[0];
+    network = shortNameToChainId(networkId) || '1';
   } else if (chunks.length === 3) {
     // format = 'caip10';
     address = chunks[2];
     network = chunks[1];
+    networkId = chainIdToShortName(network) || 'eth';
   } else if (id.startsWith('did:')) {
     // format = 'did';
     address = id.slice(4);
@@ -101,16 +111,6 @@ export async function parseQuery(id: string, type: ResolverType, query) {
     cb: query.cb,
     resolver: query.resolver
   };
-}
-
-export function chainIdToName(chainId: string) {
-  if (chainId === '1') return 'ethereum';
-  if (chainId === '56') return 'binance';
-  if (chainId === '250') return 'fantom';
-  if (chainId === '137') return 'polygon';
-  if (chainId === '42161') return 'arbitrum';
-
-  return null;
 }
 
 export function getUrl(url) {

@@ -45,13 +45,12 @@ router.get(`/clear/:type(${TYPE_CONSTRAINTS})/:id`, async (req, res) => {
     if (type === 'address' || type === 'name') {
       result = await clearCache(id);
     } else {
-      const { address, networkId, w, h, fallback, cb } = await parseQuery(id, type, {
+      const { address, network, w, h, fallback, cb } = await parseQuery(id, type, {
         s: constants.max,
         fb: req.query.fb,
         cb: req.query.cb
       });
-      const normalizedNetworkId = networkId || constants.defaultOffchainNetwork;
-      const key = getCacheKey({ type, network: normalizedNetworkId, address, w, h, fallback, cb });
+      const key = getCacheKey({ type, network, address, w, h, fallback, cb });
       result = await clear(key);
     }
     res.status(result ? 200 : 404).json({ status: result ? 'ok' : 'not found' });
@@ -76,18 +75,17 @@ router.get(`/:type(${TYPE_CONSTRAINTS})/:id`, async (req, res) => {
   }
 
   const disableCache = !!resolver;
-  const normalizedNetworkId = networkId || constants.defaultOffchainNetwork;
 
   const key1 = getCacheKey({
     type,
-    network: normalizedNetworkId,
+    network,
     address,
     w: constants.max,
     h: constants.max,
     fallback,
     cb
   });
-  const key2 = getCacheKey({ type, network: normalizedNetworkId, address, w, h, fallback, cb });
+  const key2 = getCacheKey({ type, network, address, w, h, fallback, cb });
 
   // Check resized cache
   const cache = await get(`${key1}/${key2}`);
