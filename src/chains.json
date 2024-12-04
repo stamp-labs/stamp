@@ -136,7 +136,7 @@
     "134": "rlc",
     "135": "alyxtestnet",
     "136": "deam",
-    "137": "pol",
+    "137": "matic",
     "138": "dfio-meta-main",
     "139": "woop",
     "140": "ete",
@@ -4118,6 +4118,7 @@
     "kkrt-starknet-sepolia": "920637907288165",
     "dchaint": "2713017997578000",
     "dchainmainnet": "2716446429837000",
+    "matic": "137",
     "sn": "0x534e5f4d41494e",
     "sn-sep": "0x534e5f5345504f4c4941"
   }

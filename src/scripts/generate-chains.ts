@@ -6,6 +6,8 @@ type Chain = {
 };
 
 const CUSTOM_CHAINS = [
+  // Polygon - Using old shortname for compatibility
+  ['137', 'matic'],
   // SN_MAIN
   ['0x534e5f4d41494e', 'sn'],
   // SN_SEPOLIA
