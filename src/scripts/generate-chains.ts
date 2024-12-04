@@ -24,7 +24,7 @@ async function generateChains() {
   const chains: Chain[] = JSON.parse(inputData);
 
   const CHAIN_ID_TO_SHORTNAME = [
-    ...chains.map(chain => [String(chain.chainId), chain.shortName]),
+    ...chains.map(chain => [String(chain.chainId), chain.shortName.toLowerCase()]),
     ...CUSTOM_CHAINS
   ];
 
