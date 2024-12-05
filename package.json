@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "license": "MIT",
   "scripts": {
+    "generate-chains": "node ./dist/src/scripts/generate-chains.js",
     "lint:fix": "yarn lint --fix",
     "lint": "eslint src/ test/ --ext .ts",
     "typecheck": "tsc --noEmit",
