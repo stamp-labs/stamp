@@ -7,11 +7,18 @@ import { isStarknetAddress } from '../addressResolvers/utils';
 const API_URLS = {
   s: `${process.env.HUB_URL ?? 'https://hub.snapshot.org'}/graphql`,
   's-tn': `${process.env.HUB_URL_TN ?? 'https://testnet.hub.snapshot.org'}/graphql`,
-  eth: 'https://api.studio.thegraph.com/query/23545/sx/version/latest',
-  sep: 'https://api.studio.thegraph.com/query/23545/sx-sepolia/version/latest',
-  matic: 'https://api.studio.thegraph.com/query/23545/sx-polygon/version/latest',
-  arb1: 'https://api.studio.thegraph.com/query/23545/sx-arbitrum/version/latest',
-  oeth: 'https://api.studio.thegraph.com/query/23545/sx-optimism/version/latest',
+  eth:
+    'https://subgrapher.snapshot.org/subgraph/arbitrum/GerdwbJnTbEz45K7S3D2MLET6VFiY8VqwrqWZg52x2vx',
+  sep:
+    'https://subgrapher.snapshot.org/subgraph/arbitrum/3682UpSJVQ89v6BMSzxDSiQWZKa3Hbn6RKucpT8jZ5nT',
+  matic:
+    'https://subgrapher.snapshot.org/subgraph/arbitrum/5DzKWssJUVKA1imXGyExrycUjdz7t5t7gzTsE9GQhBUn',
+  arb1:
+    'https://subgrapher.snapshot.org/subgraph/arbitrum/4QovVxoK3TBLwZKPD1YPHHko5Zz87HvdjpEDBvitCWcH',
+  oeth:
+    'https://subgrapher.snapshot.org/subgraph/arbitrum/4zXNNp5B34DUNACzonVsHivNJRUHnFBqhvBPYJVaNyks',
+  base:
+    'https://subgrapher.snapshot.org/subgraph/arbitrum/BmcnmDYyCcN7NmQuWXyx3p1xLEiq3sYmvFct8uvBQfum',
   sn: 'https://api.snapshot.box',
   'sn-sep': 'https://testnet-api.snapshot.box'
 };

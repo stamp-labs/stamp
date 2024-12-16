@@ -5,12 +5,12 @@ import { fetchHttpImage } from './utils';
 import { isStarknetAddress } from '../addressResolvers/utils';
 
 const SUBGRAPH_URLS = [
-  'https://api.studio.thegraph.com/query/23545/sx/version/latest',
-  'https://api.studio.thegraph.com/query/23545/sx-sepolia/version/latest',
-  'https://api.studio.thegraph.com/query/23545/sx-polygon/version/latest',
-  'https://api.studio.thegraph.com/query/23545/sx-arbitrum/version/latest',
-  'https://api.studio.thegraph.com/query/23545/sx-optimism/version/latest',
-  'https://api.studio.thegraph.com/query/23545/sx-base/version/latest',
+  'https://subgrapher.snapshot.org/subgraph/arbitrum/GerdwbJnTbEz45K7S3D2MLET6VFiY8VqwrqWZg52x2vx',
+  'https://subgrapher.snapshot.org/subgraph/arbitrum/3682UpSJVQ89v6BMSzxDSiQWZKa3Hbn6RKucpT8jZ5nT',
+  'https://subgrapher.snapshot.org/subgraph/arbitrum/5DzKWssJUVKA1imXGyExrycUjdz7t5t7gzTsE9GQhBUn',
+  'https://subgrapher.snapshot.org/subgraph/arbitrum/4QovVxoK3TBLwZKPD1YPHHko5Zz87HvdjpEDBvitCWcH',
+  'https://subgrapher.snapshot.org/subgraph/arbitrum/4zXNNp5B34DUNACzonVsHivNJRUHnFBqhvBPYJVaNyks',
+  'https://subgrapher.snapshot.org/subgraph/arbitrum/BmcnmDYyCcN7NmQuWXyx3p1xLEiq3sYmvFct8uvBQfum',
   'https://api.snapshot.box',
   'https://testnet-api.snapshot.box'
 ];
