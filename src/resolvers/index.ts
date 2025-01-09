@@ -2,6 +2,7 @@ import blockie from './blockie';
 import jazzicon from './jazzicon';
 import ens from './ens';
 import trustwallet from './trustwallet';
+import coingecko from './coingecko';
 import {
   resolveUserAvatar as sResolveUserAvatar,
   resolveUserCover as sResolveUserCover,
@@ -20,6 +21,7 @@ export default {
   jazzicon,
   ens,
   trustwallet,
+  coingecko,
   snapshot: sResolveUserAvatar,
   'user-cover': sResolveUserCover,
   space: sResolveSpaceAvatar,
