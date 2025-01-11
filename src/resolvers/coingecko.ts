@@ -18,6 +18,9 @@ export default async function resolve(address: string, chainId: string) {
 
   try {
     const assetPlatformId = COINGECKO_ASSET_PLATFORMS[chainId];
+
+    if (!assetPlatformId) return false;
+
     const checksum = getAddress(address);
     const url = `https://pro-api.coingecko.com/api/v3/coins/${assetPlatformId}/contract/${checksum}`;
 
