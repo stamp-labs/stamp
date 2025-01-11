@@ -13,7 +13,7 @@ const COINGECKO_ASSET_PLATFORMS = {
   42161: 'arbitrum-one'
 };
 
-export default async function resolve(address, chainId) {
+export default async function resolve(address: string, chainId: string) {
   if (!API_KEY) return false;
 
   try {
