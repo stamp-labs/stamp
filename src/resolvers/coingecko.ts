@@ -14,12 +14,16 @@ const COINGECKO_ASSET_PLATFORMS = {
 };
 
 export default async function resolve(address, chainId) {
+  if (!API_KEY) return false;
+
   try {
     const assetPlatformId = COINGECKO_ASSET_PLATFORMS[chainId];
     const checksum = getAddress(address);
-    const url = `https://pro-api.coingecko.com/api/v3/coins/${assetPlatformId}/contract/${checksum}?x_cg_pro_api_key=${API_KEY}`;
+    const url = `https://pro-api.coingecko.com/api/v3/coins/${assetPlatformId}/contract/${checksum}`;
 
-    const data = await fetch(url).then(res => res.json());
+    const data = await fetch(url, { headers: { 'x-cg-pro-api-key': API_KEY } }).then(res =>
+      res.json()
+    );
     const input = await fetchHttpImage(data?.image?.large);
     return await resize(input, max, max);
   } catch (e) {
