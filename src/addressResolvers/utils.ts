@@ -2,6 +2,8 @@ import snapshot from '@snapshot-labs/snapshot.js';
 import { getAddress } from '@ethersproject/address';
 import { Address, Handle } from '../utils';
 
+const EMPTY_ADDRESS = '0x0000000000000000000000000000000000000000';
+
 const broviderUrl = process.env.BROVIDER_URL || 'https://rpc.snapshot.org';
 
 export class FetchError extends Error {}
@@ -20,6 +22,10 @@ export function provider(network: string) {
 
 export function withoutEmptyValues(obj: Record<string, any>) {
   return Object.fromEntries(Object.entries(obj).filter(([, value]) => value));
+}
+
+export function withoutEmptyAddress(obj: Record<string, any>) {
+  return Object.fromEntries(Object.entries(obj).filter(([key]) => key !== EMPTY_ADDRESS));
 }
 
 export function normalizeAddresses(addresses: Address[]): Address[] {
