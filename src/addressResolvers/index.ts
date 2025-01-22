@@ -22,6 +22,7 @@ const RESOLVERS = [
 ];
 const MAX_LOOKUP_ADDRESSES = 50;
 const MAX_RESOLVE_NAMES = 5;
+const EMPTY_ADDRESS = '0x0000000000000000000000000000000000000000';
 
 async function _call(fnName: string, input: string[], maxInputLength: number) {
   if (input.length > maxInputLength) {
@@ -55,7 +56,12 @@ async function _call(fnName: string, input: string[], maxInputLength: number) {
       );
 
       return Object.fromEntries(
-        _input.map(item => [item, results.map(r => r[item]).filter(i => !!i)[0] || ''])
+        _input.map(item => [
+          item,
+          results
+            .map(r => (item === EMPTY_ADDRESS && fnName === 'lookupAddresses' ? '' : r[item]))
+            .filter(i => !!i)[0] || ''
+        ])
       );
     })
   );
