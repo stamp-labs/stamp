@@ -8,7 +8,8 @@ import {
   normalizeAddresses,
   normalizeHandles,
   withoutEmptyValues,
-  mapOriginalInput
+  mapOriginalInput,
+  withoutEmptyAddress
 } from './utils';
 import { Address, Handle } from '../utils';
 import { timeAddressResolverResponse as timeResponse } from '../helpers/metrics';
@@ -33,31 +34,33 @@ async function _call(fnName: string, input: string[], maxInputLength: number) {
 
   if (input.length === 0) return {};
 
-  return withoutEmptyValues(
-    await cache(input, async (_input: string[]) => {
-      const results = await Promise.all(
-        RESOLVERS.map(async r => {
-          const end = timeResponse.startTimer({
-            provider: r.NAME,
-            method: fnName
-          });
-          let result = {};
-          let status = 0;
+  return withoutEmptyAddress(
+    withoutEmptyValues(
+      await cache(input, async (_input: string[]) => {
+        const results = await Promise.all(
+          RESOLVERS.map(async r => {
+            const end = timeResponse.startTimer({
+              provider: r.NAME,
+              method: fnName
+            });
+            let result = {};
+            let status = 0;
 
-          try {
-            result = await r[fnName](_input);
-            status = 1;
-          } catch (e) {}
-          end({ status });
+            try {
+              result = await r[fnName](_input);
+              status = 1;
+            } catch (e) {}
+            end({ status });
 
-          return result;
-        })
-      );
+            return result;
+          })
+        );
 
-      return Object.fromEntries(
-        _input.map(item => [item, results.map(r => r[item]).filter(i => !!i)[0] || ''])
-      );
-    })
+        return Object.fromEntries(
+          _input.map(item => [item, results.map(r => r[item]).filter(i => !!i)[0] || ''])
+        );
+      })
+    )
   );
 }
 
