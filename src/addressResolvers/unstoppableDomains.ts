@@ -12,7 +12,7 @@ import { Address, Handle } from '../utils';
 
 export const NAME = 'Unstoppable Domains';
 const NETWORK = '137';
-const provider = getProvider(NETWORK);
+const provider = getProvider(NETWORK, { timeout: 5e3 });
 const ABI = [
   'function reverseNameOf(address addr) view returns (string reverseUri)',
   'function ownerOf(uint256 tokenId) external view returns (address address)'
