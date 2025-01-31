@@ -16,8 +16,11 @@ export function isStarknetAddress(address: Address): boolean {
   return /^0x[a-fA-F0-9]{64}$/.test(address);
 }
 
-export function provider(network: string) {
-  return snapshot.utils.getProvider(network, { broviderUrl });
+export function provider(
+  network: string,
+  providerOptions: { broviderUrl?: string; timeout?: number } = { broviderUrl, timeout: 5e3 }
+) {
+  return snapshot.utils.getProvider(network, providerOptions);
 }
 
 export function withoutEmptyValues(obj: Record<string, any>) {
