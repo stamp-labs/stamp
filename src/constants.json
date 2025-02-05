@@ -9,6 +9,7 @@
     "token": ["trustwallet", "zapper", "coingecko"],
     "space": ["space"],
     "space-cover": ["space-cover"],
+    "space-logo": ["space-logo"],
     "space-sx": ["space-sx"],
     "space-cover-sx": ["space-cover-sx"]
   },

@@ -24,7 +24,22 @@ const API_URLS = {
 };
 
 type Entity = 'user' | 'space';
-type Property = 'avatar' | 'cover';
+type Property = 'avatar' | 'cover' | 'logo';
+
+const QUERIES = {
+  avatar: {
+    query: 'avatar',
+    extract: (data: any) => data?.avatar
+  },
+  cover: {
+    query: 'cover',
+    extract: (data: any) => data?.cover
+  },
+  logo: {
+    query: 'skinSettings { logo }',
+    extract: (data: any) => data?.skinSettings?.logo
+  }
+};
 
 async function getOffchainProperty(
   networkId: string,
@@ -38,13 +53,13 @@ async function getOffchainProperty(
     }
   } = await graphQlCall(
     API_URLS[networkId],
-    `query { entry: ${entity}(id: "${id}") { ${property} } }`,
+    `query { entry: ${entity}(id: "${id}") { ${QUERIES[property].query} } }`,
     {
       headers: { 'x-api-key': process.env.HUB_API_KEY }
     }
   );
 
-  return entry?.[property];
+  return QUERIES[property].extract(entry);
 }
 
 async function getOnchainProperty(
@@ -113,3 +128,4 @@ export const resolveUserAvatar = createPropertyResolver('user', 'avatar');
 export const resolveUserCover = createPropertyResolver('user', 'cover');
 export const resolveSpaceAvatar = createPropertyResolver('space', 'avatar');
 export const resolveSpaceCover = createPropertyResolver('space', 'cover');
+export const resolveSpaceLogo = createPropertyResolver('space', 'logo');

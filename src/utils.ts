@@ -15,6 +15,7 @@ export type ResolverType =
   | 'token'
   | 'space'
   | 'space-cover'
+  | 'space-logo'
   | 'space-sx'
   | 'space-cover-sx'
   | 'address'
