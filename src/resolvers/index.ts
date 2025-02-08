@@ -7,7 +7,8 @@ import {
   resolveUserAvatar as sResolveUserAvatar,
   resolveUserCover as sResolveUserCover,
   resolveSpaceAvatar as sResolveSpaceAvatar,
-  resolveSpaceCover as sResolveSpaceCover
+  resolveSpaceCover as sResolveSpaceCover,
+  resolveSpaceLogo as sResolveSpaceLogo
 } from './snapshot';
 import { resolveAvatar as sxResolveAvatar, resolveCover as sxResolveCover } from './space-sx';
 import selfid from './selfid';
@@ -26,6 +27,7 @@ export default {
   'user-cover': sResolveUserCover,
   space: sResolveSpaceAvatar,
   'space-cover': sResolveSpaceCover,
+  'space-logo': sResolveSpaceLogo,
   'space-sx': sxResolveAvatar,
   'space-cover-sx': sxResolveCover,
   selfid,
