@@ -23,6 +23,8 @@ export type ResolverType =
 
 const providers: Record<string, StaticJsonRpcProvider> = {};
 
+const RESIZE_FITS = ['cover', 'contain', 'fill', 'inside', 'outside'];
+
 export function getProvider(network: number): StaticJsonRpcProvider {
   if (!providers[`_${network}`])
     providers[`_${network}`] = new StaticJsonRpcProvider(
@@ -43,9 +45,9 @@ export function sha256(str) {
     .digest('hex');
 }
 
-export async function resize(input, w, h) {
+export async function resize(input, w, h, options?) {
   return sharp(input)
-    .resize(w, h)
+    .resize(w, h, options)
     .webp()
     .toBuffer();
 }
@@ -110,7 +112,8 @@ export async function parseQuery(id: string, type: ResolverType, query) {
     h,
     fallback: query.fb === 'jazzicon' ? 'jazzicon' : 'blockie',
     cb: query.cb,
-    resolver: query.resolver
+    resolver: query.resolver,
+    fit: RESIZE_FITS.includes(query.fit) ? query.fit : undefined
   };
 }
 
@@ -126,7 +129,8 @@ export function getCacheKey({
   w,
   h,
   fallback,
-  cb
+  cb,
+  fit
 }: {
   type: ResolverType;
   network: string;
@@ -135,10 +139,12 @@ export function getCacheKey({
   h: number;
   fallback: string;
   cb?: string;
+  fit?: string;
 }) {
   const data = { type, network, address, w, h };
   if (fallback !== 'blockie') data['fallback'] = fallback;
   if (cb) data['cb'] = cb;
+  if (fit) data['fit'] = fit;
 
   return sha256(JSON.stringify(data));
 }
