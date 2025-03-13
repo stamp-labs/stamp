@@ -87,7 +87,6 @@ export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Ad
     if (!isSilencedError(e)) {
       capture(e, { input: { handles: normalizedHandles } });
     }
-    throw new FetchError();
   }
 
   const unresolvedHandles = normalizedHandles.filter(handle => !results[handle]);
@@ -107,7 +106,11 @@ export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Ad
         results[handle] = '';
       }
     });
-  } catch (e) {}
+  } catch (e) {
+    if (!isSilencedError(e)) {
+      capture(e, { input: { handles: normalizedHandles } });
+    }
+  }
 
   return results;
 }
