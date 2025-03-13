@@ -61,6 +61,8 @@ export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Ad
 
   if (normalizedHandles.length === 0) return {};
 
+  const results = {};
+
   try {
     const {
       data: {
@@ -78,16 +80,34 @@ export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Ad
       }`
     );
 
-    return Object.fromEntries(
-      items.map(item => [
-        item.name,
-        item.resolvedAddress ? getAddress(item.resolvedAddress.id) : ''
-      ])
-    );
+    for (const item of items) {
+      results[item.name] = item.resolvedAddress ? getAddress(item.resolvedAddress.id) : '';
+    }
   } catch (e) {
     if (!isSilencedError(e)) {
       capture(e, { input: { handles: normalizedHandles } });
     }
     throw new FetchError();
   }
+
+  const unresolvedHandles = normalizedHandles.filter(handle => !results[handle]);
+
+  if (unresolvedHandles.length === 0) return results;
+
+  try {
+    const providerResults = await Promise.allSettled(
+      unresolvedHandles.map(handle => provider.resolveName(handle))
+    );
+
+    unresolvedHandles.forEach((handle, index) => {
+      const result = providerResults[index];
+      if (result.status === 'fulfilled' && result.value) {
+        results[handle] = getAddress(result.value);
+      } else {
+        results[handle] = '';
+      }
+    });
+  } catch (e) {}
+
+  return results;
 }
