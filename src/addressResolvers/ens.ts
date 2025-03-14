@@ -102,8 +102,6 @@ export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Ad
       const result = providerResults[index];
       if (result.status === 'fulfilled' && result.value) {
         results[handle] = getAddress(result.value);
-      } else {
-        results[handle] = '';
       }
     });
   } catch (e) {
