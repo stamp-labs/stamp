@@ -8,8 +8,6 @@ import { namehash } from '@ethersproject/hash';
 import constants from './constants.json';
 
 const DEFAULT_CHAIN_ID = '1';
-const NETWORK = '1';
-const provider = getProvider(NETWORK);
 
 type Domain = {
   name: string;
@@ -46,7 +44,11 @@ async function fetchDomainData(domain: Domain, chainId: string): Promise<Domain>
 /*
  * see https://docs.ens.domains/registry/reverse
  */
-async function getDomainFromReverseRegistrar(address: Address): Promise<Domain | null> {
+async function getDomainFromReverseRegistrar(
+  address: Address,
+  chainId: string
+): Promise<Domain | null> {
+  const provider = getProvider(chainId);
   const abi = ['function name(bytes32 node) view returns (string r)'];
   const reverseName = `${address.toLowerCase().substring(2)}.addr.reverse`;
   const hash = namehash(reverseName);
@@ -111,7 +113,7 @@ export default async function lookupDomains(
   try {
     const results = await Promise.allSettled([
       ...domains.map(domain => fetchDomainData(domain, chainId)),
-      getDomainFromReverseRegistrar(address)
+      getDomainFromReverseRegistrar(address, chainId)
     ]);
 
     return results
