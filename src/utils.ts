@@ -160,9 +160,16 @@ export function setHeader(res: Response, cacheType: 'SHORT_CACHE' | 'LONG_CACHE'
 }
 
 export const getBaseAssetIconUrl = (chainId: string) => {
+  // Matic
   if (chainId === '137') {
     return 'https://github-production-user-asset-6210df.s3.amazonaws.com/1968722/269347324-fc34c3a3-01e8-424a-80f6-0910374ea6de.svg';
   }
+
+  // Apechain & Curtis
+  if (chainId === '33139' || chainId === '33111') {
+    return 'https://github.com/user-attachments/assets/0dc0a080-5b9c-4fa0-9b8d-7914eecc7e14';
+  }
+
   return 'https://static.cdnlogo.com/logos/e/81/ethereum-eth.svg';
 };
 
