@@ -167,7 +167,7 @@ export const getBaseAssetIconUrl = (chainId: string) => {
 
   // Apechain & Curtis
   if (chainId === '33139' || chainId === '33111') {
-    return 'https://github.com/user-attachments/assets/0dc0a080-5b9c-4fa0-9b8d-7914eecc7e14';
+    return 'https://ipfs.snapshot.box/ipfs/bafybeifjxd2q2znrqdsl5y2oplp6yothjfpzaosxs3kcvnxcacox6wfl5u';
   }
 
   return 'https://static.cdnlogo.com/logos/e/81/ethereum-eth.svg';
