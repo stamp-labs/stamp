@@ -161,7 +161,7 @@ export function setHeader(res: Response, cacheType: 'SHORT_CACHE' | 'LONG_CACHE'
 
 export const getBaseAssetIconUrl = (chainId: string) => {
   if (chainId === '100') {
-    return 'https://ipfs.snapshot.box/ipfs/QmZeiy8Ax4133wzxUQM9ky8z5XFVf6YLFjJMmTWbWVniZR';
+    return 'https://ipfs.snapshot.box/ipfs/bafkreie4u6cq3o6sarxti5r6riekkimr33fjnu4bw6vhnqcsijvzpxjesm';
   }
 
   // Matic
