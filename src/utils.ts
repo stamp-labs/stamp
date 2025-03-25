@@ -160,6 +160,10 @@ export function setHeader(res: Response, cacheType: 'SHORT_CACHE' | 'LONG_CACHE'
 }
 
 export const getBaseAssetIconUrl = (chainId: string) => {
+  if (chainId === '100') {
+    return 'https://ipfs.snapshot.box/ipfs/QmZeiy8Ax4133wzxUQM9ky8z5XFVf6YLFjJMmTWbWVniZR';
+  }
+
   // Matic
   if (chainId === '137') {
     return 'https://github-production-user-asset-6210df.s3.amazonaws.com/1968722/269347324-fc34c3a3-01e8-424a-80f6-0910374ea6de.svg';
