@@ -4,23 +4,25 @@ import { max, offchainNetworks, defaultOffchainNetwork } from '../constants.json
 import { fetchHttpImage } from './utils';
 import { isStarknetAddress } from '../addressResolvers/utils';
 
+const UNIFIED_API_URL = 'https://api.snapshot.box';
+const UNIFIED_API_TESTNET_URL = 'https://testnet-api.snapshot.box';
+
 const API_URLS = {
   s: `${process.env.HUB_URL ?? 'https://hub.snapshot.org'}/graphql`,
   's-tn': `${process.env.HUB_URL_TN ?? 'https://testnet.hub.snapshot.org'}/graphql`,
-  eth:
-    'https://subgrapher.snapshot.org/subgraph/arbitrum/GerdwbJnTbEz45K7S3D2MLET6VFiY8VqwrqWZg52x2vx',
-  sep:
-    'https://subgrapher.snapshot.org/subgraph/arbitrum/3682UpSJVQ89v6BMSzxDSiQWZKa3Hbn6RKucpT8jZ5nT',
-  matic:
-    'https://subgrapher.snapshot.org/subgraph/arbitrum/5DzKWssJUVKA1imXGyExrycUjdz7t5t7gzTsE9GQhBUn',
-  arb1:
-    'https://subgrapher.snapshot.org/subgraph/arbitrum/4QovVxoK3TBLwZKPD1YPHHko5Zz87HvdjpEDBvitCWcH',
-  oeth:
-    'https://subgrapher.snapshot.org/subgraph/arbitrum/4zXNNp5B34DUNACzonVsHivNJRUHnFBqhvBPYJVaNyks',
-  base:
-    'https://subgrapher.snapshot.org/subgraph/arbitrum/BmcnmDYyCcN7NmQuWXyx3p1xLEiq3sYmvFct8uvBQfum',
-  sn: 'https://api.snapshot.box',
-  'sn-sep': 'https://testnet-api.snapshot.box'
+  // SX mainnets
+  eth: UNIFIED_API_URL,
+  matic: UNIFIED_API_URL,
+  arb1: UNIFIED_API_URL,
+  oeth: UNIFIED_API_URL,
+  base: UNIFIED_API_URL,
+  mnt: UNIFIED_API_URL,
+  ape: UNIFIED_API_URL,
+  sn: UNIFIED_API_URL,
+  // SX testnets
+  sep: UNIFIED_API_TESTNET_URL,
+  curtis: UNIFIED_API_TESTNET_URL,
+  'sn-sep': UNIFIED_API_TESTNET_URL
 };
 
 type Entity = 'user' | 'space';
