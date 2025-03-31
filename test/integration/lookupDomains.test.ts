@@ -1,4 +1,4 @@
-import lookupDomains from '../../src/lookupDomains';
+import lookupDomains from '../../src/lookupDomains/ens';
 
 describe('lookupDomains', () => {
   it('should return an array of addresses on default network', async () => {
