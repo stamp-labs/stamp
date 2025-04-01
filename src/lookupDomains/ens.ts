@@ -1,7 +1,6 @@
 import { capture } from '@snapshot-labs/snapshot-sentry';
 import { FetchError, isSilencedError } from '../addressResolvers/utils';
 import { Address, graphQlCall, Handle } from '../utils';
-import { isAddress } from '@ethersproject/address';
 import constants from '../constants.json';
 
 export const SUPPORTED_CHAINS = ['1', '11155111'];
@@ -44,7 +43,7 @@ export default async function lookupDomains(
   address: Address,
   chainId = DEFAULT_CHAIN_ID
 ): Promise<Handle[]> {
-  if (!isAddress(address) || !constants.ensSubgraph[chainId]) return [];
+  if (!constants.ensSubgraph[chainId]) return [];
 
   try {
     const {
