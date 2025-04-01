@@ -19,7 +19,8 @@ export default async function lookupDomains(
   chains: string | string[] = ['1']
 ): Promise<Handle[]> {
   const promises: Promise<Handle[]>[] = [];
-  const chainIds = Array.isArray(chains) ? chains : [chains];
+  let chainIds = Array.isArray(chains) ? chains : [chains];
+  chainIds = [...new Set(chainIds.map(String))];
 
   if (!isAddress(address)) return [];
 
