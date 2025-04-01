@@ -38,4 +38,24 @@ describe('lookupDomains', () => {
 
     expect(result).not.toContain(['everaidao.eth', 'everark.eth', 'everaiark.eth']);
   });
+
+  it('should return an empty array if the address is not a valid address', async () => {
+    const result = await lookupDomains('notAValidAddress');
+    expect(result).toEqual([]);
+  });
+
+  it('should return an array of addresses for shibarium', async () => {
+    const result = await lookupDomains('0x220bc93D88C0aF11f1159eA89a885d5ADd3A7Cf6', '109');
+    expect(result).toContain('boorger.shib');
+  });
+
+  it('should return an empty array if the address does not own any shibarium domains', async () => {
+    const result = await lookupDomains('0x757a20E145435B5bDaf0E274987653aeCD47cf37', '109');
+    expect(result).toEqual([]);
+  });
+
+  it('should return all the addresses from the given chain', async () => {
+    const result = await lookupDomains('0x220bc93D88C0aF11f1159eA89a885d5ADd3A7Cf6', ['1', '109']);
+    expect(result).toEqual(['boorger.eth', 'boorger.shib']);
+  });
 });
