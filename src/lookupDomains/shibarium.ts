@@ -8,7 +8,7 @@ const API_URL = 'https://www.shibariumscan.io/api/v2';
 const SHIBD3_TOKEN_ADDRESS = '0xDe74799371Ceac11A0F52BA2694392A391D0dA18';
 
 function findShibNameContract(item: any) {
-  return item.token.address === SHIBD3_TOKEN_ADDRESS;
+  return item.token.address.toLowerCase() === SHIBD3_TOKEN_ADDRESS.toLowerCase();
 }
 
 function filterOutExpiredNames(instance: any) {
