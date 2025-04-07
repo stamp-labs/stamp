@@ -4,6 +4,7 @@ import { graphQlCall, Address, Handle } from '../utils';
 
 export const NAME = 'Lens';
 const API_URL = 'https://api-v2.lens.dev/graphql';
+const MUTED_ERRORS = ['status code 503'];
 
 async function apiCall(filterName: string, filters: string[]) {
   const {
@@ -53,7 +54,7 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
       ) || {}
     );
   } catch (e) {
-    if (!isSilencedError(e)) {
+    if (!isSilencedError(e, MUTED_ERRORS)) {
       capture(e, { input: { addresses: normalizedAddresses } });
     }
 
@@ -73,7 +74,7 @@ export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Ad
       Object.fromEntries(items.map(i => [`${i.handle.localName}.lens`, i.handle.ownedBy])) || {}
     );
   } catch (e) {
-    if (!isSilencedError(e)) {
+    if (!isSilencedError(e, MUTED_ERRORS)) {
       capture(e, { input: { handles: normalizedHandles } });
     }
     throw new FetchError();
