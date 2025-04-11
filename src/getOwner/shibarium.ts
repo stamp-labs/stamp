@@ -11,13 +11,20 @@ const API_KEYS = {
 };
 
 export default async function getOwner(handle: Handle, chainId = '109'): Promise<Address> {
+  if (!handle.endsWith('.shib')) return EMPTY_ADDRESS;
+  if (!API_URLS[chainId]) return EMPTY_ADDRESS;
+
+  const apiKey = API_KEYS[chainId];
+
+  if (!apiKey) return EMPTY_ADDRESS;
+
   const response = await fetch(
     `${API_URLS[chainId]}/v1/partner/token/${handle.replace(/\.shib$/, '')}/shib`,
     {
       method: 'GET',
       headers: {
         accept: 'application/json',
-        'Api-Key': API_KEYS[chainId]
+        'Api-Key': apiKey
       }
     }
   );
