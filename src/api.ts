@@ -7,6 +7,7 @@ import constants from './constants.json';
 import { rpcError, rpcSuccess } from './helpers/utils';
 import { lookupAddresses, resolveNames, clearCache } from './addressResolvers';
 import lookupDomains from './lookupDomains';
+import getOwner from './getOwner';
 
 const router = express.Router();
 const TYPE_CONSTRAINTS = [...Object.keys(constants.resolvers), 'address', 'name'].join('|');
@@ -19,6 +20,8 @@ router.post('/', async (req, res) => {
 
     if (method === 'lookup_domains') {
       result = await lookupDomains(params, req.body.network);
+    } else if (method === 'get_owner') {
+      result = await getOwner(params, req.body.network);
     } else if (['lookup_addresses', 'resolve_names'].includes(method)) {
       if (!Array.isArray(params))
         return rpcError(res, 400, 'params must be an array of string', id);
