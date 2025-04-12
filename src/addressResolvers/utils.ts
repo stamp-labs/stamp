@@ -1,8 +1,6 @@
 import snapshot from '@snapshot-labs/snapshot.js';
 import { getAddress } from '@ethersproject/address';
-import { Address, Handle } from '../utils';
-
-const EMPTY_ADDRESS = '0x0000000000000000000000000000000000000000';
+import { Address, Handle, EMPTY_ADDRESS } from '../utils';
 
 const broviderUrl = process.env.BROVIDER_URL || 'https://rpc.snapshot.org';
 

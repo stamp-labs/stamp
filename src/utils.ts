@@ -25,6 +25,8 @@ const providers: Record<string, StaticJsonRpcProvider> = {};
 
 const RESIZE_FITS = ['cover', 'contain', 'fill', 'inside', 'outside'];
 
+export const EMPTY_ADDRESS = '0x0000000000000000000000000000000000000000';
+
 export function getProvider(network: number): StaticJsonRpcProvider {
   if (!providers[`_${network}`])
     providers[`_${network}`] = new StaticJsonRpcProvider(
