@@ -3,8 +3,6 @@ import { FetchError, isSilencedError } from '../addressResolvers/utils';
 import { Address, graphQlCall, Handle } from '../utils';
 import constants from '../constants.json';
 
-export const SUPPORTED_CHAINS = ['1', '11155111'];
-
 const DEFAULT_CHAIN_ID = '1';
 
 type Domain = {

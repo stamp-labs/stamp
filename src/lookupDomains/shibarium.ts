@@ -1,46 +1,40 @@
 import fetch from 'node-fetch';
 import { capture } from '@snapshot-labs/snapshot-sentry';
 import { Address, Handle } from '../utils';
+import constants from '../constants.json';
 
-export const SUPPORTED_CHAINS = ['109'];
+const MAINNET = '109';
+const TESTNET = '157';
 
-const API_URL = 'https://www.shibariumscan.io/api/v2';
-const SHIBD3_TOKEN_ADDRESS = '0xDe74799371Ceac11A0F52BA2694392A391D0dA18';
-
-function findShibNameContract(item: any) {
-  return item.token.address.toLowerCase() === SHIBD3_TOKEN_ADDRESS.toLowerCase();
-}
-
-function filterOutExpiredNames(instance: any) {
-  return (
-    instance.metadata.attributes.find((attr: any) => attr.trait_type === 'Expiration Date').value *
-      1000 >
-    Date.now()
-  );
-}
-
-function formatName(instance: any) {
-  return instance.metadata.name.replace(/\*shib$/, '.shib');
-}
+const API_KEYS = {
+  [MAINNET]: process.env.D3_API_KEY_MAINNET,
+  [TESTNET]: process.env.D3_API_KEY_TESTNET
+};
 
 export default async function lookupDomains(
   address: Address,
-  chainId = SUPPORTED_CHAINS[0]
+  chainId = MAINNET
 ): Promise<Handle[]> {
-  if (!SUPPORTED_CHAINS.includes(chainId)) return [];
+  if (!constants.d3Api[chainId] || !API_KEYS[chainId]) return [];
 
   try {
-    const response = await fetch(`${API_URL}/addresses/${address}/nft/collections?type=ERC-721`, {
-      headers: { 'Content-Type': 'application/json' }
-    });
+    const response = await fetch(
+      `${constants.d3Api[chainId]}/v1/partner/tokens/EVM/${address}?limit=25&skip=0`,
+      {
+        headers: { 'Content-Type': 'application/json', 'Api-Key': API_KEYS[chainId] }
+      }
+    );
     const data = await response.json();
 
-    return (
-      data.items
-        ?.find(findShibNameContract)
-        ?.token_instances?.filter(filterOutExpiredNames)
-        .map(formatName) || []
-    );
+    if (response.status === 404) {
+      return [];
+    }
+
+    if (!response.ok) {
+      throw new Error(`Error fetching data: ${response.status} - ${data.message}`);
+    }
+
+    return data.pageItems?.map(item => `${item.sld}.${item.tld}`) || [];
   } catch (e) {
     capture(e);
     return [];
