@@ -4,7 +4,8 @@ import { graphQlCall, Address, Handle } from '../utils';
 
 export const NAME = 'Lens';
 const API_URL = 'https://api-v2.lens.dev/graphql';
-const MUTED_ERRORS = ['status code 503'];
+// mute not fixable errors, since it's a public API
+const MUTED_ERRORS = ['status code 503', 'status code 429'];
 
 async function apiCall(filterName: string, filters: string[]) {
   const {
