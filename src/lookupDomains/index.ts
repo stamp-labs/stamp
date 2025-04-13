@@ -1,18 +1,9 @@
 import { isAddress } from '@ethersproject/address';
 import { Address, Handle } from '../utils';
-import ens, { SUPPORTED_CHAINS as ENS_CHAINS } from './ens';
-import shibarium, { SUPPORTED_CHAINS as SHIBARIUM_CHAINS } from './shibarium';
+import ens from './ens';
+import shibarium from './shibarium';
 
-const RESOLVERS = {
-  ens: {
-    supportedChains: ENS_CHAINS,
-    lookup: ens
-  },
-  shibarium: {
-    supportedChains: SHIBARIUM_CHAINS,
-    lookup: shibarium
-  }
-};
+const RESOLVERS = [ens, shibarium];
 
 export default async function lookupDomains(
   address: Address,
@@ -24,11 +15,9 @@ export default async function lookupDomains(
 
   if (!isAddress(address)) return [];
 
-  Object.values(RESOLVERS).forEach(({ supportedChains, lookup }) => {
+  RESOLVERS.forEach(resolver => {
     chainIds.forEach(chain => {
-      if (supportedChains.includes(chain)) {
-        promises.push(lookup(address, chain));
-      }
+      promises.push(resolver(address, chain));
     });
   });
 

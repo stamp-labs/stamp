@@ -1,30 +1,26 @@
 import { Address, EMPTY_ADDRESS, Handle } from '../utils';
+import constants from '../constants.json';
 
-const API_URLS = {
-  '109': 'https://api-public.d3.app',
-  '157': 'https://api-public-stage.d3.app'
-};
+const MAINNET = '109';
+const TESTNET = '157';
+const TLD = 'shib';
 
 const API_KEYS = {
-  '109': process.env.D3_API_KEY_MAINNET,
-  '157': process.env.D3_API_KEY_TESTNET
+  [MAINNET]: process.env.D3_API_KEY_MAINNET,
+  [TESTNET]: process.env.D3_API_KEY_TESTNET
 };
 
-export default async function getOwner(handle: Handle, chainId = '109'): Promise<Address> {
-  if (!handle.endsWith('.shib')) return EMPTY_ADDRESS;
-  if (!API_URLS[chainId]) return EMPTY_ADDRESS;
-
-  const apiKey = API_KEYS[chainId];
-
-  if (!apiKey) return EMPTY_ADDRESS;
+export default async function getOwner(handle: Handle, chainId = MAINNET): Promise<Address> {
+  if (!handle.endsWith(`.${TLD}`) || !constants.d3Api[chainId] || !API_KEYS[chainId])
+    return EMPTY_ADDRESS;
 
   const response = await fetch(
-    `${API_URLS[chainId]}/v1/partner/token/${handle.replace(/\.shib$/, '')}/shib`,
+    `${constants.d3Api[chainId]}/v1/partner/token/${handle.replace(/\.shib$/, '')}/shib`,
     {
       method: 'GET',
       headers: {
         accept: 'application/json',
-        'Api-Key': apiKey
+        'Api-Key': API_KEYS[chainId]
       }
     }
   );
