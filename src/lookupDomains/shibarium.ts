@@ -15,11 +15,11 @@ export default async function lookupDomains(
   address: Address,
   chainId = MAINNET
 ): Promise<Handle[]> {
-  if (!constants.d3Api[chainId] || !API_KEYS[chainId]) return [];
+  if (!constants.d3[chainId]?.apiUrl || !API_KEYS[chainId]) return [];
 
   try {
     const response = await fetch(
-      `${constants.d3Api[chainId]}/v1/partner/tokens/EVM/${address}?limit=25&skip=0`,
+      `${constants.d3[chainId].apiUrl}/v1/partner/tokens/EVM/${address}?limit=25&skip=0`,
       {
         headers: { 'Content-Type': 'application/json', 'Api-Key': API_KEYS[chainId] }
       }
