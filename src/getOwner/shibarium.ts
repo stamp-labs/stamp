@@ -12,7 +12,7 @@ const API_KEYS = {
   [TESTNET]: process.env.D3_API_KEY_TESTNET
 };
 
-async function _getOwner(handle: Handle, chainId: string): Promise<Address> {
+async function getClaimedOwner(handle: Handle, chainId: string): Promise<Address> {
   if (!handle.endsWith(`.${TLD}`) || !constants.d3[chainId]?.apiUrl || !API_KEYS[chainId])
     return EMPTY_ADDRESS;
 
@@ -40,7 +40,7 @@ async function _getOwner(handle: Handle, chainId: string): Promise<Address> {
   return data.owner || '';
 }
 
-async function resolvedAddress(handle: Handle, chainId: string): Promise<Address> {
+async function getResolvedAddress(handle: Handle, chainId: string): Promise<Address> {
   const dnsConnect = new DNSConnect({ dns: { forwarderDomain: constants.d3[chainId].forwarder } });
 
   return (await dnsConnect.resolve(handle, NETWORK)) || EMPTY_ADDRESS;
@@ -52,9 +52,9 @@ async function resolvedAddress(handle: Handle, chainId: string): Promise<Address
  * it will return the resolved address.
  **/
 export default async function getOwner(handle: Handle, chainId = MAINNET): Promise<Address> {
-  const address = await _getOwner(handle, chainId);
+  const address = await getClaimedOwner(handle, chainId);
 
   if (address !== '') return address;
 
-  return resolvedAddress(handle, chainId);
+  return getResolvedAddress(handle, chainId);
 }
