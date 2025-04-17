@@ -17,10 +17,16 @@
     "1": "https://subgrapher.snapshot.org/subgraph/arbitrum/5XqPmWe6gjyrJtFn9cLy237i4cWw2j9HcUJEXsP5qGtH",
     "11155111": "https://subgrapher.snapshot.org/subgraph/arbitrum/DmMXLtMZnGbQXASJ7p1jfzLUbBYnYUD9zNBTxpkjHYXV"
   },
-  "d3Api": {
-    "109": "https://api-public.d3.app",
-    "157": "https://api-public-stage.d3.app"
+  "d3": {
+    "109": {
+      "apiUrl": "https://api-public.d3.app",
+      "forwarder": "vana"
+     },
+    "157": {
+      "apiUrl": "https://api-public-stage.d3.app",
+      "forwarder": "stage.d3test.vana"
+    }
   },
-  "defaultOffchainNetwork" : "s",
+  "defaultOffchainNetwork": "s",
   "offchainNetworks": ["s", "s-tn"]
 }
