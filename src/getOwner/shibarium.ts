@@ -12,7 +12,7 @@ const API_KEYS = {
   [TESTNET]: process.env.D3_API_KEY_TESTNET
 };
 
-async function getClaimedOwner(handle: Handle, chainId: string): Promise<Address> {
+async function getClaimedOwner(handle: Handle, chainId: string): Promise<Address | false> {
   if (!handle.endsWith(`.${TLD}`) || !constants.d3[chainId]?.apiUrl || !API_KEYS[chainId])
     return EMPTY_ADDRESS;
 
@@ -37,7 +37,7 @@ async function getClaimedOwner(handle: Handle, chainId: string): Promise<Address
   }
 
   // owner field will be missing on unclaimed names
-  return data.owner || '';
+  return data.owner || false;
 }
 
 async function getResolvedAddress(handle: Handle, chainId: string): Promise<Address> {
@@ -54,7 +54,7 @@ async function getResolvedAddress(handle: Handle, chainId: string): Promise<Addr
 export default async function getOwner(handle: Handle, chainId = MAINNET): Promise<Address> {
   const address = await getClaimedOwner(handle, chainId);
 
-  if (address !== '') return address;
+  if (address) return address;
 
   return getResolvedAddress(handle, chainId);
 }
