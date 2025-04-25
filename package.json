@@ -29,6 +29,7 @@
     "@snapshot-labs/snapshot-sentry": "^1.5.5",
     "@snapshot-labs/snapshot.js": "^0.12.61",
     "@unstoppabledomains/resolution": "^9.2.2",
+    "@webinterop/dns-connect": "^0.3.1",
     "axios": "^0.25.0",
     "canvas": "^2.9.0",
     "compression": "^1.7.4",

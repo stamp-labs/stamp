@@ -2383,7 +2383,7 @@
   resolved "https://registry.yarnpkg.com/@stablelib/wipe/-/wipe-1.0.1.tgz#d21401f1d59ade56a62e139462a97f104ed19a36"
   integrity sha512-WfqfX/eXGiAd3RJe4VU2snh/ZPwtSjLG4ynQ/vYzvghTh7dHFcI1wl+nrkWG6lGhukOxOsUHfv8dUXr58D0ayg==
 
-"@starknet-io/types-js@^0.7.7":
+"@starknet-io/types-js@^0.7.7", "starknet-types-07@npm:@starknet-io/types-js@^0.7.7":
   version "0.7.7"
   resolved "https://registry.yarnpkg.com/@starknet-io/types-js/-/types-js-0.7.7.tgz#444be5e4e585ec6f599d42d3407280d98b2dfdf8"
   integrity sha512-WLrpK7LIaIb8Ymxu6KF/6JkGW1sso988DweWu7p5QY/3y7waBIiPvzh27D9bX5KIJNRDyOoOVoHVEKYUYWZ/RQ==
@@ -2655,6 +2655,11 @@
     ethereum-ens-network-map "^1.0.2"
     js-sha256 "^0.9.0"
     js-sha3 "^0.8.0"
+
+"@webinterop/dns-connect@^0.3.1":
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/@webinterop/dns-connect/-/dns-connect-0.3.1.tgz#90349d38a856d2510299a9adfea382b0cced64dc"
+  integrity sha512-dSaCIYHEqfgKK/aZO518O42DLRIefbFxMezq05wABoHyDABneN5seUHsYEAciTRdbmQqflH7/k4Iy2BTkWg8ew==
 
 abab@^2.0.5, abab@^2.0.6:
   version "2.0.6"
