@@ -1,8 +1,35 @@
 name: Test
+
 on: [push]
+
 jobs:
   test:
-    uses: snapshot-labs/actions/.github/workflows/test.yml@main
-    secrets: inherit
-    with:
-      redis: true
+    name: Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    env:
+      D3_API_KEY_MAINNET: ${{ secrets.D3_API_KEY_MAINNET }}
+      D3_API_KEY_TESTNET: ${{ secrets.D3_API_KEY_TESTNET }}
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          cache: 'yarn'
+
+      - name: Setup Redis
+        uses: supercharge/redis-github-action@1.7.0
+        with:
+          redis-version: '7'
+
+      - name: Yarn install
+        run: yarn install --frozen-lockfile
+
+      - name: Test
+        run: yarn test
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
