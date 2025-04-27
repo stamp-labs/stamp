@@ -3,6 +3,7 @@ import * as lensResolver from './lens';
 import * as unstoppableDomainResolver from './unstoppableDomains';
 import * as starknetResolver from './starknet';
 import * as snapshotResolver from './snapshot';
+import * as shibariumResolver from './shibarium';
 import cache, { clear } from './cache';
 import {
   normalizeAddresses,
@@ -19,7 +20,8 @@ const RESOLVERS = [
   ensResolver,
   unstoppableDomainResolver,
   lensResolver,
-  starknetResolver
+  starknetResolver,
+  shibariumResolver
 ];
 const MAX_LOOKUP_ADDRESSES = 50;
 const MAX_RESOLVE_NAMES = 5;
