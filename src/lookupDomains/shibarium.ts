@@ -11,9 +11,11 @@ const API_KEYS = {
   [TESTNET]: process.env.D3_API_KEY_TESTNET
 };
 
+export const DEFAULT_CHAIN_ID = MAINNET;
+
 export default async function lookupDomains(
   address: Address,
-  chainId = MAINNET
+  chainId = DEFAULT_CHAIN_ID
 ): Promise<Handle[]> {
   if (!constants.d3[chainId]?.apiUrl || !API_KEYS[chainId]) return [];
 

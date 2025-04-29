@@ -1,13 +1,13 @@
 import { isAddress } from '@ethersproject/address';
 import { Address, Handle } from '../utils';
-import ens from './ens';
-import shibarium from './shibarium';
+import ens, { DEFAULT_CHAIN_ID as ENS_DEFAULT_CHAIN_ID } from './ens';
+import shibarium, { DEFAULT_CHAIN_ID as SHIBARIUM_DEFAULT_CHAIN_ID } from './shibarium';
 
 const RESOLVERS = [ens, shibarium];
 
 export default async function lookupDomains(
   address: Address,
-  chains: string | string[] = ['1']
+  chains: string | string[] = [ENS_DEFAULT_CHAIN_ID, SHIBARIUM_DEFAULT_CHAIN_ID]
 ): Promise<Handle[]> {
   const promises: Promise<Handle[]>[] = [];
   let chainIds = Array.isArray(chains) ? chains : [chains];

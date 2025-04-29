@@ -3,7 +3,7 @@ import { FetchError, isSilencedError } from '../addressResolvers/utils';
 import { Address, graphQlCall, Handle } from '../utils';
 import constants from '../constants.json';
 
-const DEFAULT_CHAIN_ID = '1';
+export const DEFAULT_CHAIN_ID = '1';
 
 type Domain = {
   name: string;
