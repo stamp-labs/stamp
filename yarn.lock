@@ -2312,10 +2312,10 @@
   dependencies:
     "@sentry/node" "^7.81.1"
 
-"@snapshot-labs/snapshot.js@^0.12.61":
-  version "0.12.61"
-  resolved "https://registry.yarnpkg.com/@snapshot-labs/snapshot.js/-/snapshot.js-0.12.61.tgz#3a27a06b443f85ab30fed5ac27ec45c8fbe8439f"
-  integrity sha512-ihaq69DVzUoVGmEz31dvfVM8HeRqD1gRZUhvDto3MpcNq8Eu8ZY9t3bOMo1QlL6A7h3C2KwSXDMVtJqxswsD1g==
+"@snapshot-labs/snapshot.js@^0.12.62":
+  version "0.12.62"
+  resolved "https://registry.yarnpkg.com/@snapshot-labs/snapshot.js/-/snapshot.js-0.12.62.tgz#e03e01dca134f91b639c0a5cb65fece0886ca588"
+  integrity sha512-GVe9poYyX/FRmVPYJmSNfa0x0JmWcgsdB7bqhyk9YkW9m9KEsI2sSiLuv1lhLFkDBsXoqM5Zfk9ekwA+fi2S8A==
   dependencies:
     "@ensdomains/eth-ens-namehash" "^2.0.15"
     "@ethersproject/abi" "^5.6.4"
@@ -2383,7 +2383,7 @@
   resolved "https://registry.yarnpkg.com/@stablelib/wipe/-/wipe-1.0.1.tgz#d21401f1d59ade56a62e139462a97f104ed19a36"
   integrity sha512-WfqfX/eXGiAd3RJe4VU2snh/ZPwtSjLG4ynQ/vYzvghTh7dHFcI1wl+nrkWG6lGhukOxOsUHfv8dUXr58D0ayg==
 
-"@starknet-io/types-js@^0.7.7", "starknet-types-07@npm:@starknet-io/types-js@^0.7.7":
+"@starknet-io/types-js@^0.7.7":
   version "0.7.7"
   resolved "https://registry.yarnpkg.com/@starknet-io/types-js/-/types-js-0.7.7.tgz#444be5e4e585ec6f599d42d3407280d98b2dfdf8"
   integrity sha512-WLrpK7LIaIb8Ymxu6KF/6JkGW1sso988DweWu7p5QY/3y7waBIiPvzh27D9bX5KIJNRDyOoOVoHVEKYUYWZ/RQ==
