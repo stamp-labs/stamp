@@ -6,16 +6,16 @@ Resolve and resize web3 avatar and token images.
 
 Simply use a valid Stamp URL to display an avatar:
 
-https://cdn.stamp.fyi/avatar/0xeF8305E140ac520225DAf050e2f71d5fBcC543e7
+https://cdn.stamp.fyi/avatar/0xeF8305E140ac520225DAf050e2f71d5fBcC543e7?s=200
 
 ```
-<img src="https://cdn.stamp.fyi/avatar/0xeF8305E140ac520225DAf050e2f71d5fBcC543e7" />
+<img src="https://cdn.stamp.fyi/avatar/0xeF8305E140ac520225DAf050e2f71d5fBcC543e7?s=200" />
 ```
 
 ### URL structure
 
 cdn.stamp.fyi/**{type}**/**{identifier}**?**{params}**  
-cdn.stamp.fyi/**avatar**/**0xeF8305E140ac520225DAf050e2f71d5fBcC543e7**?**s=140**
+cdn.stamp.fyi/**avatar**/**0xeF8305E140ac520225DAf050e2f71d5fBcC543e7**?**s=200**
 
 ### Type
 
