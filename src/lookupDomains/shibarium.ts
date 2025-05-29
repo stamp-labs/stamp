@@ -5,6 +5,8 @@ import constants from '../constants.json';
 
 const MAINNET = '109';
 const TESTNET = '157';
+const PAGE_SIZE = 25;
+const TIMEOUT = 10000;
 
 const API_KEYS = {
   [MAINNET]: process.env.D3_API_KEY_MAINNET,
@@ -19,20 +21,18 @@ export default async function lookupDomains(
 ): Promise<Handle[]> {
   if (!constants.d3[chainId]?.apiUrl || !API_KEYS[chainId]) return [];
 
-  const limit = 25;
-  let skip = 0;
   const allDomains: Handle[] = [];
+  let skip = 0;
   let hasMore = true;
-  const timeout = 10000; // 10 seconds
 
   try {
     while (hasMore) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), timeout);
+        const timeoutId = setTimeout(() => controller.abort(), TIMEOUT);
 
         const response = await fetch(
-          `${constants.d3[chainId].apiUrl}/v1/partner/tokens/EVM/${address}?limit=${limit}&skip=${skip}`,
+          `${constants.d3[chainId].apiUrl}/v1/partner/tokens/EVM/${address}?limit=${PAGE_SIZE}&skip=${skip}`,
           {
             headers: { 'Content-Type': 'application/json', 'Api-Key': API_KEYS[chainId] },
             signal: controller.signal
@@ -59,8 +59,8 @@ export default async function lookupDomains(
         const domains = data.pageItems?.map(item => `${item.sld}.${item.tld}`) || [];
         allDomains.push(...domains);
 
-        hasMore = domains.length === limit;
-        skip += limit;
+        hasMore = domains.length === PAGE_SIZE;
+        skip += PAGE_SIZE;
       } catch (e) {
         capture(e, { input: { address, chainId, skip } });
         break;
