@@ -5,6 +5,8 @@ import constants from '../constants.json';
 
 const MAINNET = '109';
 const TESTNET = '157';
+const PAGE_SIZE = 25;
+const TIMEOUT = 10000;
 
 const API_KEYS = {
   [MAINNET]: process.env.D3_API_KEY_MAINNET,
@@ -19,26 +21,55 @@ export default async function lookupDomains(
 ): Promise<Handle[]> {
   if (!constants.d3[chainId]?.apiUrl || !API_KEYS[chainId]) return [];
 
+  const allDomains: Handle[] = [];
+  let skip = 0;
+  let hasMore = true;
+
   try {
-    const response = await fetch(
-      `${constants.d3[chainId].apiUrl}/v1/partner/tokens/EVM/${address}?limit=25&skip=0`,
-      {
-        headers: { 'Content-Type': 'application/json', 'Api-Key': API_KEYS[chainId] }
+    while (hasMore) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), TIMEOUT);
+
+      try {
+        const response = await fetch(
+          `${constants.d3[chainId].apiUrl}/v1/partner/tokens/EVM/${address}?limit=${PAGE_SIZE}&skip=${skip}`,
+          {
+            headers: { 'Content-Type': 'application/json', 'Api-Key': API_KEYS[chainId] },
+            signal: controller.signal
+          }
+        );
+
+        if (response.status === 404) {
+          break;
+        }
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        let data: { pageItems?: Array<{ sld: string; tld: string }> };
+        try {
+          data = await response.json();
+        } catch (e) {
+          throw new Error(`Invalid JSON response: ${(e as any).message}`);
+        }
+
+        const domains = data.pageItems?.map(item => `${item.sld}.${item.tld}`) || [];
+        allDomains.push(...domains);
+
+        hasMore = domains.length === PAGE_SIZE;
+        skip += PAGE_SIZE;
+      } catch (e) {
+        capture(e, { input: { address, chainId, skip } });
+        break;
+      } finally {
+        clearTimeout(timeoutId);
       }
-    );
-    const data = await response.json();
-
-    if (response.status === 404) {
-      return [];
     }
 
-    if (!response.ok) {
-      throw new Error(`Error fetching data: ${response.status} - ${data.message}`);
-    }
-
-    return data.pageItems?.map(item => `${item.sld}.${item.tld}`) || [];
+    return allDomains;
   } catch (e) {
     capture(e);
-    return [];
+    return allDomains;
   }
 }
