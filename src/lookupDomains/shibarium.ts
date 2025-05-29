@@ -27,10 +27,10 @@ export default async function lookupDomains(
 
   try {
     while (hasMore) {
-      try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), TIMEOUT);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), TIMEOUT);
 
+      try {
         const response = await fetch(
           `${constants.d3[chainId].apiUrl}/v1/partner/tokens/EVM/${address}?limit=${PAGE_SIZE}&skip=${skip}`,
           {
@@ -38,8 +38,6 @@ export default async function lookupDomains(
             signal: controller.signal
           }
         );
-
-        clearTimeout(timeoutId);
 
         if (response.status === 404) {
           break;
@@ -64,6 +62,8 @@ export default async function lookupDomains(
       } catch (e) {
         capture(e, { input: { address, chainId, skip } });
         break;
+      } finally {
+        clearTimeout(timeoutId);
       }
     }
 
