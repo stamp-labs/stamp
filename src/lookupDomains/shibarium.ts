@@ -47,7 +47,7 @@ export default async function lookupDomains(
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
 
-        let data;
+        let data: { pageItems?: Array<{ sld: string; tld: string }> };
         try {
           data = await response.json();
         } catch (e) {
