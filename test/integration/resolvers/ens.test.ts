@@ -17,7 +17,7 @@ describe('resolvers', () => {
     }, 10e3);
 
     it('should resolve', async () => {
-      const result = await resolvers.ens('snowowl.eth');
+      const result = await resolvers.ens('fabien.eth');
 
       expect(result).toBeInstanceOf(Buffer);
       return expect(result.length).toBeGreaterThan(1000);
