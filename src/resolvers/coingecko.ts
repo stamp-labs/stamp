@@ -10,6 +10,7 @@ const COINGECKO_ASSET_PLATFORMS = {
   10: 'optimistic-ethereum',
   137: 'polygon-pos',
   8453: 'base',
+  33139: 'apechain',
   42161: 'arbitrum-one'
 };
 
