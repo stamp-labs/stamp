@@ -117,7 +117,7 @@ function createPropertyResolver(entity: Entity, property: Property) {
       const url = getUrl(value);
       const input = await fetchHttpImage(url);
 
-      if (property === 'cover') return input;
+      if (['cover', 'logo'].includes(property)) return input;
 
       return await resize(input, max, max);
     } catch (e) {
