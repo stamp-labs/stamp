@@ -22,12 +22,12 @@ function normalizeImageUrl(url: string) {
 }
 
 export default async function resolve(domainOrAddress: string) {
-  let request: string;
+  let request: Record<string, any>;
 
   if (isAddress(domainOrAddress)) {
-    request = `{ address: "${getAddress(domainOrAddress)}" }`;
+    request = { address: getAddress(domainOrAddress) };
   } else if (domainOrAddress.endsWith(LENS_EXTENSION)) {
-    request = `{ username: { localName: "${domainOrAddress.split(LENS_EXTENSION)[0]}" } }`;
+    request = { username: { localName: domainOrAddress.split(LENS_EXTENSION)[0] } };
   } else {
     return false;
   }
@@ -39,13 +39,14 @@ export default async function resolve(domainOrAddress: string) {
       }
     } = await graphQlCall(
       `${API_URL}/graphql`,
-      `query Account {
-        account(request: ${request}) {
+      `query Account($request: AccountRequest!) {
+        account(request: $request) {
           metadata {
             picture
           }
         }
-      }`
+      }`,
+      { request }
     );
 
     const img_url = normalizeImageUrl(account?.metadata?.picture);

@@ -55,7 +55,12 @@ async function getOffchainProperty(
     }
   } = await graphQlCall(
     API_URLS[networkId],
-    `query { entry: ${entity}(id: "${id}") { ${QUERIES[property].query} } }`,
+    `query GetEntry($id: String!) {
+      entry: ${entity}(id: $id) {
+        ${QUERIES[property].query}
+      }
+    }`,
+    { id },
     {
       headers: { 'x-api-key': process.env.HUB_API_KEY }
     }
@@ -81,13 +86,14 @@ async function getOnchainProperty(
     }
   } = await graphQlCall(
     API_URLS[networkId],
-    `query {
-      spaces(where: { id_in: [${ids.map(item => `"${item}"`).join(', ')}] }) {
+    `query GetSpaces($ids: [String!]!) {
+      spaces(where: { id_in: $ids }) {
         metadata {
           ${property}
         }
       }
-    }`
+    }`,
+    { ids }
   );
 
   return spaces?.map(space => space.metadata?.[property]).filter(Boolean)[0];

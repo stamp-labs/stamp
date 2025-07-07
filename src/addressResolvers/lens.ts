@@ -9,10 +9,10 @@ const MUTED_ERRORS = ['status code 503', 'status code 429'];
 
 async function apiCall(filterName: string, filters: string[]) {
   const filterValue =
-    filterName === 'addresses' ? `["${filters.join('","')}"]` : `[${filters.join(', ')}]`;
+    filterName === 'addresses' ? filters : filters.map(h => ({ localName: h.replace(/"/g, '') }));
 
-  const query = `query AccountBulk {
-    accountsBulk(request: { ${filterName}: ${filterValue} }) {
+  const query = `query AccountBulk($request: AccountsBulkRequest!) {
+    accountsBulk(request: $request) {
       username {
         localName
         ownedBy
@@ -24,7 +24,7 @@ async function apiCall(filterName: string, filters: string[]) {
     data: {
       data: { accountsBulk }
     }
-  } = await graphQlCall(API_URL, query);
+  } = await graphQlCall(API_URL, query, { request: { [filterName]: filterValue } });
 
   return accountsBulk;
 }
@@ -69,10 +69,7 @@ export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Ad
   if (normalizedHandles.length === 0) return {};
 
   try {
-    const accounts = await apiCall(
-      'usernames',
-      normalizedHandles.map(h => `{ localName: "${h}" }`)
-    );
+    const accounts = await apiCall('usernames', normalizedHandles);
 
     return (
       Object.fromEntries(accounts.map(i => [`${i.username.localName}.lens`, i.username.ownedBy])) ||

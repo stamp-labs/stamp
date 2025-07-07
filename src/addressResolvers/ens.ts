@@ -70,14 +70,15 @@ export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Ad
       }
     } = await graphQlCall(
       constants.ensSubgraph[NETWORK],
-      `query Domains {
-        domains(where: {name_in: ["${normalizedHandles.join('","')}"]}) {
+      `query Domains($handles: [String!]!) {
+        domains(where: {name_in: $handles}) {
           name
           resolvedAddress {
             id
           }
         }
-      }`
+      }`,
+      { handles: normalizedHandles }
     );
 
     for (const item of items) {

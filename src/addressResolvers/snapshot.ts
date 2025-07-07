@@ -13,18 +13,21 @@ export async function lookupAddresses(addresses: Address[]): Promise<Record<Addr
       }
     } = await graphQlCall(
       `${HUB_URL}/graphql`,
-      `query users {
-        users(where: {id_in: ["${addresses.join('","')}"]}) {
+      `query users($addresses: [String!]!) {
+        users(where: {id_in: $addresses}) {
           id
           name
         }
       }`,
+      { addresses },
       {
         headers: { 'x-api-key': process.env.HUB_API_KEY }
       }
     );
 
-    return Object.fromEntries(users.filter(user => user.name).map(user => [user.id, user.name]));
+    return Object.fromEntries(
+      users.filter((user: any) => user.name).map((user: any) => [user.id, user.name])
+    );
   } catch (e) {
     if (!isSilencedError(e)) {
       capture(e, { input: { addresses } });
