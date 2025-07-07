@@ -186,10 +186,16 @@ export const getBaseAssetIconUrl = (chainId: string) => {
 export function graphQlCall(
   url: string,
   query: string,
+  variables?: Record<string, any>,
   options: any = {
     headers: {}
   }
 ) {
+  const data: { query: string; variables?: Record<string, any> } = { query };
+  if (variables) {
+    data.variables = variables;
+  }
+
   return axios({
     url: url,
     method: 'post',
@@ -200,8 +206,6 @@ export function graphQlCall(
       )
     },
     timeout: 5e3,
-    data: {
-      query
-    }
+    data
   });
 }

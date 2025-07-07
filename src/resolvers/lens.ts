@@ -3,7 +3,7 @@ import { graphQlCall, resize } from '../utils';
 import { max } from '../constants.json';
 import { fetchHttpImage } from './utils';
 
-const API_URL = 'https://api-v2.lens.dev';
+const API_URL = 'https://api.lens.xyz';
 const LENS_IPFS_GATEWAY = 'https://gw.ipfs-lens.dev/ipfs/';
 const LENS_EXTENSION = '.lens';
 
@@ -16,15 +16,18 @@ function normalizeImageUrl(url: string) {
       url.split(LENS_IPFS_GATEWAY)[1]
     }`;
   }
+
+  // Return the URL as-is if it's not an IPFS URL
+  return url;
 }
 
 export default async function resolve(domainOrAddress: string) {
-  let request: string;
+  let request: Record<string, any>;
 
   if (isAddress(domainOrAddress)) {
-    request = `{ ownedBy: ["${getAddress(domainOrAddress)}"] }`;
+    request = { address: getAddress(domainOrAddress) };
   } else if (domainOrAddress.endsWith(LENS_EXTENSION)) {
-    request = `{ handles: ["lens/${domainOrAddress.split(LENS_EXTENSION)[0]}"] }`;
+    request = { username: { localName: domainOrAddress.split(LENS_EXTENSION)[0] } };
   } else {
     return false;
   }
@@ -32,30 +35,21 @@ export default async function resolve(domainOrAddress: string) {
   try {
     const {
       data: {
-        data: {
-          profiles: { items }
-        }
+        data: { account }
       }
     } = await graphQlCall(
       `${API_URL}/graphql`,
-      `query Profile {
-        profiles(request: { where: ${request}, limit: Ten }) {
-          items {
-            metadata {
-              picture {
-                ... on ImageSet {
-                  raw {
-                    uri
-                  }
-                }
-              }
-            }
+      `query Account($request: AccountRequest!) {
+        account(request: $request) {
+          metadata {
+            picture
           }
         }
-      }`
+      }`,
+      { request }
     );
 
-    const img_url = normalizeImageUrl(items?.[0]?.metadata?.picture?.raw?.uri);
+    const img_url = normalizeImageUrl(account?.metadata?.picture);
     if (!img_url) return false;
 
     const input = await fetchHttpImage(img_url);
