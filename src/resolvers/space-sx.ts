@@ -18,13 +18,14 @@ async function getSpaceProperty(key: string, url: string, property: 'avatar' | '
     }
   } = await graphQlCall(
     url,
-    `query {
-      spaces(where: { id_in: [${ids.map(item => `"${item}"`).join(', ')}] }) {
+    `query GetSpaces($ids: [String!]!) {
+      spaces(where: { id_in: $ids }) {
         metadata {
           ${property}
         }
       }
-    }`
+    }`,
+    { ids }
   );
 
   const result = spaces?.map(space => space.metadata?.[property]).filter(Boolean)[0];
