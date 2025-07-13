@@ -58,4 +58,20 @@ describe('lookupDomains', () => {
     const result = await lookupDomains('0x220bc93D88C0aF11f1159eA89a885d5ADd3A7Cf6', ['1', '109']);
     expect(result).toEqual(['boorger.eth', 'boorger.shib']);
   });
+
+  it('should return an array of addresses for unstoppable domains', async () => {
+    const result = await lookupDomains(
+      '0xeF8305E140ac520225DAf050e2f71d5fBcC543e7',
+      'unstoppable-domains'
+    );
+    expect(result).toContain('snapshot.crypto');
+  });
+
+  it('should return an empty array if the address does not own any unstoppable domains', async () => {
+    const result = await lookupDomains(
+      '0x76ece6825602294b87a40d783982d83bb8ebcaf7',
+      'unstoppable-domains'
+    );
+    expect(result).toEqual([]);
+  });
 });
