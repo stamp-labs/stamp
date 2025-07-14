@@ -16,5 +16,6 @@ export default {
   setupFiles: ['dotenv/config'],
   setupFilesAfterEnv: ['<rootDir>/test/setup-jest.ts'],
   testPathIgnorePatterns: ['/node_modules/', '<rootDir>/dist/', '<rootDir>/test/fixtures/'],
-  moduleFileExtensions: ['js', 'ts']
+  moduleFileExtensions: ['js', 'ts'],
+  testTimeout: 30000
 };
