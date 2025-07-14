@@ -4,10 +4,10 @@ import { Address, Handle } from '../utils';
 
 export const DEFAULT_CHAIN_ID = 'unstoppable-domains';
 
-// Filter out invalid ENS domains like
-// [0xa410d74c2b6736f223654461c22395a9b49e2c36fcfcbef22962a195a6a67c37].[0xd8cc269d5812cbdfe0adbba6897038c687381383d2e1cf56e0696d3133566d6e].eth
+const SUPPORTED_TLDS = ['sonic'];
+
 function normalizeHandles(handles: Handle[]): Handle[] {
-  return handles.map(h => (/^[.a-z0-9-]+$/.test(h) ? h : '')).filter(h => h);
+  return handles.filter(h => SUPPORTED_TLDS.some(tld => h.endsWith(`.${tld}`)));
 }
 
 export default async function lookupDomains(address: Address, chainId: string): Promise<Handle[]> {

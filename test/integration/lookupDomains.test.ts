@@ -61,10 +61,10 @@ describe('lookupDomains', () => {
 
   it('should return an array of addresses for unstoppable domains', async () => {
     const result = await lookupDomains(
-      '0xeF8305E140ac520225DAf050e2f71d5fBcC543e7',
+      '0x17af7086649580ab880060c92f46fc931ab3588b',
       'unstoppable-domains'
     );
-    expect(result).toContain('snapshot.crypto');
+    expect(result).toContain('boorger.sonic');
   });
 
   it('should return an empty array if the address does not own any unstoppable domains', async () => {
