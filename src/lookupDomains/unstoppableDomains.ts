@@ -14,7 +14,7 @@ export default async function lookupDomains(address: Address, chainId: string): 
   if (chainId !== DEFAULT_CHAIN_ID) return [];
 
   if (!process.env.UNSTOPPABLE_DOMAINS_API_KEY) {
-    throw new Error('UNSTOPPABLE_DOMAINS_API_KEY is not set');
+    return [];
   }
 
   try {
