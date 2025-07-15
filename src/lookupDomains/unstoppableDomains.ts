@@ -2,7 +2,7 @@ import { capture } from '@snapshot-labs/snapshot-sentry';
 import { FetchError, isSilencedError } from '../addressResolvers/utils';
 import { Address, Handle } from '../utils';
 
-export const DEFAULT_CHAIN_ID = 'unstoppable-domains';
+export const DEFAULT_CHAIN_ID = '146';
 
 const SUPPORTED_TLDS = ['sonic'];
 
