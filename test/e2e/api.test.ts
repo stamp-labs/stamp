@@ -1,9 +1,10 @@
-import axios from 'axios';
-import fetch from 'node-fetch';
+import request from 'supertest';
 import redis from '../../src/helpers/redis';
 import { KEY_PREFIX } from '../../src/addressResolvers/cache';
+import { createTestApp } from '../helpers/testServer';
 
-const HOST = `http://localhost:${process.env.PORT || 3003}`;
+const app = createTestApp();
+let server: any;
 
 async function purge(): Promise<void> {
   if (!redis) return;
@@ -15,14 +16,26 @@ async function purge(): Promise<void> {
   transaction.exec();
 }
 
-async function imageToBase64(url: string) {
-  const response = await fetch(url);
-  const buffer = await response.buffer();
-
-  return buffer.toString('base64');
-}
-
 describe('E2E api', () => {
+  beforeAll(async () => {
+    server = app.listen(0); // Use port 0 to get a random available port
+  });
+
+  afterAll(async () => {
+    if (server) {
+      // Force close all connections if available
+      if (server.closeAllConnections) {
+        server.closeAllConnections();
+      }
+      await new Promise<void>((resolve, reject) => {
+        server.close((err: any) => {
+          if (err) reject(err);
+          else resolve();
+        });
+      });
+      server = null;
+    }
+  });
   describe('GET type/TYPE/ID', () => {
     it.todo('returns a 500 status on invalid query');
 
@@ -32,45 +45,43 @@ describe('E2E api', () => {
       it.todo('caches the resized image');
 
       it('returns same space avatar for snapshot legacy and non-legacy format', async () => {
-        expect(await imageToBase64(`${HOST}/space/ens.eth`)).toEqual(
-          await imageToBase64(`${HOST}/space/s:ens.eth`)
+        const response1 = await request(server).get('/space/ens.eth');
+        const response2 = await request(server).get('/space/s:ens.eth');
+        expect(response1.body.toString('base64')).toEqual(response2.body.toString('base64'));
+
+        const response3 = await request(server).get(
+          '/space/sn:0x07c251045154318a2376a3bb65be47d3c90df1740d8e35c9b9d943aa3f240e50'
         );
-        expect(
-          await imageToBase64(
-            `${HOST}/space/sn:0x07c251045154318a2376a3bb65be47d3c90df1740d8e35c9b9d943aa3f240e50`
-          )
-        ).toEqual(
-          await imageToBase64(
-            `${HOST}/space-sx/0x07c251045154318a2376a3bb65be47d3c90df1740d8e35c9b9d943aa3f240e50`
-          )
+        const response4 = await request(server).get(
+          '/space-sx/0x07c251045154318a2376a3bb65be47d3c90df1740d8e35c9b9d943aa3f240e50'
         );
+        expect(response3.body.toString('base64')).toEqual(response4.body.toString('base64'));
       });
 
       it('returns different space avatar for different network', async () => {
-        expect(await imageToBase64(`${HOST}/space/s:ens.eth`)).not.toEqual(
-          await imageToBase64(`${HOST}/space/s-tn:ens.eth`)
-        );
+        const response1 = await request(server).get('/space/s:ens.eth');
+        const response2 = await request(server).get('/space/s-tn:ens.eth');
+        expect(response1.body.toString('base64')).not.toEqual(response2.body.toString('base64'));
       });
 
       it('returns same space cover for snapshot legacy and non-legacy format', async () => {
-        expect(await imageToBase64(`${HOST}/space-cover/test.wa0x6e.eth`)).toEqual(
-          await imageToBase64(`${HOST}/space-cover/s:test.wa0x6e.eth`)
+        const response1 = await request(server).get('/space-cover/test.wa0x6e.eth');
+        const response2 = await request(server).get('/space-cover/s:test.wa0x6e.eth');
+        expect(response1.body.toString('base64')).toEqual(response2.body.toString('base64'));
+
+        const response3 = await request(server).get(
+          '/space-cover/sn:0x07c251045154318a2376a3bb65be47d3c90df1740d8e35c9b9d943aa3f240e50'
         );
-        expect(
-          await imageToBase64(
-            `${HOST}/space-cover/sn:0x07c251045154318a2376a3bb65be47d3c90df1740d8e35c9b9d943aa3f240e50`
-          )
-        ).toEqual(
-          await imageToBase64(
-            `${HOST}/space-cover-sx/0x07c251045154318a2376a3bb65be47d3c90df1740d8e35c9b9d943aa3f240e50`
-          )
+        const response4 = await request(server).get(
+          '/space-cover-sx/0x07c251045154318a2376a3bb65be47d3c90df1740d8e35c9b9d943aa3f240e50'
         );
+        expect(response3.body.toString('base64')).toEqual(response4.body.toString('base64'));
       });
 
       it('returns different space cover for different network', async () => {
-        expect(await imageToBase64(`${HOST}/space-cover/s:test.wa0x6e.eth`)).not.toEqual(
-          await imageToBase64(`${HOST}/space-cover/s-tn:test.wa0x6e.eth`)
-        );
+        const response1 = await request(server).get('/space-cover/s:test.wa0x6e.eth');
+        const response2 = await request(server).get('/space-cover/s-tn:test.wa0x6e.eth');
+        expect(response1.body.toString('base64')).not.toEqual(response2.body.toString('base64'));
       });
     });
 
@@ -101,12 +112,9 @@ describe('E2E api', () => {
 
     describe('on lookup_addresses', () => {
       function fetchLookupAddresses(params: any) {
-        return axios({
-          url: HOST,
-          method: 'POST',
-          responseType: 'json',
-          data: { method: 'lookup_addresses', params }
-        });
+        return request(server)
+          .post('/')
+          .send({ method: 'lookup_addresses', params });
       }
 
       describe('when not passing an array as params', () => {
@@ -119,8 +127,9 @@ describe('E2E api', () => {
           ['a boolean', true]
         ];
         // @ts-ignore
-        it.each(tests)('returns an error when passing %s', async (title: string, params: any) => {
-          expect(fetchLookupAddresses(params)).rejects.toThrowError(/status code 400/);
+        it.each(tests)('returns an error when passing %s', async (_: string, params: any) => {
+          const response = await fetchLookupAddresses(params);
+          expect(response.status).toBe(400);
         });
       });
 
@@ -133,7 +142,7 @@ describe('E2E api', () => {
           ]);
 
           expect(response.status).toBe(200);
-          expect(response.data.result).toEqual({
+          expect(response.body.result).toEqual({
             '0xE6D0Dd18C6C3a9Af8C2FaB57d6e6A38E29d513cC': 'sdntestens.eth',
             '0xe6d0dd18c6c3a9af8c2fab57d6e6a38e29d513cc': 'sdntestens.eth'
           });
@@ -149,7 +158,7 @@ describe('E2E api', () => {
           ]);
 
           expect(response.status).toBe(200);
-          expect(response.data.result).toEqual({
+          expect(response.body.result).toEqual({
             '0x07FF6B17F07C4D83236E3FC5F94259A19D1ED41BBCF1822397EA17882E9B038D': 'Checkpoint',
             '0x07ff6b17f07c4d83236e3fc5f94259a19d1ed41bbcf1822397ea17882e9b038d': 'Checkpoint'
           });
@@ -167,7 +176,7 @@ describe('E2E api', () => {
           ]);
 
           expect(response.status).toBe(200);
-          expect(response.data.result).toEqual({
+          expect(response.body.result).toEqual({
             '0x07FF6B17F07C4D83236E3FC5F94259A19D1ED41BBCF1822397EA17882E9B038D': 'Checkpoint',
             '0x07ff6b17f07c4d83236e3fc5f94259a19d1ed41bbcf1822397ea17882e9b038d': 'Checkpoint',
             '0xE6D0Dd18C6C3a9Af8C2FaB57d6e6A38E29d513cC': 'sdntestens.eth',
