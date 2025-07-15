@@ -60,18 +60,12 @@ describe('lookupDomains', () => {
   });
 
   it('should return an array of addresses for unstoppable domains', async () => {
-    const result = await lookupDomains(
-      '0x17af7086649580ab880060c92f46fc931ab3588b',
-      'unstoppable-domains'
-    );
+    const result = await lookupDomains('0x17af7086649580ab880060c92f46fc931ab3588b', '146');
     expect(result).toContain('boorger.sonic');
   });
 
   it('should return an empty array if the address does not own any unstoppable domains', async () => {
-    const result = await lookupDomains(
-      '0x76ece6825602294b87a40d783982d83bb8ebcaf7',
-      'unstoppable-domains'
-    );
+    const result = await lookupDomains('0x76ece6825602294b87a40d783982d83bb8ebcaf7', '146');
     expect(result).toEqual([]);
   });
 });
