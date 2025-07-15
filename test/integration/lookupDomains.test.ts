@@ -60,7 +60,7 @@ describe('lookupDomains', () => {
   });
 
   it('should return an array of addresses for unstoppable domains', async () => {
-    const result = await lookupDomains('0x17af7086649580ab880060c92f46fc931ab3588b', '146');
+    const result = await lookupDomains('0x220bc93D88C0aF11f1159eA89a885d5ADd3A7Cf6', '146');
     expect(result).toContain('boorger.sonic');
   });
 
