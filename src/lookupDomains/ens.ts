@@ -1,6 +1,5 @@
 import { capture } from '@snapshot-labs/snapshot-sentry';
-import { FetchError, isSilencedError } from '../addressResolvers/utils';
-import { Address, graphQlCall, Handle } from '../utils';
+import { Address, graphQlCall, Handle, FetchError, isSilencedError } from '../utils';
 import constants from '../constants.json';
 
 export const DEFAULT_CHAIN_ID = '1';

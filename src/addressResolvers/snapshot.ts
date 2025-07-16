@@ -1,6 +1,5 @@
 import { capture } from '@snapshot-labs/snapshot-sentry';
-import { Address, graphQlCall, Handle } from '../utils';
-import { FetchError, isSilencedError } from './utils';
+import { Address, graphQlCall, Handle, FetchError, isSilencedError } from '../utils';
 
 const HUB_URL = process.env.HUB_URL ?? 'https://hub.snapshot.org';
 export const NAME = 'Snapshot';

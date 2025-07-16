@@ -1,6 +1,6 @@
 import { capture } from '@snapshot-labs/snapshot-sentry';
-import { Address, Handle } from '../utils';
-import { FetchError, isSilencedError, withoutEmptyValues } from './utils';
+import { Address, Handle, FetchError, isSilencedError } from '../utils';
+import { withoutEmptyValues } from './utils';
 import { DNSConnect } from '@webinterop/dns-connect';
 import constants from '../constants.json';
 

@@ -11,6 +11,11 @@ describe('getOwner', () => {
       const result = await getOwner('snapshot-test-1.shib', '157');
       expect(result).toContain('0x91FD2c8d24767db4Ece7069AA27832ffaf8590f3');
     });
+
+    it('should return an address for sonic', async () => {
+      const result = await getOwner('boorger.sonic', '146');
+      expect(result).toContain('0x220bc93D88C0aF11f1159eA89a885d5ADd3A7Cf6');
+    });
   });
 
   describe('on unclaimed names', () => {
@@ -41,6 +46,11 @@ describe('getOwner', () => {
 
   it('should return an empty address for puppynet when domain does not exist', async () => {
     const result = await getOwner('invalid-domain-h.shib', '157');
+    expect(result).toContain('0x0000000000000000000000000000000000000000');
+  });
+
+  it('should return an empty address for sonic when domain does not exist', async () => {
+    const result = await getOwner('invalid-domain-h.sonic', '146');
     expect(result).toContain('0x0000000000000000000000000000000000000000');
   });
 });

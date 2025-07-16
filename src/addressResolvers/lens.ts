@@ -1,6 +1,6 @@
 import { capture } from '@snapshot-labs/snapshot-sentry';
-import { FetchError, isSilencedError, isEvmAddress } from './utils';
-import { graphQlCall, Address, Handle } from '../utils';
+import { isEvmAddress } from './utils';
+import { graphQlCall, Address, Handle, FetchError, isSilencedError } from '../utils';
 
 export const NAME = 'Lens';
 const API_URL = 'https://api.lens.xyz/graphql';

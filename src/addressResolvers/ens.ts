@@ -2,8 +2,15 @@ import { getAddress } from '@ethersproject/address';
 import snapshot from '@snapshot-labs/snapshot.js';
 import { capture } from '@snapshot-labs/snapshot-sentry';
 import { ens_normalize } from '@adraffy/ens-normalize';
-import { provider as getProvider, isSilencedError, FetchError, isEvmAddress } from './utils';
-import { Address, graphQlCall, Handle } from '../utils';
+import { isEvmAddress } from './utils';
+import {
+  Address,
+  graphQlCall,
+  Handle,
+  provider as getProvider,
+  isSilencedError,
+  FetchError
+} from '../utils';
 import constants from '../constants.json';
 
 export const NAME = 'Ens';

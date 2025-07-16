@@ -1,14 +1,8 @@
 import snapshot from '@snapshot-labs/snapshot.js';
 import Resolution, { NamingServiceName } from '@unstoppabledomains/resolution';
 import { capture } from '@snapshot-labs/snapshot-sentry';
-import {
-  provider as getProvider,
-  withoutEmptyValues,
-  isSilencedError,
-  FetchError,
-  isEvmAddress
-} from './utils';
-import { Address, Handle } from '../utils';
+import { withoutEmptyValues, isEvmAddress } from './utils';
+import { Address, Handle, provider as getProvider, isSilencedError, FetchError } from '../utils';
 
 export const NAME = 'Unstoppable Domains';
 const NETWORK = '137';

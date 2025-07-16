@@ -40,10 +40,10 @@ async function getClaimedOwner(handle: Handle, chainId: string): Promise<Address
   return data.owner || false;
 }
 
-async function getResolvedAddress(handle: Handle, chainId: string): Promise<Address> {
+async function getResolvedAddress(handle: Handle, chainId: string): Promise<Address | null> {
   const dnsConnect = new DNSConnect({ dns: { forwarderDomain: constants.d3[chainId].forwarder } });
 
-  return (await dnsConnect.resolve(handle, NETWORK)) || EMPTY_ADDRESS;
+  return (await dnsConnect.resolve(handle, NETWORK)) || null;
 }
 
 /**
@@ -51,10 +51,12 @@ async function getResolvedAddress(handle: Handle, chainId: string): Promise<Addr
  * In case the name has not been claimed (when bought with a credit card),
  * it will return the resolved address.
  **/
-export default async function getOwner(handle: Handle, chainId = MAINNET): Promise<Address> {
+export default async function getOwner(handle: Handle, chainId = MAINNET): Promise<Address | null> {
   const address = await getClaimedOwner(handle, chainId);
 
-  if (address) return address;
+  if (address) {
+    return address === EMPTY_ADDRESS ? null : address;
+  }
 
   return getResolvedAddress(handle, chainId);
 }

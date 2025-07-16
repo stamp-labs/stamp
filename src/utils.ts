@@ -27,6 +27,32 @@ const RESIZE_FITS = ['cover', 'contain', 'fill', 'inside', 'outside'];
 
 export const EMPTY_ADDRESS = '0x0000000000000000000000000000000000000000';
 
+const broviderUrl = process.env.BROVIDER_URL || 'https://rpc.snapshot.org';
+
+export class FetchError extends Error {}
+
+export function provider(
+  network: string,
+  providerOptions: { broviderUrl?: string; timeout?: number } = { broviderUrl, timeout: 5e3 }
+) {
+  return snapshot.utils.getProvider(network, providerOptions);
+}
+
+export function isSilencedError(error: any, additionalMessages?: string[]): boolean {
+  return (
+    [
+      'invalid token ID',
+      'is not supported',
+      'execution reverted',
+      'status=504',
+      ...(additionalMessages || [])
+    ].some(m => error.message?.toLowerCase()?.includes(m)) ||
+    ['TIMEOUT', 'ECONNABORTED', 'ETIMEDOUT', 'ECONNRESET', 504].some(c =>
+      (error.error?.code || error.error?.status || error.code)?.includes(c)
+    )
+  );
+}
+
 export function getProvider(network: number): StaticJsonRpcProvider {
   if (!providers[`_${network}`])
     providers[`_${network}`] = new StaticJsonRpcProvider(

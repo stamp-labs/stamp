@@ -1,6 +1,5 @@
 import { capture } from '@snapshot-labs/snapshot-sentry';
-import { FetchError, isSilencedError } from '../addressResolvers/utils';
-import { Address, Handle } from '../utils';
+import { Address, Handle, FetchError, isSilencedError } from '../utils';
 
 export const DEFAULT_CHAIN_ID = '146';
 

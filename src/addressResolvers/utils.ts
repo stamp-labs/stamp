@@ -1,10 +1,5 @@
-import snapshot from '@snapshot-labs/snapshot.js';
 import { getAddress } from '@ethersproject/address';
 import { Address, Handle, EMPTY_ADDRESS } from '../utils';
-
-const broviderUrl = process.env.BROVIDER_URL || 'https://rpc.snapshot.org';
-
-export class FetchError extends Error {}
 
 export function isEvmAddress(address: Address): boolean {
   return /^0x[a-fA-F0-9]{40}$/.test(address);
@@ -12,13 +7,6 @@ export function isEvmAddress(address: Address): boolean {
 
 export function isStarknetAddress(address: Address): boolean {
   return /^0x[a-fA-F0-9]{64}$/.test(address);
-}
-
-export function provider(
-  network: string,
-  providerOptions: { broviderUrl?: string; timeout?: number } = { broviderUrl, timeout: 5e3 }
-) {
-  return snapshot.utils.getProvider(network, providerOptions);
 }
 
 export function withoutEmptyValues(obj: Record<string, any>) {
@@ -44,21 +32,6 @@ export function normalizeAddresses(addresses: Address[]): Address[] {
 
 export function normalizeHandles(handles: Handle[]): Handle[] {
   return handles.filter(h => /^[^\s]*\.[^\s]*$/.test(h)).map(h => h.toLowerCase());
-}
-
-export function isSilencedError(error: any, additionalMessages?: string[]): boolean {
-  return (
-    [
-      'invalid token ID',
-      'is not supported',
-      'execution reverted',
-      'status=504',
-      ...(additionalMessages || [])
-    ].some(m => error.message?.includes(m)) ||
-    ['TIMEOUT', 'ECONNABORTED', 'ETIMEDOUT', 'ECONNRESET', 504].some(c =>
-      (error.error?.code || error.error?.status || error.code)?.includes(c)
-    )
-  );
 }
 
 export function mapOriginalInput(
