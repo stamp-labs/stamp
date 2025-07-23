@@ -46,7 +46,7 @@ router.get(`/clear/:type(${TYPE_CONSTRAINTS})/:id`, async (req, res) => {
     let result = false;
 
     if (type === 'address' || type === 'name') {
-      result = await clearCache(id);
+      result = await clearCache(id, type);
     } else {
       const { address, network, w, h, fallback, cb, fit } = await parseQuery(id, type, {
         s: constants.max,
