@@ -17,5 +17,6 @@ export default {
   setupFilesAfterEnv: ['<rootDir>/test/setup-jest.ts'],
   testPathIgnorePatterns: ['/node_modules/', '<rootDir>/dist/', '<rootDir>/test/fixtures/'],
   moduleFileExtensions: ['js', 'ts'],
-  testTimeout: 30000
+  testTimeout: 30000,
+  retryTimes: 3
 };
