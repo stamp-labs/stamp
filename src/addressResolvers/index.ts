@@ -86,6 +86,6 @@ export async function resolveNames(handles: Handle[]): Promise<Record<Handle, Ad
   return mapOriginalInput(handles, result);
 }
 
-export function clearCache(input: string): Promise<boolean> {
-  return clear(normalizeAddresses([input])[0]);
+export function clearCache(input: string, type: 'address' | 'name'): Promise<boolean> {
+  return clear(type === 'address' ? normalizeAddresses([input])[0] : normalizeHandles([input])[0]);
 }
