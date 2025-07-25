@@ -34,7 +34,9 @@ router.post('/', async (req, res) => {
     return rpcSuccess(res, result, id);
   } catch (e) {
     const err = e as any;
-    capture(err.error ? new Error(err.error) : err);
+    if (err.code !== 400) {
+      capture(err.error ? new Error(err.error) : err);
+    }
     return rpcError(res, 500, e, id);
   }
 });
